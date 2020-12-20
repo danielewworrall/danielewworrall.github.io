@@ -1,0 +1,24 @@
+---
+title: "Effective theories"
+date: 2019-12-29 00:00:00 +0000
+tags: probability bayesianism Jaynes philosophy effective-theories
+---
+**This is a follow-on post from ["On the 'invention' of randomness"]({% post_url blog/2019-12-15-randomness %})**
+
+# Get real
+In my [previous post]({% post_url blog/2019-12-15-randomness %}) I talked about the *invention of randomness*. Randomness, some claim, can be viewed as a post hoc invention used to fill in the cracks and account for observer ignorance. Critically, it is a quantitative way to model everything I do not know and everything I do know but am too lazy to model. You might say it is the theory of known unknowns. This closed on a (somewhat uninformed) discussion on quantum theory, where I pointed towards the conundrum in the quantum physics community as to how to interpret wavefunctions. What is striking is that quantum mechanics works really well, the maths appears to be correct as far as we all know. The issue is that we just don't know what it describes.
+
+This thought left me with a slight feeling of déjà vu. It smacks a bit of an *effective theory*. An effective theory is a just fancy name for any theory, which describes *effects* and not underlying causes. A much cited example of an effective theory is *thermodynamics*. In thermodynamics, we might ask questions such as "If I heat up this gas, how much will it expand"? Such a question is of central importance to the automobile industry. The thermodynamicist's answer might say something like, if the gas is *ideal* and at constant pressure then by Boyle's Law volume is proportional to temperature et cetera. In the laws of thermodynamics we never actually see what is really going on mechanically when I add heat to my gas. Heating a gas is essentially the act of adding energy to molecules, i.e. we knock them about a bit and make them whizz about faster. This added momentum causes molecules to knock into each other more often and with higher impulse upon contact, causing a rise in pressure, which would lead to a volumetric expansion. Nowhere in all the equations I was tortured with in first-year undergraduate thermodynamics class did we ever talk about molecules. In applying the laws of thermodynamics, engineers regularly skip the fiddly bit of having to model the underlying molecular dynamics giving rise to all the observed phenomena of temperature and pressure etc. That's because, thermodynamics is an effective theory.
+
+In fact, in the 19th and early 20th century, many of the laws of thermodynamics had already been recorded empirically. Where they came from, however, was a big mystery. Why should temperature and volume be proportional to one another anyway? The theory that matter was made of atoms inspired the *kinetic theory of gases* and the closely linked *statistical mechanics*, which sought to address this gap in our understanding. Under the law of large number, the motion of particles explains intrinsic properties such as temperature and pressure. So engineers and lazy people like myself can get away with using a theory that has no connection with the underlying physics of things, but just models observed effects. I find this quite profound. We need not actually complicate ours lives with the cumbersome task of modelling reality. To quote a friend who recently went through a difficult breakup, "Reality sucks."
+
+For the purists, however, modelling reality is important. Some, like Judea Pearl, poo poo effective theories as a sophisticated form of curve fitting. Underlying causational models are important in the end, thermodynamics does have its limits: low pressures, high pressures, relativistic velocities and so forth. It is in these limits that we have to resort to the more detailed (and realistic) kinetic theory. One small observation is that we refer to quantities such as pressure, volume, and temperature as *properties*. They are collective properties of a gas, since note that we cannot talk of an individual molecule having temperature or pressure or volume. In some sense, these quantities are not fundamental at all, but humans have invented them to make life easier. Why does water freeze? Because it's cold. In fact, even talking about a liquid freezing only makes sense when we have invented material *phases* and begin to think of a collection of water molecules as forming crystals. In analogy to machine learning, we might see these quantities as good *features*. Feature themselves are not fundamental, they describe certain configurations of inputs, which are helpful for downstream tasks.
+
+# Where am I heading with all of this?
+
+
+- Effective theories: do we need reality? Is reality even important
+- Correlation versus causation
+- The Scientific Method
+- Thermal physics, is temperature real?
+- Gerard 't Hooft: automata

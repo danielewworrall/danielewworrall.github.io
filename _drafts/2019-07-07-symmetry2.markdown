@@ -1,0 +1,31 @@
+---
+title: "Symmetry 2: A Brief Sketch"
+date: 2019-07-07 00:00:00 +0000
+tags: equivariance deep-learning convolution
+---
+# The universe is symmetrical
+In the last few years, there has been a lot of interest in an area called *equivariance*. Synonyms include, *symmetry*, *invariance*, and *covariance* (different to the covariance we see in statistics) and I will probably use them interchangeably. In this and some planned posts, I hope to demystify what equivariance is, why you should be excited about it, and what this implies for the field of machine learning. Before we can understand equivariance, however, we are going to take a detour into physics.
+
+Anyone familiar with modern physics will know that it is written entirely from the point of view of invariances. Let's consider a high school example. If I hurl a tennis ball into the air, Newton's laws of motion will pull it back down to Earth. So much is true whether I hurled it in London or in Amsterdam. It also does not matter whether I'm facing due North or into the Sun---admittedly there is not much Sun in either London or Amsterdam. Furthermore, I could stand on top of a train, Great Escape style, and neglecting wind resistance, those very same familiar laws of physics apply. Physicists and mathematicians say that the laws of physics are *invariant* to position, orientation, and velocity (as long as you're not travelling close to the speed of light).
+
+The fact that the laws of physics do not depend on where you are is a fundament of the field, and *it allows us to make predictions*. If the physics in Kolkatta were different to the physics in Chicago, imagine the vast amounts of effort required to figure them out, (not to mention the number of papers we would publish as a result). That we only need to figure out one set of rules that apply everywhere not only saves time and effort, but in some sense, it provides a minimal description of the universe. If I am to make a tentative machine learning analogy, the existence of invariances allows scientists to *generalise*. Beyond position, orientation, and velocity, physics actually hosts a whole league of invariances from the exotic $$SU(3)$$ symmetries of quantum chromodynamics to the gauge symmetries of electromagnetism.
+
+"Now this is all very nice and fancy, but how does it help me progress in my noble endeavour to build the world's most accurate dog detector", you say. In essence, the aim of machine learning scientists in the field of equivariance is to adopt the 100+ year long trend in physics and related fields, and implement symmetry principles in our very own corner of science. The promised payoffs are better generalisation (which naturally implies better data efficiency), tighter control of what our models can learn, and some beautiful maths.
+
+# Symmetry in machine learning
+So let's consider some examples of symmetry in machine learning. A common example I like to give is from classification. In the dog picture below, we see two dogs, indeed, the exact same dog side-by-side. Both images contain the exact same semantic content, but at a horizontal translation, indicated by the arrows. Now to a human, this is trivial and what I have just told you has probably not revolutionised your world, but to a computer this is not the case. It just sees two different images. What a computer's visual system lacks is a mechanism to say that these two images are of the same concept, but transformed versions of each other.
+
+![A cute pic of a dog](/media/translated_doggie.png)
+
+# What is symmetry?
+Let's lay down this idea with a little mathematics. We are going to denote a function $$f: \mathcal{X} \to \mathcal{Y}$$ from image space $$\mathcal{X}$$ to some output space $$\mathcal{Y}$$. This function could represent a single neural network layer, or an entire neural net. And the output space $$\mathcal{Y}$$ could be a label space, another image space, an activation space or something else entirely. We are also going to introduce something called a *transformation operator* $$\mathcal{T}_\theta: \mathcal{X} \to \mathcal{X}$$. This is also a very abstract concept. If $$\mathcal{X}$$ is image space, then $$T_\theta$$ could represent a rotation for instance.
+
+We say that $$f$$ is *invariant* to $$T_\theta$$ if for all $$\theta$$
+
+$$
+f(x) = f(T_{\theta}[x]).
+$$
+
+The set of all $$T_\theta$$ such that this property holds is called the *symmetries* of $$f$$. Now we usually assume that $$f$$ may represent some groundtruth function, out there in the universe, which we are trying to discover. It is the ultimate dog classification function, or the ultimate French to Japanese mapping. If this is the case, then $$f$$ really represents a *task*, and so **symmetry is a property of the task, not the data**. This is a common misconception many stumble into. The field of equivariance is dedicated to building expressive functions $$f$$, with built-in symmetries $$\{T_\theta\}_\theta$$.
+
+In the next post, we'll dive into to maths behind equivariance and start to really build up one of the languages in which we can think about symmetry in machine learning.

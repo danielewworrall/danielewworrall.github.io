@@ -1,0 +1,11 @@
+---
+title:  "Witnessing atrocities: quantifying villages destruction in Darfur with crowdsourcing and transfer learning"
+date: 2018-12-08
+authors: Julien Cornebise\*, Daniel E Worrall\*, Micah Farfour, Milena Marin
+venue: NeurIPS AI for Social Good Workshop
+paperurl: https://aiforsocialgood.github.io/2018/pdfs/track1/80-main_light.pdf
+---
+### Abstract
+We report the first, to the best of our knowledge, hand-in-hand collaboration between human rights activists and machine learners, leveraging crowdsourcing and transfer learning to automatically analyze satellite imagery, at country-wide scale, for conflict reporting. This will allow for large-scale quantitative evidence gathering, beyond closed borders, usable in conjunction with survivors testimonials to demand justice and accountability.
+
+{% bibliography --query @*[title={{ page.title }}] %}
