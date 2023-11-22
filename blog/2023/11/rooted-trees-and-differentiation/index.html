@@ -1,0 +1,703 @@
+
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+
+<meta charset="utf-8">
+
+
+
+<!-- begin SEO -->
+
+
+
+
+
+
+
+
+
+<title>On rooted trees and differentiation - Daniel Worrall</title>
+
+
+
+
+
+
+
+<meta property="og:locale" content="en-US">
+<meta property="og:site_name" content="Daniel Worrall">
+<meta property="og:title" content="On rooted trees and differentiation">
+
+
+  <link rel="canonical" href="https://danielewworrall.github.io/blog/2023/11/rooted-trees-and-differentiation/">
+  <meta property="og:url" content="https://danielewworrall.github.io/blog/2023/11/rooted-trees-and-differentiation/">
+
+
+
+  <meta property="og:description" content="The chain rule for higher order derivatives boosts a wealth of beautiful mathematical structure touching the theory of special rooted trees, group theory, combinatorics of integer partitions, order theory, and many others.">
+
+
+
+
+
+  
+
+  
+
+
+
+
+
+  <meta property="og:type" content="article">
+  <meta property="article:published_time" content="2023-11-22T00:00:00+01:00">
+
+
+
+
+
+
+
+
+  <script type="application/ld+json">
+    {
+      "@context" : "http://schema.org",
+      "@type" : "Person",
+      "name" : "Daniel Worrall",
+      "url" : "https://danielewworrall.github.io",
+      "sameAs" : null
+    }
+  </script>
+
+
+
+
+
+
+<!-- end SEO -->
+
+
+<link href="https://danielewworrall.github.io/feed.xml" type="application/atom+xml" rel="alternate" title="Daniel Worrall Feed">
+
+<!-- http://t.co/dKP3o1e -->
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="https://danielewworrall.github.io/assets/css/main.css">
+
+<meta http-equiv="cleartype" content="on">
+    
+
+<!-- start custom head snippets -->
+
+<link rel="apple-touch-icon" sizes="57x57" href="https://danielewworrall.github.io/images/apple-touch-icon-57x57.png?v=M44lzPylqQ">
+<link rel="apple-touch-icon" sizes="60x60" href="https://danielewworrall.github.io/images/apple-touch-icon-60x60.png?v=M44lzPylqQ">
+<link rel="apple-touch-icon" sizes="72x72" href="https://danielewworrall.github.io/images/apple-touch-icon-72x72.png?v=M44lzPylqQ">
+<link rel="apple-touch-icon" sizes="76x76" href="https://danielewworrall.github.io/images/apple-touch-icon-76x76.png?v=M44lzPylqQ">
+<link rel="apple-touch-icon" sizes="114x114" href="https://danielewworrall.github.io/images/apple-touch-icon-114x114.png?v=M44lzPylqQ">
+<link rel="apple-touch-icon" sizes="120x120" href="https://danielewworrall.github.io/images/apple-touch-icon-120x120.png?v=M44lzPylqQ">
+<link rel="apple-touch-icon" sizes="144x144" href="https://danielewworrall.github.io/images/apple-touch-icon-144x144.png?v=M44lzPylqQ">
+<link rel="apple-touch-icon" sizes="152x152" href="https://danielewworrall.github.io/images/apple-touch-icon-152x152.png?v=M44lzPylqQ">
+<link rel="apple-touch-icon" sizes="180x180" href="https://danielewworrall.github.io/images/apple-touch-icon-180x180.png?v=M44lzPylqQ">
+<link rel="icon" type="image/png" href="https://danielewworrall.github.io/images/favicon-32x32.png?v=M44lzPylqQ" sizes="32x32">
+<link rel="icon" type="image/png" href="https://danielewworrall.github.io/images/android-chrome-192x192.png?v=M44lzPylqQ" sizes="192x192">
+<link rel="icon" type="image/png" href="https://danielewworrall.github.io/images/favicon-96x96.png?v=M44lzPylqQ" sizes="96x96">
+<link rel="icon" type="image/png" href="https://danielewworrall.github.io/images/favicon-16x16.png?v=M44lzPylqQ" sizes="16x16">
+<link rel="manifest" href="https://danielewworrall.github.io/images/manifest.json?v=M44lzPylqQ">
+<link rel="mask-icon" href="https://danielewworrall.github.io/images/safari-pinned-tab.svg?v=M44lzPylqQ" color="#000000">
+<link rel="shortcut icon" href="/images/favicon.ico?v=M44lzPylqQ">
+<meta name="msapplication-TileColor" content="#000000">
+<meta name="msapplication-TileImage" content="https://danielewworrall.github.io/images/mstile-144x144.png?v=M44lzPylqQ">
+<meta name="msapplication-config" content="https://danielewworrall.github.io/images/browserconfig.xml?v=M44lzPylqQ">
+<meta name="theme-color" content="#ffffff">
+<link rel="stylesheet" href="https://danielewworrall.github.io/assets/css/academicons.css"/>
+
+<script type="text/x-mathjax-config"> MathJax.Hub.Config({ TeX: { equationNumbers: { autoNumber: "all" } } }); </script>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/latest.js?config=TeX-MML-AM_CHTML' async></script>
+
+<link rel="stylesheet" type="text/css" href="https://tikzjax.com/v1/fonts.css">
+<script src="https://tikzjax.com/v1/tikzjax.js"></script>
+
+<!-- end custom head snippets -->
+
+  </head>
+
+  <body>
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+    
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        <button><div class="navicon"></div></button>
+        <ul class="visible-links">
+          <li class="masthead__menu-item masthead__menu-item--lg"><a href="https://danielewworrall.github.io/">Daniel Worrall</a></li>
+          
+            
+            <li class="masthead__menu-item"><a href="https://danielewworrall.github.io/publications/">Publications</a></li>
+          
+            
+            <li class="masthead__menu-item"><a href="https://danielewworrall.github.io/talks/">Talks</a></li>
+          
+            
+            <li class="masthead__menu-item"><a href="https://danielewworrall.github.io/teaching/">Teaching</a></li>
+          
+            
+            <li class="masthead__menu-item"><a href="https://danielewworrall.github.io/blog/">Blog</a></li>
+          
+        </ul>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+    
+
+
+
+
+
+<div id="main" role="main">
+  
+
+
+  <div class="sidebar sticky">
+  
+
+
+
+<div itemscope itemtype="http://schema.org/Person">
+
+  <div class="author__avatar">
+    
+    	<img src="https://danielewworrall.github.io/images/me.jpg" class="author__avatar" alt="Daniel Worrall">
+    
+  </div>
+
+  <div class="author__content">
+    <h3 class="author__name">Daniel Worrall</h3>
+    <p class="author__bio">Machine Learning Researcher</p>
+  </div>
+
+  <div class="author__urls-wrapper">
+    <button class="btn btn--inverse">Follow</button>
+    <ul class="author__urls social-icons">
+      
+        <li><i class="fa fa-fw fa-map-marker" aria-hidden="true"></i> London</li>
+      
+      
+      
+      
+        <li><a href="mailto:daniel.e.w.worrall at gmail.com"><i class="fas fa-fw fa-envelope" aria-hidden="true"></i> Email</a></li>
+      
+      
+       
+      
+        <li><a href="https://twitter.com/danielewworrall"><i class="fab fa-fw fa-twitter-square" aria-hidden="true"></i> Twitter</a></li>
+      
+      
+      
+      
+        <li><a href="https://www.linkedin.com/in/https://www.linkedin.com/in/daniel-worrall-46a43238/"><i class="fab fa-fw fa-linkedin" aria-hidden="true"></i> LinkedIn</a></li>
+      
+      
+      
+      
+      
+      
+        <li><a href="https://github.com/danielewworrall"><i class="fab fa-fw fa-github" aria-hidden="true"></i> Github</a></li>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+        <li><a href="https://scholar.google.com/citations?user=613GPbQAAAAJ&hl=en"><i class="fas fa-fw fa-graduation-cap"></i> Google Scholar</a></li>
+      
+      
+      
+      
+      
+    </ul>
+  </div>
+</div>
+
+  
+  </div>
+
+
+  <article class="page" itemscope itemtype="http://schema.org/CreativeWork">
+    <meta itemprop="headline" content="On rooted trees and differentiation">
+    <meta itemprop="description" content="The chain rule for higher order derivatives boosts a wealth of beautiful mathematical structure touching the theory of special rooted trees, group theory, combinatorics of integer partitions, order theory, and many others.">
+    <meta itemprop="datePublished" content="November 22, 2023">
+    
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          <h1 class="page__title" itemprop="headline">On rooted trees and differentiation
+</h1>
+          
+            <p class="page__meta"><i>22 November 2023</i>,
+
+
+  
+	  10 minute read
+	
+</p>
+          
+        
+
+        
+
+        
+
+        </header>
+      
+
+      <section class="page__content" itemprop="text">
+        <h1 id="introduction">Introduction</h1>
+<p>The chain rule lies at the heart of the backpropagation algorithm in deep learning. Unbeknownst to many though, the chain rule for higher order derivatives boasts a wealth of beautiful mathematical structure touching the theory of special rooted trees, group theory, combinatorics of integer partitions, order theory, and many others. I’ve been meaning to write this post for a long time, but in the last year work has been quite busy. I’m glad I can finally share with you the beautiful maths connecting special rooted trees and differentiation.</p>
+
+<h3 id="the-chain-rule">The chain rule</h3>
+<p>We start with a composition of functions
+\begin{align}
+    \textbf{z} = f(g(\textbf{x}))
+\end{align}
+where $f$ and $g$ are vector-in vector-out functions. We can introduce an intermediate variable $\textbf{y} = g(\textbf{x})$ so that $\textbf{z} = f(\textbf{y})$. The derivative of $\textbf{z}$ with respect to $\textbf{x}$ is then
+\begin{align}
+    \frac{\partial \textbf{z}}{\partial \textbf{x}} = \frac{\partial \textbf{z}}{\partial \textbf{y}} \frac{\partial \textbf{y}}{\partial \textbf{x}}.
+\end{align}
+In any contemporary machine learning masters course, this is about as far as we go. Couple the chain rule with dynamic programming and you get the backpropagation algorithm and forward-mode differentiation. And for most practitioners, we do not even need to know as much. With the advent of packages like <a href="https://jax.readthedocs.io/en/latest/notebooks/quickstart.html">JAX</a> all this machinery is hidden away. Well not today!</p>
+
+<p>Now while vector notation is neat, it’s actually really unhelpful when we wish to do calculus. Each Jacobian in the above expression is a matrix and I always forget how to order the rows and columns properly. Furthermore, the following is going to involve a lot of vector derivatives, matrix derivatives, and higher order tensor derivatives, which can all be very unwieldy, so to ease notation we shall adopt index notation instead. As we shall see, switching up our notation frequently is going to help our understanding and aid our ability to generalize.</p>
+
+<p>So using $z^i$ to denote the $i$th component of a vector $\textbf{z}$, we could write
+\begin{align}
+    \frac{\partial z^i}{\partial x^j} = \sum_{\alpha} \frac{\partial z^i}{\partial y^\alpha} \frac{\partial y^\alpha}{\partial x^j}.
+\end{align}
+As a second notational step, we are going to denote differentiation of a function $h$ with respect to the $\alpha$th dimension of its input as $h_\alpha$. Notice we do not need to make  reference to $y$ in this notation, since it is understood at we differentiate with respect to the input of $f$, however we might wish to label it. So
+\begin{align}
+    \frac{\partial f^i}{\partial y^\alpha} = f^i_\alpha
+\end{align}
+The chain rule is then just
+\begin{align}
+    \frac{\partial f^i}{\partial x^j} = \sum_{\alpha} f^i_\alpha g^\alpha_j.
+\end{align}
+Notice how there is one $\alpha$ on the bottom and one $\alpha$ on the top. For this reason, as one final notational convenience, we will switch to Einstein notation, where we implicitly sum over repeated indices in upper–lower pairs, so the chain rule is
+\begin{align}
+    \frac{\partial f^i}{\partial x^j} =  f^i_\alpha g^\alpha_j.
+\end{align}
+I have always found this notation both very elegant and parsimonious. Back in my PhD, before automatic differentiation was commonplace in machine learning, I would often use this notation to work out gradients, because it is both uncluttered and unconfusing.</p>
+
+<p>You may have noticed that I am using Greek letters for the dummy variables we sum over. This is just a choice mainly for me to remember what we are summing over. With this highly compressed notation, let’s write the $2$nd derivative of $f^i$ with respect to $x$. It’s
+\begin{align}
+    \frac{\partial^2 f^i}{\partial x^j \partial x^k} = f^i_{\alpha \beta} g^\alpha_j g^\beta_k + f^i_{\alpha} g^\alpha_{jk}.
+\end{align}
+The 3th derivative is
+\begin{align}
+    \frac{\partial^3 f^i}{\partial x^j \partial x^k \partial x^\ell} &amp;= f^i_{\alpha \beta \gamma} g^\alpha_j g^\beta_k g^\gamma_\ell + f^i_{\alpha \beta} g^\alpha_{j\ell} g^\beta_k + + f^i_{\alpha \beta} g^\alpha_{j} g^\beta_{k\ell} + f^i_{\alpha \beta} g^\alpha_{jk} g^\beta_\ell + f^i_{\alpha} g^\alpha_{jk\ell} \newline
+    &amp;= f^i_{\alpha \beta \gamma} g^\alpha_j g^\beta_k g^\gamma_\ell + 3 \cdot  f^i_{\alpha \beta} g^\alpha_j g^\beta_{k\ell} + f^i_{\alpha} g^\alpha_{jk\ell}
+\end{align}
+These expressions get very unwieldy for higher order derivatives. Let’s try one fourth!
+\begin{align}
+    \frac{\partial^4 f^i}{\partial x^j \partial x^k \partial x^\ell \partial x^m} &amp;= f^i_{\alpha \beta \gamma \delta} g^\alpha_j g^\beta_k g^\gamma_\ell g^\delta_m + 6 \cdot f^i_{\alpha \beta \gamma} g^\alpha_j g^\beta_k g^\gamma_{\ell m} + 3 \cdot  f^i_{\alpha \beta} g^\alpha_{j\ell} g^\beta_{km}
+    + 4 \cdot  f^i_{\alpha \beta} g^\alpha_{j} g^\beta_{k \ell m} + f^i_{\alpha} g^\alpha_{jk\ell m}.
+\end{align}
+OK, what is going on? This is tedious and confusing and it is not obvious if there is any structure to this. In fact there is a very simple structure and we can derive all the above with some simple rules involving <em>special labeled rooted trees</em>. To make the connection, we make two observations. Each derivative is a sum of factors of the form $f^i_{\alpha\beta…}g^\alpha_{ij…}g^\beta_{k\ell…} \cdots$ where there is a:</p>
+
+<ol>
+  <li>single term in $f^i_{\alpha\beta…}$ with multiple subscripts,</li>
+  <li>multiple terms in $g^\alpha_{ij…}$ where $g$ has a single superscript and potentially many subscripts.</li>
+</ol>
+
+<p>We are going to replace each term in $f$ or $g$ with parts of a special rooted tree.</p>
+
+<h1 id="special-labeled-rooted-trees">Special labeled rooted trees</h1>
+<p>We begin by drawing the simplest tree $f^i$ as</p>
+<p align="center">
+  <img src="/media/2023/aod_1.svg" />
+</p>
+<p>This is just a root node of a tree—hence special labeled <em>rooted</em> tree. Every time we differentiate $f^i$ we will draw a branch emanating from the root node. In other words, for every subscript of $f^i$ we draw a branch. The first derivative $f^i_{\alpha} g^\alpha_j$ we thus draw as</p>
+
+<p align="center">
+  <img src="/media/2023/aod_2.svg" />
+</p>
+
+<p>This is simple enough. Note, we shall also label the nodes with the subscript of the attached branch—in this case $j$—so that we can keep track of what branch corresponds to what algebraïc terms. Hence special <em>labeled</em> rooted tree. We didn’t write $i$ by the root node, since it is not a <em>sub</em>script. In fact, since $i$ only ever appears in the superscript of $f$, we could drop it entirely, leaving $f$ as a vector-in scalar-out mapping, which we choose to do from now on.</p>
+
+<p>Now what about the factor $f_{\alpha\beta} g^\alpha_j g^\beta_k$? It has two branches emanating from the root as</p>
+
+<p align="center">
+  <img src="/media/2023/aod_3.svg" />
+</p>
+
+<p>What if $g$ has multiple subscripts? Well, we then extend the branch by as many subscripts in $g$ so $f_{\alpha} g^\alpha_{jk}$ and $f_{\alpha\beta} g^\alpha_{jk}g^\beta_\ell$ look like</p>
+
+<p align="center">
+  <img src="/media/2023/aod_4.svg" />
+</p>
+
+<p>This notation is a little weird at first, but as expressions get longer and more cumbersome, the tree representations become easier to handle. Now we have everything we need to differentiate the tree representation of our function $f(g(\textbf{x}))$. The $1$st derivative of $f$ is $f_\alpha g^\alpha_j$, which is a single branched tree</p>
+
+<p align="center">
+  <img src="/media/2023/aod_5.svg" />
+</p>
+
+<p>I have drawn the new branch in red to emphasize it. Differentiating again yields $f_{\alpha \beta} g^\alpha_j g^\beta_k + f_{\alpha} g^\alpha_{jk}$, so</p>
+
+<p align="center">
+  <img src="/media/2023/aod_6.svg" />
+</p>
+
+<p>What just happened? When differentiating $f_\alpha g^\alpha_j$, which in the literature is called an <em>elementary differential</em>, we applied the product rule and made two copies of $f_\alpha g^\alpha_j$. To the first copy we differentiated the $f_{\alpha}$ term, adding a new subscript $\beta$ and an extra $g^\beta_k$ branch to the root. To the second copy we differentiated the $g^\alpha_j$ term, raising it to a $2$nd order deriviative, and thus extending the already existing $g^\alpha_j$ branch to a length $2$ $g^\alpha_{jk}$.</p>
+
+<p>We can easily see how this technique generalizes to higher order factors. We apply the product rule and make as many copies of our special labeled rooted tree as there are terms in the factor. To the first copy we add a branch corresponding to differentiating $f$ and to the remaining copies we extend each of the existing branches, one by one. Let’s apply this technique to differentiate again, either adding a new branch to root or extending existing branches. This yields</p>
+
+<p align="center">
+  <img src="/media/2023/aod_7.svg" />
+</p>
+
+<p>Now, noticing that the middle three trees are topologically the same, with permuted labels, we can rewrite this, but we need to strip the labels. This results in</p>
+
+<p align="center">
+  <img src="/media/2023/aod_8.svg" />
+</p>
+
+<p>which corresponds to the expression $f_{\alpha \beta \gamma} g^\alpha_j g^\beta_k g^\gamma_\ell + 3 \cdot  f_{\alpha \beta} g^\alpha_j g^\beta_{k\ell} + f_{\alpha} g^\alpha_{jk\ell}$ that we derived earlier! These new label-less trees are referred to as simply as <em>special rooted trees</em>. In maths-speak, a special rooted tree is an representative of the equivalence class of special labeled rooted trees.</p>
+
+<h1 id="aside-where-does-that-3-come-from">Aside: Where does that 3 come from?</h1>
+<p>That 3 we see popping up in front is the <em>cardinality</em> of the equivalence class–the total number of valid labelings of the tree. Without getting too distracted, for a labeling to be valid labels need to increase from the root, so</p>
+
+<p align="center">
+  <img src="/media/2023/aod_9.svg" />
+</p>
+
+<p>is an invalid labeling, assuming we have chosen alphabetical ordering of labels. On the surface, it’s not very obvious why the coefficients that precede the elementary differentials in higher derivative expressions would naturally be the number of valid labelings. But staring at the diagram of how we differentiate special labeled rooted trees, we see that each row essentially generated all possible special rooted labeled trees. So all possible labelings of each special rooted labeled tree are enumerated. And hence these coefficients have a very beautiful origin.</p>
+
+<p>For those with a background in combinatorix, you will probably be quick to realize that there is a bijection between special rooted labeled trees and integer partitions of sets. We can associate each of the following  4-node trees with partitions with integer partitions of the set ${j, k, \ell}$</p>
+
+<p align="center">
+  <img src="/media/2023/aod_10.svg" />
+</p>
+
+<p>Each branch in the diagram is a grouping of letters into a subset. While each branch has to be ordered alphabetically from its root, there is only one such valid ordering, so the subset can just be left unordered. We could go deeper into partitions of sets, but Wikipedia is your friend here.</p>
+
+<h1 id="back-to-differentiation">Back to differentiation</h1>
+<p>For me I would say the tree representation is much easier to parse than the algebraïc representation, which, mind you, is still shorthand for
+\begin{align}
+    \frac{\partial^3 f}{\partial y^\alpha \partial y^\beta \partial y^\gamma}\frac{\partial g^\alpha}{\partial y^j}\frac{\partial g^\beta}{\partial y^k}\frac{\partial g^\gamma}{\partial y^\ell} + 3\frac{\partial^2 f}{\partial y^\alpha \partial y^\beta}\frac{\partial g^\alpha}{\partial y^j}\frac{\partial^2 g^\beta}{\partial y^k \partial y^\ell}+ \frac{\partial f}{\partial y^\alpha}\frac{\partial^3 g^\alpha}{\partial y^j \partial y^k \partial y^\ell}.
+\end{align}
+What would be the expression for the $5$th order derivative?</p>
+
+<p>So we can study higher order derivatives of compositions of functions via special rooted trees! This process of adding and extending branches can be applied recursively very easily and a list of the first few special rooted trees looks like</p>
+
+<p align="center">
+  <img src="/media/2023/aod_11.svg" />
+</p>
+
+<p>The theory of rooted trees goes very deep. We have only considered the <em>special</em> variety, for which branching can only occur at the root node. People have gone far into defining entire algebras over rooted trees, defining operations such as multiplication and addition. This comes in handy when studying order conditions of Runge-Kutta solvers and renormalization in quantum field theory. I personally think this area is extremely beautiful and am even more happy that I have a quick trick to derive expressions for higher order derivatives of composed functions.</p>
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+
+
+  
+
+
+
+
+  
+  
+  
+
+  <p class="page__taxonomy">
+    <strong><i class="fa fa-fw fa-tags" aria-hidden="true"></i> Tags: </strong>
+    <span itemprop="keywords">
+    
+      
+      
+      <a href="https://danielewworrall.github.io/tags/#algebra" class="page__taxonomy-item" rel="tag">algebra</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://danielewworrall.github.io/tags/#differentiation" class="page__taxonomy-item" rel="tag">differentiation</a>
+    
+    </span>
+  </p>
+
+
+
+
+      </footer>
+
+      
+
+<section class="page__share">
+  
+    <h4 class="page__share-title">Share on</h4>
+  
+
+  <a href="https://twitter.com/intent/tweet?text=https://danielewworrall.github.io/blog/2023/11/rooted-trees-and-differentiation/" class="btn btn--twitter" title="Share on Twitter"><i class="fab fa-twitter" aria-hidden="true"></i><span> Twitter</span></a>
+
+  <a href="https://www.facebook.com/sharer/sharer.php?u=https://danielewworrall.github.io/blog/2023/11/rooted-trees-and-differentiation/" class="btn btn--facebook" title="Share on Facebook"><i class="fab fa-facebook" aria-hidden="true"></i><span> Facebook</span></a>
+
+  <a href="https://www.linkedin.com/shareArticle?mini=true&url=https://danielewworrall.github.io/blog/2023/11/rooted-trees-and-differentiation/" class="btn btn--linkedin" title="Share on LinkedIn"><i class="fab fa-linkedin" aria-hidden="true"></i><span> LinkedIn</span></a>
+</section>
+
+      
+
+
+  <nav class="pagination">
+    
+      <a href="https://danielewworrall.github.io/blog/2021/08/dual-numbers/" class="pagination--pager" title="Dual numbers
+">Previous</a>
+    
+    
+      <a href="#" class="pagination--pager disabled">Next</a>
+    
+  </nav>
+
+    </div>
+
+    
+  </article>
+
+  
+  
+    <div class="page__related">
+      
+        <h4 class="page__related-title">You May Also Enjoy</h4>
+      
+      <div class="grid__wrapper">
+        
+          
+
+
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="http://schema.org/CreativeWork">
+    
+
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="https://danielewworrall.github.io/blog/2021/08/dual-numbers/" rel="permalink">Dual numbers
+</a>
+      
+    </h2>
+
+    
+
+    
+
+    
+      <p class="page__meta"><i>09 August 2021</i>,
+
+
+  
+	  8 minute read
+	
+</p>
+    
+
+    
+    <p class="archive__item-excerpt" itemprop="description"><p>I found writing this next post is a real treat. It’s about <em>dual numbers</em>. Dual numbers are a bit strange, to say the least, and at first they seem like an abstract mathematical fancy, but as you will see they have quite a useful purpose in the realm of automatic differentiation.</p>
+</p>
+    
+
+    <!--
+    
+    -->
+
+    
+
+  </article>
+</div>
+
+        
+          
+
+
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="http://schema.org/CreativeWork">
+    
+
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="https://danielewworrall.github.io/blog/2020/12/reversible-optimisers/" rel="permalink">Reversible optimisers
+</a>
+      
+    </h2>
+
+    
+
+    
+
+    
+      <p class="page__meta"><i>20 December 2020</i>,
+
+
+  
+	  6 minute read
+	
+</p>
+    
+
+    
+    <p class="archive__item-excerpt" itemprop="description"><p>Reversible neural architectures have been a popular research area in the last few years, but reversibility is also built into many modern day neural optimisers, perhaps serendipitously.</p>
+</p>
+    
+
+    <!--
+    
+    -->
+
+    
+
+  </article>
+</div>
+
+        
+          
+
+
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="http://schema.org/CreativeWork">
+    
+
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="https://danielewworrall.github.io/blog/2019/12/the-invention-of-randomness/" rel="permalink">On the ‘invention’ of randomness
+</a>
+      
+    </h2>
+
+    
+
+    
+
+    
+      <p class="page__meta"><i>15 December 2019</i>,
+
+
+  
+	  10 minute read
+	
+</p>
+    
+
+    
+    <p class="archive__item-excerpt" itemprop="description"><p>Recently in AMLAB we started a Jaynes reading group. E T Jaynes’ posthumous book and general all-round cult classic Probability Theory: The Logic of Science is the focus of our study. After having lectured a Bayesian statistics course for the last two years…</p>
+</p>
+    
+
+    <!--
+    
+    -->
+
+    
+
+  </article>
+</div>
+
+        
+      </div>
+    </div>
+  
+</div>
+
+
+    <div class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+<a href="/sitemap/">Sitemap</a>
+<!-- end custom footer snippets -->
+
+        
+
+<div class="page__footer-follow">
+  <ul class="social-icons">
+    
+      <li><strong>Follow:</strong></li>
+    
+    
+    
+    
+      <li><a href="http://github.com/danielewworrall"><i class="fab fa-github" aria-hidden="true"></i> GitHub</a></li>
+    
+    
+    <li><a href="https://danielewworrall.github.io/feed.xml"><i class="fa fa-fw fa-rss-square" aria-hidden="true"></i> Feed</a></li>
+  </ul>
+</div>
+
+<div class="page__footer-copyright">&copy; 2023 Daniel Worrall. Powered by <a href="http://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://github.com/academicpages/academicpages.github.io">AcademicPages</a>, a fork of <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a>.</div>
+
+      </footer>
+    </div>
+
+    <script src="https://danielewworrall.github.io/assets/js/main.min.js"></script>
+
+
+
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-HQ7NJT20N9"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-HQ7NJT20N9', { 'anonymize_ip': false});
+</script>
+
+
+
+
+
+
+
+
+  </body>
+</html>
+

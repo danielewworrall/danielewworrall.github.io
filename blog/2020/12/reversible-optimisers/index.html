@@ -1,0 +1,631 @@
+
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+
+<meta charset="utf-8">
+
+
+
+<!-- begin SEO -->
+
+
+
+
+
+
+
+
+
+<title>Reversible optimisers - Daniel Worrall</title>
+
+
+
+
+
+
+
+<meta property="og:locale" content="en-US">
+<meta property="og:site_name" content="Daniel Worrall">
+<meta property="og:title" content="Reversible optimisers">
+
+
+  <link rel="canonical" href="https://danielewworrall.github.io/blog/2020/12/reversible-optimisers/">
+  <meta property="og:url" content="https://danielewworrall.github.io/blog/2020/12/reversible-optimisers/">
+
+
+
+  <meta property="og:description" content="Reversible neural architectures have been a popular research area in the last few years, but reversibility is also built into many modern day neural optimisers, perhaps serendipitously.">
+
+
+
+
+
+  
+
+  
+
+
+
+
+
+  <meta property="og:type" content="article">
+  <meta property="article:published_time" content="2020-12-20T00:00:00+01:00">
+
+
+
+
+
+
+
+
+  <script type="application/ld+json">
+    {
+      "@context" : "http://schema.org",
+      "@type" : "Person",
+      "name" : "Daniel Worrall",
+      "url" : "https://danielewworrall.github.io",
+      "sameAs" : null
+    }
+  </script>
+
+
+
+
+
+
+<!-- end SEO -->
+
+
+<link href="https://danielewworrall.github.io/feed.xml" type="application/atom+xml" rel="alternate" title="Daniel Worrall Feed">
+
+<!-- http://t.co/dKP3o1e -->
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="https://danielewworrall.github.io/assets/css/main.css">
+
+<meta http-equiv="cleartype" content="on">
+    
+
+<!-- start custom head snippets -->
+
+<link rel="apple-touch-icon" sizes="57x57" href="https://danielewworrall.github.io/images/apple-touch-icon-57x57.png?v=M44lzPylqQ">
+<link rel="apple-touch-icon" sizes="60x60" href="https://danielewworrall.github.io/images/apple-touch-icon-60x60.png?v=M44lzPylqQ">
+<link rel="apple-touch-icon" sizes="72x72" href="https://danielewworrall.github.io/images/apple-touch-icon-72x72.png?v=M44lzPylqQ">
+<link rel="apple-touch-icon" sizes="76x76" href="https://danielewworrall.github.io/images/apple-touch-icon-76x76.png?v=M44lzPylqQ">
+<link rel="apple-touch-icon" sizes="114x114" href="https://danielewworrall.github.io/images/apple-touch-icon-114x114.png?v=M44lzPylqQ">
+<link rel="apple-touch-icon" sizes="120x120" href="https://danielewworrall.github.io/images/apple-touch-icon-120x120.png?v=M44lzPylqQ">
+<link rel="apple-touch-icon" sizes="144x144" href="https://danielewworrall.github.io/images/apple-touch-icon-144x144.png?v=M44lzPylqQ">
+<link rel="apple-touch-icon" sizes="152x152" href="https://danielewworrall.github.io/images/apple-touch-icon-152x152.png?v=M44lzPylqQ">
+<link rel="apple-touch-icon" sizes="180x180" href="https://danielewworrall.github.io/images/apple-touch-icon-180x180.png?v=M44lzPylqQ">
+<link rel="icon" type="image/png" href="https://danielewworrall.github.io/images/favicon-32x32.png?v=M44lzPylqQ" sizes="32x32">
+<link rel="icon" type="image/png" href="https://danielewworrall.github.io/images/android-chrome-192x192.png?v=M44lzPylqQ" sizes="192x192">
+<link rel="icon" type="image/png" href="https://danielewworrall.github.io/images/favicon-96x96.png?v=M44lzPylqQ" sizes="96x96">
+<link rel="icon" type="image/png" href="https://danielewworrall.github.io/images/favicon-16x16.png?v=M44lzPylqQ" sizes="16x16">
+<link rel="manifest" href="https://danielewworrall.github.io/images/manifest.json?v=M44lzPylqQ">
+<link rel="mask-icon" href="https://danielewworrall.github.io/images/safari-pinned-tab.svg?v=M44lzPylqQ" color="#000000">
+<link rel="shortcut icon" href="/images/favicon.ico?v=M44lzPylqQ">
+<meta name="msapplication-TileColor" content="#000000">
+<meta name="msapplication-TileImage" content="https://danielewworrall.github.io/images/mstile-144x144.png?v=M44lzPylqQ">
+<meta name="msapplication-config" content="https://danielewworrall.github.io/images/browserconfig.xml?v=M44lzPylqQ">
+<meta name="theme-color" content="#ffffff">
+<link rel="stylesheet" href="https://danielewworrall.github.io/assets/css/academicons.css"/>
+
+<script type="text/x-mathjax-config"> MathJax.Hub.Config({ TeX: { equationNumbers: { autoNumber: "all" } } }); </script>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/latest.js?config=TeX-MML-AM_CHTML' async></script>
+
+<link rel="stylesheet" type="text/css" href="https://tikzjax.com/v1/fonts.css">
+<script src="https://tikzjax.com/v1/tikzjax.js"></script>
+
+<!-- end custom head snippets -->
+
+  </head>
+
+  <body>
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+    
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        <button><div class="navicon"></div></button>
+        <ul class="visible-links">
+          <li class="masthead__menu-item masthead__menu-item--lg"><a href="https://danielewworrall.github.io/">Daniel Worrall</a></li>
+          
+            
+            <li class="masthead__menu-item"><a href="https://danielewworrall.github.io/publications/">Publications</a></li>
+          
+            
+            <li class="masthead__menu-item"><a href="https://danielewworrall.github.io/talks/">Talks</a></li>
+          
+            
+            <li class="masthead__menu-item"><a href="https://danielewworrall.github.io/teaching/">Teaching</a></li>
+          
+            
+            <li class="masthead__menu-item"><a href="https://danielewworrall.github.io/blog/">Blog</a></li>
+          
+        </ul>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+    
+
+
+
+
+
+<div id="main" role="main">
+  
+
+
+  <div class="sidebar sticky">
+  
+
+
+
+<div itemscope itemtype="http://schema.org/Person">
+
+  <div class="author__avatar">
+    
+    	<img src="https://danielewworrall.github.io/images/me.jpg" class="author__avatar" alt="Daniel Worrall">
+    
+  </div>
+
+  <div class="author__content">
+    <h3 class="author__name">Daniel Worrall</h3>
+    <p class="author__bio">Machine Learning Researcher</p>
+  </div>
+
+  <div class="author__urls-wrapper">
+    <button class="btn btn--inverse">Follow</button>
+    <ul class="author__urls social-icons">
+      
+        <li><i class="fa fa-fw fa-map-marker" aria-hidden="true"></i> London</li>
+      
+      
+      
+      
+        <li><a href="mailto:daniel.e.w.worrall at gmail.com"><i class="fas fa-fw fa-envelope" aria-hidden="true"></i> Email</a></li>
+      
+      
+       
+      
+        <li><a href="https://twitter.com/danielewworrall"><i class="fab fa-fw fa-twitter-square" aria-hidden="true"></i> Twitter</a></li>
+      
+      
+      
+      
+        <li><a href="https://www.linkedin.com/in/https://www.linkedin.com/in/daniel-worrall-46a43238/"><i class="fab fa-fw fa-linkedin" aria-hidden="true"></i> LinkedIn</a></li>
+      
+      
+      
+      
+      
+      
+        <li><a href="https://github.com/danielewworrall"><i class="fab fa-fw fa-github" aria-hidden="true"></i> Github</a></li>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+        <li><a href="https://scholar.google.com/citations?user=613GPbQAAAAJ&hl=en"><i class="fas fa-fw fa-graduation-cap"></i> Google Scholar</a></li>
+      
+      
+      
+      
+      
+    </ul>
+  </div>
+</div>
+
+  
+  </div>
+
+
+  <article class="page" itemscope itemtype="http://schema.org/CreativeWork">
+    <meta itemprop="headline" content="Reversible optimisers">
+    <meta itemprop="description" content="Reversible neural architectures have been a popular research area in the last few years, but reversibility is also built into many modern day neural optimisers, perhaps serendipitously.">
+    <meta itemprop="datePublished" content="December 20, 2020">
+    
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          <h1 class="page__title" itemprop="headline">Reversible optimisers
+</h1>
+          
+            <p class="page__meta"><i>20 December 2020</i>,
+
+
+  
+	  6 minute read
+	
+</p>
+          
+        
+
+        
+
+        
+
+        </header>
+      
+
+      <section class="page__content" itemprop="text">
+        <p>This post touches on a curious property of some common optimisers used by the machine learning community: <em>reversibility</em>.</p>
+
+<p>I tend to hate reading through lengthy introductions, so let’s just dive in with an example. Take gradient descent with momentum, this has the following form
+\begin{align}
+  \mu_{t+1} &amp;= \alpha \mu_t + \nabla_{x} f(x_{t}) \newline
+  x_{t+1} &amp;= x_t - \lambda \mu_{t+1}.
+\end{align}
+Here $x_t$ denotes the optimisation variable, or <em>position</em>, $x$ at time $t$, $\mu$ is the associated <em>momentum</em>, and $0 &lt; \alpha &lt; 1$ &amp; $\lambda &gt; 0$ are metaparameters, which govern the dynamics of the descent trajectory. I use the term <em>meta</em>parameters, instead of <em>hyper</em>parameters, to distinguish that they are part of the optimiser and not the model, even though some would nowadays say that the optimiser is in fact part of the model, implicitly regularising it.</p>
+
+<p>Anyway, interestingly we can reverse these equations, given the state $[x_{t+1}, \mu_{t+1}]$ as
+\begin{align}
+x_t &amp;= x_{t+1} + \lambda \mu_{t+1} \newline
+\mu_{t} &amp;= \frac{1}{\alpha} \left ( \mu_{t+1} - \nabla_{x} f(x_{t}) \right).
+\end{align}
+This seemingly arbitrary property is useful from a practical standpoint.</p>
+
+<h3 id="memory-efficiency">Memory efficiency</h3>
+<p>An oft-lauded property of reversible systems is that we do not have to store intermediate computations, since they should be easily reconstructed from the system’s end-state. Typically for reverse-mode differentiation to work (i.e. backpropagation), we have to store all the intermediate activations in the forward pass of a network. This has memory complexity, which scales linearly with the size of the computation graph. If we can dynamically reconstruct intermediate activations during the backward pass, then we instantly convert this linear memory complexity to a constant, which enables us to build (in theory) infinitely deep networks.</p>
+
+<h3 id="momentum-is-additive-coupling">Momentum is additive coupling</h3>
+<p>Indeed, if you look a little closer at the momentum equations, then you may spot that they resemble an <a href="https://arxiv.org/pdf/1410.8516.pdf">additive coupling layer</a>. Here we have that a state, split into two parts $x$ and $\mu$ (to mimic the momentum optimiser notation), is reversible with the following computation graph
+\begin{align}
+  \mu_{t+1} &amp;= \mu_t + g(x_t) \newline
+  x_{t+1} &amp;= x_t + h(\mu_{t+1})
+\end{align}
+To make a direct comparison, $g(x) = \nabla_x f(x)$ and $h(x) = \lambda x$. The one slight discrepancy is the factor of $\alpha$, but we can sweep that under the rug. The reverse equations for the additive coupling layer are
+\begin{align}
+  x_{t} &amp;= x_{t-1} - h(\mu_{t+1}) \newline
+  \mu_{t} &amp;= \mu_{t+1} - g(x_t).
+\end{align}</p>
+<div style="text-align:center"><img src="/images/coupling.png" width="50%" /></div>
+<p><em>Source: <a href="https://arxiv.org/pdf/1902.02729.pdf">Reversible GANs for Memory-efficient Image-to-Image Translation</a>. This diagramme represents the additive coupling layer in its computation graph form. LEFT: forward pass. RIGHT: reverse pass. To link up the notation $x_1 = \mu_{t}$, $x_2 = x_{t}$, $y_1 = \mu_{t+1}$, $y_2 = x_{t+1}$, $g = \texttt{NN}_1$, and $h=\texttt{NN}_2$</em></p>
+
+<h3 id="case-study">Case study</h3>
+<p>Specifically in the case of optimisers, I was pointed towards this paper <a href="https://arxiv.org/pdf/1502.03492.pdf">Gradient-based Hyperparameter Optimization with Reversible Learning</a> (2015) by <a href="https://dougalmaclaurin.com/">Dougal Maclaurin</a>, <a href="http://www.cs.toronto.edu/~duvenaud/">David Duvenaud</a>, and <a href="https://www.cs.princeton.edu/~rpa/">Ryan Adams</a>. The authors exploited the reversibility property of SGD with momentum to train the optimiser metaparameters themselves. First they run the optimiser an arbitrary number of steps, say 100 iterations. This defines an optimisation trajectory $x_0, x_1, x_2, …, x_{99}$. Now the clever part is that you can view the unrolled optimisation trajectory as a computation graph in itself. They compute a loss at the end of the trajectory, then they backpropagate the loss in the reverse direction with respect to the optimiser’s metaparameters.</p>
+
+<div style="text-align:center"><img src="/images/reversibility.png" width="50%" /></div>
+<p><em>Source: <a href="https://arxiv.org/pdf/1502.03492.pdf">Gradient-based Hyperparameter Optimization with Reversible Learning</a>. The authors optimise metaparameters by backpropagating along optimisation roll outs. This is made possible with the reversibility of momentum-based SGD, to cap memory-complexity.</em></p>
+
+<p>Could we not do this already, such as in <a href="https://arxiv.org/abs/1606.04474">Learning to learn by gradient descent by gradient descent</a> (Andrychowicz et al., 2016)? Well yes, but the crucial point is that you would usually have to store all the intermediate states $\{[x_t, \mu_t]\}_{t=0}^{99}$, which is costly memory-wise. Exploiting the reversibility property, this memory explosion falls away. Indeed there are issues with numerical stability of the inverse, which the papers dives into, but the principle is elegant.</p>
+
+<h3 id="adam">Adam</h3>
+<p>So what other optimisers are reversible? Let’s consider <a href="https://arxiv.org/pdf/1412.6980.pdf">Adam</a>, where
+\begin{align}
+  \mu_{t+1} &amp;= \beta_1 \mu_t + (1-\beta_1) \nabla_{x} f(x_{t}) \newline
+  \nu_{t+1} &amp;= \beta_2 \nu_t + (1-\beta_2) (\nabla_{x} f(x_{t}))^2 \newline
+  x_{t+1} &amp;= x_t - \lambda \frac{\mu_{t+1}}{\sqrt{\nu_{t+1}} + \epsilon}.
+\end{align}
+Given $x_{t+1}$, $\mu_{t+1}$ and $\nu_{t+1}$, we can easily reconstruct $x_t$ from the last line and from there, we can compute the gradient and recover $\mu_{t}$ and $\nu_{t}$. In maths
+\begin{align}
+  x_{t} &amp;= x_{t+1} + \lambda \frac{\mu_{t+1}}{\sqrt{\nu_{t+1}} + \epsilon} \newline
+  \mu_{t} &amp;= \frac{1}{\beta_1} \left ( \mu_{t+1} - (1-\beta_1) \nabla_{x} f(x_{t}) \right ) \newline
+  \nu_{t} &amp;= \frac{1}{\beta_2} \left ( \nu_{t+1} - (1-\beta_2) (\nabla_{x} f(x_{t}))^2 \right).
+\end{align}
+So Adam is reversible. We actually missed out the bias correction steps
+\begin{align}
+  \mu_{t+1} &amp;\gets \mu_{t+1} / (1 - \beta_1^{t+1}) \newline
+  \nu_{t+1} &amp;\gets \nu_{t+1} / (1 - \beta_2^{t+1}).
+\end{align}
+You can also verify for yourself that these are reversible too.</p>
+
+<h3 id="do-we-need-reversibility-in-optimisers">Do we need reversibility in optimisers?</h3>
+<p>Well, no. In fact, in some ways, we would rather do without it. Optimisers are supposed to be many-to-one mappings. Starting from an infinity of initial conditions, we should converge to the global minimum of a convex function. This means we should discard information about initialisation along the way. To put it as Maclaurin et al. do:</p>
+<blockquote>
+  <p>[O]ptimization moves a system from a high-entropy initial state to a low-entropy (hopefully zero entropy) optimized final state.</p>
+</blockquote>
+
+<p>It turns out that if you set $\alpha = 0$ for the momentum method; that is, you just run gradient descent, then this is not reversible. I think this may also be true for <a href="https://www.cs.toronto.edu/~fritz/absps/momentum.pdf">Nesterov accelerated momentum</a>, and <a href="http://www.cs.toronto.edu/~hinton/coursera/lecture6/lec6.pdf">RMSProp</a> which I couldn’t make reversible (I call this <em>proof by fatigue</em>). So I’m left wondering, is reversibility just some extra curious property that can be useful sometimes, but is completely arbitrary when it comes to doing optimisation? Or is there some deeper meaning to it? Is it just some artifact of how we think of optimisation, in terms of balls rolling down hills? Maybe more interestingly, what does the lack of reversibility for standard gradient descent and Nesterov entail? Could this be another reason why Nesterov works better than classical momentum? Could we measure the information loss somehow? And if we could, what would this mean?</p>
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+
+
+  
+
+
+
+
+  
+  
+  
+
+  <p class="page__taxonomy">
+    <strong><i class="fa fa-fw fa-tags" aria-hidden="true"></i> Tags: </strong>
+    <span itemprop="keywords">
+    
+      
+      
+      <a href="https://danielewworrall.github.io/tags/#optimisation" class="page__taxonomy-item" rel="tag">optimisation</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://danielewworrall.github.io/tags/#reversibility" class="page__taxonomy-item" rel="tag">reversibility</a>
+    
+    </span>
+  </p>
+
+
+
+
+      </footer>
+
+      
+
+<section class="page__share">
+  
+    <h4 class="page__share-title">Share on</h4>
+  
+
+  <a href="https://twitter.com/intent/tweet?text=https://danielewworrall.github.io/blog/2020/12/reversible-optimisers/" class="btn btn--twitter" title="Share on Twitter"><i class="fab fa-twitter" aria-hidden="true"></i><span> Twitter</span></a>
+
+  <a href="https://www.facebook.com/sharer/sharer.php?u=https://danielewworrall.github.io/blog/2020/12/reversible-optimisers/" class="btn btn--facebook" title="Share on Facebook"><i class="fab fa-facebook" aria-hidden="true"></i><span> Facebook</span></a>
+
+  <a href="https://www.linkedin.com/shareArticle?mini=true&url=https://danielewworrall.github.io/blog/2020/12/reversible-optimisers/" class="btn btn--linkedin" title="Share on LinkedIn"><i class="fab fa-linkedin" aria-hidden="true"></i><span> LinkedIn</span></a>
+</section>
+
+      
+
+
+  <nav class="pagination">
+    
+      <a href="https://danielewworrall.github.io/blog/2019/12/the-invention-of-randomness/" class="pagination--pager" title="On the ‘invention’ of randomness
+">Previous</a>
+    
+    
+      <a href="https://danielewworrall.github.io/blog/2021/08/dual-numbers/" class="pagination--pager" title="Dual numbers
+">Next</a>
+    
+  </nav>
+
+    </div>
+
+    
+  </article>
+
+  
+  
+    <div class="page__related">
+      
+        <h4 class="page__related-title">You May Also Enjoy</h4>
+      
+      <div class="grid__wrapper">
+        
+          
+
+
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="http://schema.org/CreativeWork">
+    
+
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="https://danielewworrall.github.io/blog/2023/11/rooted-trees-and-differentiation/" rel="permalink">On rooted trees and differentiation
+</a>
+      
+    </h2>
+
+    
+
+    
+
+    
+      <p class="page__meta"><i>22 November 2023</i>,
+
+
+  
+	  10 minute read
+	
+</p>
+    
+
+    
+    <p class="archive__item-excerpt" itemprop="description"><p>The chain rule for higher order derivatives boosts a wealth of beautiful mathematical structure touching the theory of special rooted trees, group theory, combinatorics of integer partitions, order theory, and many others.</p>
+</p>
+    
+
+    <!--
+    
+    -->
+
+    
+
+  </article>
+</div>
+
+        
+          
+
+
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="http://schema.org/CreativeWork">
+    
+
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="https://danielewworrall.github.io/blog/2021/08/dual-numbers/" rel="permalink">Dual numbers
+</a>
+      
+    </h2>
+
+    
+
+    
+
+    
+      <p class="page__meta"><i>09 August 2021</i>,
+
+
+  
+	  8 minute read
+	
+</p>
+    
+
+    
+    <p class="archive__item-excerpt" itemprop="description"><p>I found writing this next post is a real treat. It’s about <em>dual numbers</em>. Dual numbers are a bit strange, to say the least, and at first they seem like an abstract mathematical fancy, but as you will see they have quite a useful purpose in the realm of automatic differentiation.</p>
+</p>
+    
+
+    <!--
+    
+    -->
+
+    
+
+  </article>
+</div>
+
+        
+          
+
+
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="http://schema.org/CreativeWork">
+    
+
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="https://danielewworrall.github.io/blog/2019/12/the-invention-of-randomness/" rel="permalink">On the ‘invention’ of randomness
+</a>
+      
+    </h2>
+
+    
+
+    
+
+    
+      <p class="page__meta"><i>15 December 2019</i>,
+
+
+  
+	  10 minute read
+	
+</p>
+    
+
+    
+    <p class="archive__item-excerpt" itemprop="description"><p>Recently in AMLAB we started a Jaynes reading group. E T Jaynes’ posthumous book and general all-round cult classic Probability Theory: The Logic of Science is the focus of our study. After having lectured a Bayesian statistics course for the last two years…</p>
+</p>
+    
+
+    <!--
+    
+    -->
+
+    
+
+  </article>
+</div>
+
+        
+      </div>
+    </div>
+  
+</div>
+
+
+    <div class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+<a href="/sitemap/">Sitemap</a>
+<!-- end custom footer snippets -->
+
+        
+
+<div class="page__footer-follow">
+  <ul class="social-icons">
+    
+      <li><strong>Follow:</strong></li>
+    
+    
+    
+    
+      <li><a href="http://github.com/danielewworrall"><i class="fab fa-github" aria-hidden="true"></i> GitHub</a></li>
+    
+    
+    <li><a href="https://danielewworrall.github.io/feed.xml"><i class="fa fa-fw fa-rss-square" aria-hidden="true"></i> Feed</a></li>
+  </ul>
+</div>
+
+<div class="page__footer-copyright">&copy; 2023 Daniel Worrall. Powered by <a href="http://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://github.com/academicpages/academicpages.github.io">AcademicPages</a>, a fork of <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a>.</div>
+
+      </footer>
+    </div>
+
+    <script src="https://danielewworrall.github.io/assets/js/main.min.js"></script>
+
+
+
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-HQ7NJT20N9"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-HQ7NJT20N9', { 'anonymize_ip': false});
+</script>
+
+
+
+
+
+
+
+
+  </body>
+</html>
+
