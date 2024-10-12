@@ -11,7 +11,7 @@ extract: "There is a generalisation of the complex numbers with a nilpotent imag
 
 # Dual numbers I
 
-**TL;DR**: There is a generalisation of the complex numbers where {{< math >}}$i^2=0${{< /math >}} instead of {{< math >}}$i^2=-1${{< /math >}}. Functions extended to this _dual number_ system have the curious property that we can read off their derivatives (at a point {{< math >}}$x$) if we evaluate them at the dual number {{< math >}}$x + i${{< /math >}}. This has implications for automatic differentiation frameworks.
+**TL;DR**: There is a generalisation of the complex numbers where {{< math >}}$i^2=0${{< /math >}} instead of {{< math >}}$i^2=-1${{< /math >}}. Functions extended to this _dual number_ system have the curious property that we can read off their derivatives (at a point {{< math >}}$x${{< /math >}}) if we evaluate them at the dual number {{< math >}}$x + i${{< /math >}}. This has implications for automatic differentiation frameworks.
 
 I found writing this next post is a real treat. It's about *dual numbers*. Dual numbers are a bit strange, to say the least, and at first they seem like an abstract mathematical fancy, but as you will see they serve quite a useful purpose in the realm of automatic differentiation. We're going to start by reviewing what we know about the complex numbers. It will turn out that by tweaking them a wee bit we end up with the dual numbers, which, as mentioned, have some strikingly elegant properties when it comes to evaluating derivatives on computation graphs.
 
@@ -27,7 +27,7 @@ $$
 Now why did I have to learn to perform these mundane manipulations? Well the complex numbers have these beautiful geometric properties that connect them with the trigonometric functions. Since (periodic and analytic) functions can be expanded in a trigonometric basis, it turned out that we could study just about any function of interest in the complex domain and usually it was simpler to do so.
 
 ### Hypercomplex numbers: complex, double, and dual
-But do we necessarily have to demand that {{< math >}}$i^2 = -1$? Well no. In fact, allowing {{< math >}}$i^2${{< /math >}} to equal other values opens up a garden of delights. If we set {{< math >}}$i^2 = 1${{< /math >}} we have the *double numbers*, also known as the *split complex-numbers*, and if we set {{< math >}}$i^2 = 0${{< /math >}} (making sure that {{< math >}}$i \neq 0$), then we have the *dual numbers*. It turns out that all 3 number systems for {{< math >}}$i^2=-1${{< /math >}}, {{< math >}}$i^2=1${{< /math >}}, and {{< math >}}$i^2=0${{< /math >}} are cases of [hypercomplex numbers](https://en.wikipedia.org/wiki/Hypercomplex_numbers). The above multiplication for dual numbers is
+But do we necessarily have to demand that {{< math >}}$i^2 = -1${{< /math >}}? Well no. In fact, allowing {{< math >}}$i^2${{< /math >}} to equal other values opens up a garden of delights. If we set {{< math >}}$i^2 = 1${{< /math >}} we have the *double numbers*, also known as the *split complex-numbers*, and if we set {{< math >}}$i^2 = 0${{< /math >}} (making sure that {{< math >}}$i \neq 0${{< /math >}}), then we have the *dual numbers*. It turns out that all 3 number systems for {{< math >}}$i^2=-1${{< /math >}}, {{< math >}}$i^2=1${{< /math >}}, and {{< math >}}$i^2=0${{< /math >}} are cases of [hypercomplex numbers](https://en.wikipedia.org/wiki/Hypercomplex_numbers). The above multiplication for dual numbers is
 
 {{< math >}}
 $$
@@ -38,7 +38,7 @@ $$
 The term {{< math >}}$i^2bd${{< /math >}} falls away since {{< math >}}$i^2=0${{< /math >}}, as we defined. A mathematical object, where {{< math >}}$\underbrace{ii \cdots i}_{k \text{ times}} = 0${{< /math >}} is called *nilpotent* with degree {{< math >}}$k${{< /math >}}.
 
 ### Taylor expansions and exact linearisation
-Let's do some computations and see why dual numbers are useful. We are going to take a function {{< math >}}$f${{< /math >}} defined on the real domain and stick dual numbers {{< math >}}$z = x + iy${{< /math >}} into it. This may seem cowboyish, and it is, but it will lead us somewhere very satisfying. Now how do we evaluate a function at a point {{< math >}}$x + iy$? Well if the function is [analytic](https://en.wikipedia.org/wiki/Analytic_function) (fancy word for smooth), then we can just use a Taylor expansion, so
+Let's do some computations and see why dual numbers are useful. We are going to take a function {{< math >}}$f${{< /math >}} defined on the real domain and stick dual numbers {{< math >}}$z = x + iy${{< /math >}} into it. This may seem cowboyish, and it is, but it will lead us somewhere very satisfying. Now how do we evaluate a function at a point {{< math >}}$x + iy${{< /math >}}? Well if the function is [analytic](https://en.wikipedia.org/wiki/Analytic_function) (fancy word for smooth), then we can just use a Taylor expansion, so
 
 {{< math >}}
 $$
@@ -49,7 +49,7 @@ $$
 $$
 {{< /math >}}
 
-We dropped the second-order and higher-order terms because they all contained terms with {{< math >}}$i^2${{< /math >}}, which we have defined as zero. This is marvellous! By evaluating {{< math >}}$f${{< /math >}} at the point {{< math >}}$x + iy${{< /math >}}, we can return its exact linearisation. No need for Big-$\mathcal{O}${{< /math >}} Notation and hand-waving about {{< math >}}$iy${{< /math >}} being 'small enough'. Furthermore, if we set {{< math >}}$y=1${{< /math >}}, then we can read off the derivative of {{< math >}}$f${{< /math >}} as the dual component (analogous to imaginary component) of {{< math >}}$f(x + i)${{< /math >}}.
+We dropped the second-order and higher-order terms because they all contained terms with {{< math >}}$i^2${{< /math >}}, which we have defined as zero. This is marvellous! By evaluating {{< math >}}$f${{< /math >}} at the point {{< math >}}$x + iy${{< /math >}}, we can return its exact linearisation. No need for Big-{{< math >}}$\mathcal{O}${{< /math >}} Notation and hand-waving about {{< math >}}$iy${{< /math >}} being 'small enough'. Furthermore, if we set {{< math >}}$y=1${{< /math >}}, then we can read off the derivative of {{< math >}}$f${{< /math >}} as the dual component (analogous to imaginary component) of {{< math >}}$f(x + i)${{< /math >}}.
 
 Regarding terminology, for a dual number {{< math >}}$x+iy${{< /math >}} it is common to call {{< math >}}$x${{< /math >}} the *primal* since it represents the primary component of the computation; {{< math >}}$y${{< /math >}} is the *tangent*, giving a nod to the fact that it. represents a derivative, which lives in a tangent space; and {{< math >}}$i${{< /math >}} is the tag, which is an odd name, but it will make sense in a following blog when I discuss higher-order derivatives.
 
@@ -73,7 +73,7 @@ $$
 So we see indeed that the tangent component of {{< math >}}$f(g(x + i))${{< /math >}} is indeed the correct derivative, had we used the chain rule! How would we code this? How do we even represent dual numbers?
 
 ### Automagic dual number-based differentation
-What do we need to implement dual number-based automatic differentation? First we need a dictionary of composible atomic functions {{< math >}}$f_1, f_2, f_3, ...${{< /math >}}, typically called *primitives*, from which we can build a computation graph. All deep learning libraries contain them. For instance, think of PyTorch's `torch.nn.functional.relu()`. Next we are going to require all of their derivative functions. Just like in standard backprop, we always have these at hand. Typically we may be used to defining a function with separate `forward()` and `backward()` methods for the evaluation and derivative separately. For instance, consider the tangent function {{< math >}}$f(x) = \tan(x)${{< /math >}}, which has derivative {{< math >}}$f'(x) = 1 + \tan^2(x)$:
+What do we need to implement dual number-based automatic differentation? First we need a dictionary of composible atomic functions {{< math >}}$f_1, f_2, f_3, ...${{< /math >}}, typically called *primitives*, from which we can build a computation graph. All deep learning libraries contain them. For instance, think of PyTorch's `torch.nn.functional.relu()`. Next we are going to require all of their derivative functions. Just like in standard backprop, we always have these at hand. Typically we may be used to defining a function with separate `forward()` and `backward()` methods for the evaluation and derivative separately. For instance, consider the tangent function {{< math >}}$f(x) = \tan(x)${{< /math >}}, which has derivative {{< math >}}$f'(x) = 1 + \tan^2(x)${{< /math >}}:
 
 ```python
 class Tan:
