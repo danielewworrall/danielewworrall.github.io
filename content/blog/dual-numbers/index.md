@@ -1,7 +1,6 @@
 ---
 title: "Dual numbers"
 date: 2021-08-09                    
-permalink: /blog/2021/08/dual-numbers/
 tags:
   - optimisation
   - differentiation
