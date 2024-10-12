@@ -6,7 +6,7 @@ tags:
   - differentiation
   - automatic differentiation
   - algebra
-extract: "There is a generalisation of the complex numbers where {{< math >}}$i^2=0${{< /math >}}"
+extract: "There is a generalisation of the complex numbers with a nilpotent imaginary unit"
 ---
 
 # Dual numbers I
