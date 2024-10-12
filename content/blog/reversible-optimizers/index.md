@@ -86,10 +86,12 @@ $$
 {{< /math >}}
 So Adam is reversible. We actually missed out the bias correction steps
 {{< math >}}
+$$
 \begin{align}
   \mu_{t+1} &\gets \mu_{t+1} / (1 - \beta_1^{t+1}) \\\\\\
   \nu_{t+1} &\gets \nu_{t+1} / (1 - \beta_2^{t+1}).
 \end{align}
+$$
 {{< /math >}}
 You can also verify for yourself that these are reversible too.
 
