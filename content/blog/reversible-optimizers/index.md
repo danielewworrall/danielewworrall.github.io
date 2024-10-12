@@ -56,7 +56,7 @@ $$
 $$
 {{< /math >}}
 
-![Coupling](images/coupling.png")
+![Coupling](images/coupling.png)
 *Source: [Reversible GANs for Memory-efficient Image-to-Image Translation](https://arxiv.org/pdf/1902.02729.pdf). This diagramme represents the additive coupling layer in its computation graph form. LEFT: forward pass. RIGHT: reverse pass. To link up the notation {{< math >}}$x_1 = \mu_{t}${{< /math >}}, {{< math >}}$x_2 = x_{t}${{< /math >}}, {{< math >}}$y_1 = \mu_{t+1}${{< /math >}}, {{< math >}}$y_2 = x_{t+1}${{< /math >}}, {{< math >}}$g = \texttt{NN}_1${{< /math >}}, and {{< math >}}$h=\texttt{NN}_2${{< /math >}}*
 
 ### Case study
