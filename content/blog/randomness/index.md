@@ -6,7 +6,7 @@ tags:
   - bayesianism
   - Jaynes
   - philosophy
-extract: On E T Jaynes' posthumous all-round cult classic Probability Theory: The Logic of Science is the focus of our study
+extract: "On E T Jaynes' posthumous all-round cult classic Probability Theory: The Logic of Science is the focus of our study"
 ---
 
 Recently in AMLAB we started a Jaynes reading group. [E T Jaynes'](https://en.wikipedia.org/wiki/Edwin_Thompson_Jaynes) posthumous book and general all-round cult classic *Probability Theory: The Logic of Science* is the focus of our study. After having lectured a Bayesian statistics course for the last two years, I felt fairly confident in my understanding of the subject matter. It seems that while I am at ease with performing computations I have far from grasped Bayesianism from a conceptual, and some might say doctrinal, standpoint. And after a couple of conversations with others in a similar situation to me, it seems I may not be alone.

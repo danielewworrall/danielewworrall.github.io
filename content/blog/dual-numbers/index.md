@@ -1,7 +1,14 @@
 ---
 title: "Dual numbers"
 date: 2021-08-09
+tags: 
+  - optimisation
+  - differentiation
+  - automatic differentiation
+  - algebra
+extract: "There is a generalisation of the complex numbers where {{< math >}}$i^2=0${{< /math >}}"
 ---
+
 # Dual numbers I
 
 **TL;DR**: There is a generalisation of the complex numbers where {{< math >}}$i^2=0${{< /math >}} instead of {{< math >}}$i^2=-1${{< /math >}}. Functions extended to this _dual number_ system have the curious property that we can read off their derivatives (at a point {{< math >}}$x$) if we evaluate them at the dual number {{< math >}}$x + i${{< /math >}}. This has implications for automatic differentiation frameworks.
