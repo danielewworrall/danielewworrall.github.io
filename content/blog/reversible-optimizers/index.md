@@ -12,10 +12,12 @@ excerpt: "Reversible neural architectures have been a popular research area in t
 This post touches on a curious property of some common optimisers used by the machine learning community: *reversibility*.
 
 I tend to hate reading through lengthy introductions, so let's just dive in with an example. Take gradient descent with momentum, this has the following form
+{{< math >}}
 \begin{align}
   \mu_{t+1} &= \alpha \mu_t + \nabla_{x} f(x_{t}) \newline
   x_{t+1} &= x_t - \lambda \mu_{t+1}.
 \end{align}
+{{< math >}}
 Here $x_t$ denotes the optimisation variable, or *position*, $x$ at time $t$, $\mu$ is the associated *momentum*, and $0 < \alpha < 1$ & $\lambda > 0$ are metaparameters, which govern the dynamics of the descent trajectory. I use the term *meta*parameters, instead of *hyper*parameters, to distinguish that they are part of the optimiser and not the model, even though some would nowadays say that the optimiser is in fact part of the model, implicitly regularising it.
 
 Anyway, interestingly we can reverse these equations, given the state $[x_{t+1}, \mu_{t+1}]$ as
@@ -39,7 +41,7 @@ To make a direct comparison, $g(x) = \nabla_x f(x)$ and $h(x) = \lambda x$. The 
   x_{t} &= x_{t-1} - h(\mu_{t+1}) \newline
   \mu_{t} &= \mu_{t+1} - g(x_t).
 \end{align}
-![Coupling](/images/coupling.png")
+![Coupling](images/coupling.png")
 *Source: [Reversible GANs for Memory-efficient Image-to-Image Translation](https://arxiv.org/pdf/1902.02729.pdf). This diagramme represents the additive coupling layer in its computation graph form. LEFT: forward pass. RIGHT: reverse pass. To link up the notation $x_1 = \mu_{t}$, $x_2 = x_{t}$, $y_1 = \mu_{t+1}$, $y_2 = x_{t+1}$, $g = \texttt{NN}_1$, and $h=\texttt{NN}_2$*
 
 ### Case study
