@@ -13,19 +13,23 @@ This post touches on a curious property of some common optimisers used by the ma
 
 I tend to hate reading through lengthy introductions, so let's just dive in with an example. Take gradient descent with momentum, this has the following form
 {{< math >}}
+$$
 \begin{align}
-  \mu_{t+1} &= \alpha \mu_t + \nabla_{x} f(x_{t}) \newline
+  \mu_{t+1} &= \alpha \mu_t + \nabla_{x} f(x_{t}) \\\\\\
   x_{t+1} &= x_t - \lambda \mu_{t+1}.
 \end{align}
+$$
 {{< /math >}}
 Here {{< math >}}$x_t${{< /math >}} denotes the optimisation variable, or *position*, {{< math >}}$x{{< /math >}}$ at time {{< math >}}$t${{< /math >}}, {{< math >}}$\mu{{< /math >}}$ is the associated *momentum*, and {{< math >}}$0 < \alpha < 1${{< /math >}} & {{< math >}}$\lambda > 0${{< /math >}} are metaparameters, which govern the dynamics of the descent trajectory. I use the term *meta*parameters, instead of *hyper*parameters, to distinguish that they are part of the optimiser and not the model, even though some would nowadays say that the optimiser is in fact part of the model, implicitly regularising it.
 
 Anyway, interestingly we can reverse these equations, given the state {{< math >}}$[x_{t+1}, \mu_{t+1}]${{< /math >}} as
 {{< math >}}
+$$
 \begin{align}
-x_t &= x_{t+1} + \lambda \mu_{t+1} \newline
+x_t &= x_{t+1} + \lambda \mu_{t+1} \\\\\\
 \mu_{t} &= \frac{1}{\alpha} \left ( \mu_{t+1} - \nabla_{x} f(x_{t}) \right).
 \end{align}
+$$
 {{< /math >}}
 This seemingly arbitrary property is useful from a practical standpoint.
 
@@ -35,17 +39,21 @@ An oft-lauded property of reversible systems is that we do not have to store int
 ### Momentum is additive coupling
 Indeed, if you look a little closer at the momentum equations, then you may spot that they resemble an [additive coupling layer](https://arxiv.org/pdf/1410.8516.pdf). Here we have that a state, split into two parts {{< math >}}$x${{< /math >}} and {{< math >}}$\mu${{< /math >}} (to mimic the momentum optimiser notation), is reversible with the following computation graph
 {{< math >}}
+$$
 \begin{align}
-  \mu_{t+1} &= \mu_t + g(x_t) \newline
+  \mu_{t+1} &= \mu_t + g(x_t) \\\\\\
   x_{t+1} &= x_t + h(\mu_{t+1})
 \end{align}
+$$
 {{< /math >}}
 To make a direct comparison, {{< math >}}$g(x) = \nabla_x f(x)${{< /math >}} and {{< math >}}$h(x) = \lambda x${{< /math >}}. The one slight discrepancy is the factor of {{< math >}}$\alpha${{< /math >}}, but we can sweep that under the rug. The reverse equations for the additive coupling layer are
 {{< math >}}
+$
 \begin{align}
-  x_{t} &= x_{t-1} - h(\mu_{t+1}) \newline
+  x_{t} &= x_{t-1} - h(\mu_{t+1}) \\\\\\\
   \mu_{t} &= \mu_{t+1} - g(x_t).
 \end{align}
+$
 {{< /math >}}
 ![Coupling](images/coupling.png")
 *Source: [Reversible GANs for Memory-efficient Image-to-Image Translation](https://arxiv.org/pdf/1902.02729.pdf). This diagramme represents the additive coupling layer in its computation graph form. LEFT: forward pass. RIGHT: reverse pass. To link up the notation {{< math >}}$x_1 = \mu_{t}${{< /math >}}, {{< math >}}$x_2 = x_{t}${{< /math >}}, {{< math >}}$y_1 = \mu_{t+1}${{< /math >}}, {{< math >}}$y_2 = x_{t+1}${{< /math >}}, {{< math >}}$g = \texttt{NN}_1${{< /math >}}, and {{< math >}}$h=\texttt{NN}_2${{< /math >}}*
@@ -58,24 +66,28 @@ Could we not do this already, such as in [Learning to learn by gradient descent 
 ### Adam
 So what other optimisers are reversible? Let's consider [Adam](https://arxiv.org/pdf/1412.6980.pdf), where
 {{< math >}}
+$$
 \begin{align}
-  \mu_{t+1} &= \beta_1 \mu_t + (1-\beta_1) \nabla_{x} f(x_{t}) \newline
-  \nu_{t+1} &= \beta_2 \nu_t + (1-\beta_2) (\nabla_{x} f(x_{t}))^2 \newline
+  \mu_{t+1} &= \beta_1 \mu_t + (1-\beta_1) \nabla_{x} f(x_{t}) \\\\\\
+  \nu_{t+1} &= \beta_2 \nu_t + (1-\beta_2) (\nabla_{x} f(x_{t}))^2 \\\\\\
   x_{t+1} &= x_t - \lambda \frac{\mu_{t+1}}{\sqrt{\nu_{t+1}} + \epsilon}.
 \end{align}
+$$
 {{< /math >}}
 Given {{< math >}}$x_{t+1}${{< /math >}}, {{< math >}}$\mu_{t+1}${{< /math >}} and {{< math >}}$\nu_{t+1}${{< /math >}}, we can easily reconstruct {{< math >}}$x_t${{< /math >}} from the last line and from there, we can compute the gradient and recover {{< math >}}$\mu_{t}${{< /math >}} and {{< math >}}$\nu_{t}${{< /math >}}. In maths
 {{< math >}}
+$$
 \begin{align}
-  x_{t} &= x_{t+1} + \lambda \frac{\mu_{t+1}}{\sqrt{\nu_{t+1}} + \epsilon} \newline
-  \mu_{t} &= \frac{1}{\beta_1} \left ( \mu_{t+1} - (1-\beta_1) \nabla_{x} f(x_{t}) \right ) \newline
+  x_{t} &= x_{t+1} + \lambda \frac{\mu_{t+1}}{\sqrt{\nu_{t+1}} + \epsilon} \\\\\\
+  \mu_{t} &= \frac{1}{\beta_1} \left ( \mu_{t+1} - (1-\beta_1) \nabla_{x} f(x_{t}) \right ) \\\\\\
   \nu_{t} &= \frac{1}{\beta_2} \left ( \nu_{t+1} - (1-\beta_2) (\nabla_{x} f(x_{t}))^2 \right).
 \end{align}
+$$
 {{< /math >}}
 So Adam is reversible. We actually missed out the bias correction steps
 {{< math >}}
 \begin{align}
-  \mu_{t+1} &\gets \mu_{t+1} / (1 - \beta_1^{t+1}) \newline
+  \mu_{t+1} &\gets \mu_{t+1} / (1 - \beta_1^{t+1}) \\\\\\
   \nu_{t+1} &\gets \nu_{t+1} / (1 - \beta_2^{t+1}).
 \end{align}
 {{< /math >}}
