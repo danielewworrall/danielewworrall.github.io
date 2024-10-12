@@ -22,7 +22,7 @@ role: Machine Learning Research Scientist
 # Organizations/Affiliations to show in About widget
 organizations:
   - name: Google DeepMind
-    url: https://www.stanford.edu/
+    url: https://deepmind.google/
 
 # Short bio (displayed in user profile at end of posts)
 bio: I'm interested in using ML to accelerate simulation of physical systems
