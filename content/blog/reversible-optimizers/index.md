@@ -15,7 +15,7 @@ I tend to hate reading through lengthy introductions, so let's just dive in with
 {{< math >}}
 $$
 \begin{align}
-  \mu_{t+1} &= \alpha \mu_t + \nabla_{x} f(x_{t}) \\\\\\
+  \mu_{t+1} &= \alpha \mu_t + \nabla_{x} f(x_{t}) \\
   x_{t+1} &= x_t - \lambda \mu_{t+1}.
 \end{align}
 $$
@@ -26,7 +26,7 @@ Anyway, interestingly we can reverse these equations, given the state {{< math >
 {{< math >}}
 $$
 \begin{align}
-x_t &= x_{t+1} + \lambda \mu_{t+1} \\\\\\
+x_t &= x_{t+1} + \lambda \mu_{t+1} \\
 \mu_{t} &= \frac{1}{\alpha} \left ( \mu_{t+1} - \nabla_{x} f(x_{t}) \right).
 \end{align}
 $$
@@ -41,20 +41,21 @@ Indeed, if you look a little closer at the momentum equations, then you may spot
 {{< math >}}
 $$
 \begin{align}
-  \mu_{t+1} &= \mu_t + g(x_t) \\\\\\
+  \mu_{t+1} &= \mu_t + g(x_t) \\
   x_{t+1} &= x_t + h(\mu_{t+1})
 \end{align}
 $$
 {{< /math >}}
 To make a direct comparison, {{< math >}}$g(x) = \nabla_x f(x)${{< /math >}} and {{< math >}}$h(x) = \lambda x${{< /math >}}. The one slight discrepancy is the factor of {{< math >}}$\alpha${{< /math >}}, but we can sweep that under the rug. The reverse equations for the additive coupling layer are
 {{< math >}}
-$
+$$
 \begin{align}
-  x_{t} &= x_{t-1} - h(\mu_{t+1}) \\\\\\\
+  x_{t} &= x_{t-1} - h(\mu_{t+1}) \\
   \mu_{t} &= \mu_{t+1} - g(x_t).
 \end{align}
-$
+$$
 {{< /math >}}
+
 ![Coupling](images/coupling.png")
 *Source: [Reversible GANs for Memory-efficient Image-to-Image Translation](https://arxiv.org/pdf/1902.02729.pdf). This diagramme represents the additive coupling layer in its computation graph form. LEFT: forward pass. RIGHT: reverse pass. To link up the notation {{< math >}}$x_1 = \mu_{t}${{< /math >}}, {{< math >}}$x_2 = x_{t}${{< /math >}}, {{< math >}}$y_1 = \mu_{t+1}${{< /math >}}, {{< math >}}$y_2 = x_{t+1}${{< /math >}}, {{< math >}}$g = \texttt{NN}_1${{< /math >}}, and {{< math >}}$h=\texttt{NN}_2${{< /math >}}*
 
@@ -68,8 +69,8 @@ So what other optimisers are reversible? Let's consider [Adam](https://arxiv.org
 {{< math >}}
 $$
 \begin{align}
-  \mu_{t+1} &= \beta_1 \mu_t + (1-\beta_1) \nabla_{x} f(x_{t}) \\\\\\
-  \nu_{t+1} &= \beta_2 \nu_t + (1-\beta_2) (\nabla_{x} f(x_{t}))^2 \\\\\\
+  \mu_{t+1} &= \beta_1 \mu_t + (1-\beta_1) \nabla_{x} f(x_{t}) \\
+  \nu_{t+1} &= \beta_2 \nu_t + (1-\beta_2) (\nabla_{x} f(x_{t}))^2 \\
   x_{t+1} &= x_t - \lambda \frac{\mu_{t+1}}{\sqrt{\nu_{t+1}} + \epsilon}.
 \end{align}
 $$
@@ -78,8 +79,8 @@ Given {{< math >}}$x_{t+1}${{< /math >}}, {{< math >}}$\mu_{t+1}${{< /math >}} a
 {{< math >}}
 $$
 \begin{align}
-  x_{t} &= x_{t+1} + \lambda \frac{\mu_{t+1}}{\sqrt{\nu_{t+1}} + \epsilon} \\\\\\
-  \mu_{t} &= \frac{1}{\beta_1} \left ( \mu_{t+1} - (1-\beta_1) \nabla_{x} f(x_{t}) \right ) \\\\\\
+  x_{t} &= x_{t+1} + \lambda \frac{\mu_{t+1}}{\sqrt{\nu_{t+1}} + \epsilon} \\
+  \mu_{t} &= \frac{1}{\beta_1} \left ( \mu_{t+1} - (1-\beta_1) \nabla_{x} f(x_{t}) \right ) \\
   \nu_{t} &= \frac{1}{\beta_2} \left ( \nu_{t+1} - (1-\beta_2) (\nabla_{x} f(x_{t}))^2 \right).
 \end{align}
 $$
@@ -88,7 +89,7 @@ So Adam is reversible. We actually missed out the bias correction steps
 {{< math >}}
 $$
 \begin{align}
-  \mu_{t+1} &\gets \mu_{t+1} / (1 - \beta_1^{t+1}) \\\\\\
+  \mu_{t+1} &\gets \mu_{t+1} / (1 - \beta_1^{t+1}) \\
   \nu_{t+1} &\gets \nu_{t+1} / (1 - \beta_2^{t+1}).
 \end{align}
 $$
