@@ -6,6 +6,9 @@ tags:
   - reversibility
 excerpt: "Reversible neural architectures have been a popular research area in the last few years, but reversibility is also built into many modern day neural optimisers, perhaps serendipitously."
 ---
+<!-- ![Reversibility](/images/reversibility.png") -->
+*Source: [Gradient-based Hyperparameter Optimization with Reversible Learning](https://arxiv.org/pdf/1502.03492.pdf). The authors optimise metaparameters by backpropagating along optimisation roll outs. This is made possible with the reversibility of momentum-based SGD, to cap memory-complexity.*
+
 This post touches on a curious property of some common optimisers used by the machine learning community: *reversibility*.
 
 I tend to hate reading through lengthy introductions, so let's just dive in with an example. Take gradient descent with momentum, this has the following form
@@ -41,9 +44,6 @@ To make a direct comparison, $g(x) = \nabla_x f(x)$ and $h(x) = \lambda x$. The 
 
 ### Case study
 Specifically in the case of optimisers, I was pointed towards this paper [Gradient-based Hyperparameter Optimization with Reversible Learning](https://arxiv.org/pdf/1502.03492.pdf) (2015) by [Dougal Maclaurin](https://dougalmaclaurin.com/), [David Duvenaud](http://www.cs.toronto.edu/~duvenaud/), and [Ryan Adams](https://www.cs.princeton.edu/~rpa/). The authors exploited the reversibility property of SGD with momentum to train the optimiser metaparameters themselves. First they run the optimiser an arbitrary number of steps, say 100 iterations. This defines an optimisation trajectory $x_0, x_1, x_2, ..., x_{99}$. Now the clever part is that you can view the unrolled optimisation trajectory as a computation graph in itself. They compute a loss at the end of the trajectory, then they backpropagate the loss in the reverse direction with respect to the optimiser's metaparameters.
-
-![Reversibility](/images/reversibility.png")
-*Source: [Gradient-based Hyperparameter Optimization with Reversible Learning](https://arxiv.org/pdf/1502.03492.pdf). The authors optimise metaparameters by backpropagating along optimisation roll outs. This is made possible with the reversibility of momentum-based SGD, to cap memory-complexity.*
 
 Could we not do this already, such as in [Learning to learn by gradient descent by gradient descent](https://arxiv.org/abs/1606.04474) (Andrychowicz et al., 2016)? Well yes, but the crucial point is that you would usually have to store all the intermediate states $\\{[x_t, \mu_t]\\}_{t=0}^{99}$, which is costly memory-wise. Exploiting the reversibility property, this memory explosion falls away. Indeed there are issues with numerical stability of the inverse, which the papers dives into, but the principle is elegant.
 
