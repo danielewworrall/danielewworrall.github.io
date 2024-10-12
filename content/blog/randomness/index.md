@@ -9,8 +9,6 @@ tags:
 excerpt: "Recently in AMLAB we started a Jaynes reading group. E T Jaynes' posthumous book and general all-round cult classic Probability Theory: The Logic of Science is the focus of our study. After having lectured a Bayesian statistics course for the last two years..."
 ---
 
-![The legend himself](jaynes-himself.jpg)
-
 Recently in AMLAB we started a Jaynes reading group. [E T Jaynes'](https://en.wikipedia.org/wiki/Edwin_Thompson_Jaynes) posthumous book and general all-round cult classic *Probability Theory: The Logic of Science* is the focus of our study. After having lectured a Bayesian statistics course for the last two years, I felt fairly confident in my understanding of the subject matter. It seems that while I am at ease with performing computations I have far from grasped Bayesianism from a conceptual, and some might say doctrinal, standpoint. And after a couple of conversations with others in a similar situation to me, it seems I may not be alone.
 
 Now this book is littered with gems and Jaynes' colourful written-style is literary gold, but I want to focus on a small snippet, which got me thinking hard about my understanding of what it means to be *random*. **Jaynes essentially claims that randomness simply does not exist**. It is a human invention, which you can find in Digression 3.8.1. Let's step through the logic.
@@ -47,3 +45,6 @@ One school of thinking, in fact the one I learnt in secondary school (that's hig
 So whether intrinsic randomness does exists is an open and potentially unanswerable question. At least to determine the potentiality of intrinsic randomness would require us to step outside of the rôle of observer---a purely unscientific practice. All observers are bound to make world inferences via the methods of epistemic randomness and are thus at risk of succumbing to Jaynesian mind projection fallacies. Some might go as far to say that if something is unverifiable by experiment it cannot *exist*. Enter die-hard scientific methodists (theological pun intended). On a side note, the question of existence seems to be an argument I get into a lot nowadays with post-structuralists from the arts and humanities, who always tell me that scientists are mistaken in believing that what they study exists.
 
 Inevitably after reading a story about flipping coins, I seem to have found myself in quite the bind. If I have come to understand anything, it is that you can never be safe in thinking you know anything.
+
+
+[def]: jaynes-himself.jpg
