@@ -17,7 +17,7 @@ I tend to hate reading through lengthy introductions, so let's just dive in with
   \mu_{t+1} &= \alpha \mu_t + \nabla_{x} f(x_{t}) \newline
   x_{t+1} &= x_t - \lambda \mu_{t+1}.
 \end{align}
-{{< math >}}
+{{< /math >}}
 Here $x_t$ denotes the optimisation variable, or *position*, $x$ at time $t$, $\mu$ is the associated *momentum*, and $0 < \alpha < 1$ & $\lambda > 0$ are metaparameters, which govern the dynamics of the descent trajectory. I use the term *meta*parameters, instead of *hyper*parameters, to distinguish that they are part of the optimiser and not the model, even though some would nowadays say that the optimiser is in fact part of the model, implicitly regularising it.
 
 Anyway, interestingly we can reverse these equations, given the state $[x_{t+1}, \mu_{t+1}]$ as
