@@ -4,7 +4,7 @@ date: 2020-12-20
 tags:
   - optimisation
   - reversibility
-excerpt: "Reversible neural architectures have been a popular research area in the last few years, but reversibility is also built into many modern day neural optimisers, perhaps serendipitously."
+extract: Some optimizers can be run backwards
 ---
 <!-- ![Reversibility](/images/reversibility.png") -->
 *Source: [Gradient-based Hyperparameter Optimization with Reversible Learning](https://arxiv.org/pdf/1502.03492.pdf). The authors optimise metaparameters by backpropagating along optimisation roll outs. This is made possible with the reversibility of momentum-based SGD, to cap memory-complexity.*

@@ -7,7 +7,7 @@ tags:
   - differentiation
   - automatic differentiation
   - algebra
-excerpt: "I found writing this next post is a real treat. It's about *dual numbers*. Dual numbers are a bit strange, to say the least, and at first they seem like an abstract mathematical fancy, but as you will see they have quite a useful purpose in the realm of automatic differentiation."
+extract: There is a generalisation of the complex numbers where {{< math >}}$i^2=0${{< math >}}
 ---
 # Dual numbers I
 
