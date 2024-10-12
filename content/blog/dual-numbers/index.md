@@ -1,12 +1,6 @@
 ---
 title: "Dual numbers"
 date: 2021-08-09
-tags:
-  - optimisation
-  - differentiation
-  - automatic differentiation
-  - algebra
-extract: There is a generalisation of the complex numbers where {{< math >}}$i^2=0${{< /math >}}
 ---
 # Dual numbers I
 
