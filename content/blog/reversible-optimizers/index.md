@@ -36,7 +36,7 @@ To make a direct comparison, $g(x) = \nabla_x f(x)$ and $h(x) = \lambda x$. The 
   x_{t} &= x_{t-1} - h(\mu_{t+1}) \newline
   \mu_{t} &= \mu_{t+1} - g(x_t).
 \end{align}
-<div style="text-align:center"><img src="/images/coupling.png" width="50%"/></div>
+![Coupling](/images/coupling.png")
 *Source: [Reversible GANs for Memory-efficient Image-to-Image Translation](https://arxiv.org/pdf/1902.02729.pdf). This diagramme represents the additive coupling layer in its computation graph form. LEFT: forward pass. RIGHT: reverse pass. To link up the notation $x_1 = \mu_{t}$, $x_2 = x_{t}$, $y_1 = \mu_{t+1}$, $y_2 = x_{t+1}$, $g = \texttt{NN}_1$, and $h=\texttt{NN}_2$*
 
 ### Case study
