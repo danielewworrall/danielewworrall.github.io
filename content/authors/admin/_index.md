@@ -35,7 +35,7 @@ profiles:
     label: E-mail Me
   - icon: brands/x
     url: 'https://x.com/danielewworrall'
-  - icon: google-scholar
+  - icon: brands/google-scholar
     url: 'https://scholar.google.com/citations?user=613GPbQAAAAJ&hl=en'
   # Link to a PDF of your resume/CV - upload it to `static/uploads/resume.pdf`
   # - icon: academicons/cv
