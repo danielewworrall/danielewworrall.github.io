@@ -9,7 +9,7 @@ appearance:
   color: blue
 
 font: minimal
-font_size: s
+font_size: xs
 
 # SEO
 marketing:
