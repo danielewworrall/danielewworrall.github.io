@@ -55,12 +55,14 @@ $$
 
 
 ![Coupling](images/coupling.png)
+
 *Source: [Reversible GANs for Memory-efficient Image-to-Image Translation](https://arxiv.org/pdf/1902.02729.pdf). This diagramme represents the additive coupling layer in its computation graph form. LEFT: forward pass. RIGHT: reverse pass. To link up the notation $x_1 = \mu_{t}$, $x_2 = x_{t}$, $y_1 = \mu_{t+1}$, $y_2 = x_{t+1}$, $g = \texttt{NN}_1$, and $h=\texttt{NN}_2$*
 
 ### Case study
 Specifically in the case of optimisers, I was pointed towards this paper [Gradient-based Hyperparameter Optimization with Reversible Learning](https://arxiv.org/pdf/1502.03492.pdf) (2015) by [Dougal Maclaurin](https://dougalmaclaurin.com/), [David Duvenaud](http://www.cs.toronto.edu/~duvenaud/), and [Ryan Adams](https://www.cs.princeton.edu/~rpa/). The authors exploited the reversibility property of SGD with momentum to train the optimiser metaparameters themselves. First they run the optimiser an arbitrary number of steps, say 100 iterations. This defines an optimisation trajectory $x_0, x_1, x_2, ..., x_{99}$. Now the clever part is that you can view the unrolled optimisation trajectory as a computation graph in itself. They compute a loss at the end of the trajectory, then they backpropagate the loss in the reverse direction with respect to the optimiser's metaparameters.
 
-![Reversibility](/images/reversibility.png")
+![Reversibility](images/reversibility.png")
+
 *Source: [Gradient-based Hyperparameter Optimization with Reversible Learning](https://arxiv.org/pdf/1502.03492.pdf). The authors optimise metaparameters by backpropagating along optimisation roll outs. This is made possible with the reversibility of momentum-based SGD, to cap memory-complexity.*
 
 Could we not do this already, such as in [Learning to learn by gradient descent by gradient descent](https://arxiv.org/abs/1606.04474) (Andrychowicz et al., 2016)? Well yes, but the crucial point is that you would usually have to store all the intermediate states $\\{[x_t, \mu_t]\\}_{t=0}^{99}$, which is costly memory-wise. Exploiting the reversibility property, this memory explosion falls away. Indeed there are issues with numerical stability of the inverse, which the papers dives into, but the principle is elegant.
