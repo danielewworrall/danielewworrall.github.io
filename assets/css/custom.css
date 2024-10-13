@@ -17,8 +17,8 @@ p {
     font-size: 1em; /* Increase base font size by 20% */
   }
   
-.katex .display { /* Target display mode math specifically */
-font-size: 0.5em; /* Increase font size further for display math */
+.katex-display { /* Target display mode math specifically */
+font-size: 0.2em; /* Increase font size further for display math */
 }
 
 li {  /* Targets all list items in unordered lists */
