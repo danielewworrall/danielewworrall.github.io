@@ -34,5 +34,5 @@ ol li p { /* Targets <p> tags within <li> within <ol> only */
 }
 
 .prose {
-    max-width: 160ch;
+    max-width: 160ch !important;
   }
