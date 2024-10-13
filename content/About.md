@@ -4,7 +4,6 @@ excerpt: "About me"
 author_profile: true
 hide_date: true
 reading_time: false
-style: 'text-align: justify; font-size: 0.8em;'
 ---
 **I am** a Senior Research Scientist in Pete Battaglia's Structured Intelligence
 Team at DeepMind, London.
@@ -27,7 +26,7 @@ I am proud contributor to the [UvA Inclusive AI Initiative](https://uva-iai.gith
 
 ## Reading Groups
 - [UvA AMLAB Seminars](http://amlab.science.uva.nl/meetings/amlab-seminar/)
-- UvA Geometric Methods: Riemannian Geometry [Notes](/docs/GM04-RiemannianGeometry.pdf)
+- UvA Geometric Methods: Riemannian Geometry [Notes](https://drive.google.com/file/d/1w80W57bBOyZVgjwk5w9v045WU1EoWb3U/view?usp=sharing)
 - [UCL Computer Vision Reading Group](http://visual.cs.ucl.ac.uk/vrg/)
 
 ## Bio
