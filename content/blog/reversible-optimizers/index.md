@@ -4,7 +4,7 @@ date: 2020-12-20
 tags:
   - optimisation
   - reversibility
-extract: "Some optimizers can be run backwards"
+summary: "Some optimizers can be run backwards"
 ---
 <!-- ![Reversibility](/images/reversibility.png") -->
 *Source: [Gradient-based Hyperparameter Optimization with Reversible Learning](https://arxiv.org/pdf/1502.03492.pdf). The authors optimise metaparameters by backpropagating along optimisation roll outs. This is made possible with the reversibility of momentum-based SGD, to cap memory-complexity.*

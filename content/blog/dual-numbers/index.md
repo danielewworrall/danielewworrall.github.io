@@ -6,7 +6,7 @@ tags:
   - differentiation
   - automatic differentiation
   - algebra
-extract: "There is a generalisation of the complex numbers with a nilpotent imaginary unit"
+summary: "There is a generalisation of the complex numbers with a nilpotent imaginary unit"
 ---
 
 # Dual numbers I
