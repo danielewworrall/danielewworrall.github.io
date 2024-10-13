@@ -21,6 +21,6 @@ p {
 font-size: 0.5em; /* Increase font size further for display math */
 }
 
-ul li {  /* Targets all list items in unordered lists */
-  @apply text-base; 
+li {  /* Targets all list items in unordered lists */
+  @apply text-sm; 
 }
