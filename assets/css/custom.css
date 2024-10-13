@@ -1,0 +1,4 @@
+/* assets/css/custom.css */
+.blog-post p {  /* Targets all paragraphs within blog posts */
+    font-size: 10px;
+  }
