@@ -32,8 +32,3 @@ ul li p { /* Targets <p> tags within <li> within <ul> only */
 ol li p { /* Targets <p> tags within <li> within <ol> only */
     font-size: 16px !important;
 }
-
-.prose {
-    min-width: 160ch !important;
-    max-width: 160ch !important;
-  }
