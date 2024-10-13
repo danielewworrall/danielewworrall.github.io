@@ -8,9 +8,6 @@ appearance:
   mode: system
   color: blue
 
-font: minimal
-font_size: xs
-
 # SEO
 marketing:
   seo:
