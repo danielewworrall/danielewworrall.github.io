@@ -20,3 +20,7 @@ p {
 .katex .display { /* Target display mode math specifically */
 font-size: 0.5em; /* Increase font size further for display math */
 }
+
+ul li {  /* Targets all list items in unordered lists */
+  @apply text-lg;  /* Sets the font size to 'large' */
+}
