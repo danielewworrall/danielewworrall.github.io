@@ -4,6 +4,16 @@ excerpt: "About me"
 author_profile: true
 hide_date: true
 reading_time: false
+sections:
+  - block: resume-biography
+    content:
+      # The user's folder name in content/authors/
+      username: admin
+    design:
+      spacing:
+        padding: [0, 0, 0, 0]
+      biography:
+        style: 'text-align: justify; font-size: 0.8em;'
 ---
 **I am** a Senior Research Scientist in Pete Battaglia's Structured Intelligence
 Team at DeepMind, London.
