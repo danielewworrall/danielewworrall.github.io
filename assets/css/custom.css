@@ -1,9 +1,9 @@
 /* assets/css/custom.css */
 h1 {
-    font-size: 24px !important;
+    font-size: 28px !important;
 }
 h2 {
-    font-size: 22px !important;
+    font-size: 24px !important;
 }
 h3 {
     font-size: 20px !important;
@@ -17,6 +17,6 @@ p {
     font-size: 1em; /* Increase base font size by 20% */
   }
   
-  .katex .display { /* Target display mode math specifically */
-    font-size: 0.8em; /* Increase font size further for display math */
-  }
+.katex .display { /* Target display mode math specifically */
+font-size: 0.5em; /* Increase font size further for display math */
+}
