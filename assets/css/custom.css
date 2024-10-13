@@ -1,20 +1,20 @@
 /* assets/css/custom.css */
 h1 {
-    font-size: 24px;
+    font-size: 24px !important;
 }
 h2 {
-    font-size: 22px;
+    font-size: 22px !important;
 }
 h3 {
-    font-size: 20px;
+    font-size: 20px !important;
 }
-p {  /* Targets all paragraphs within blog posts */
-    font-size: 16px;
+p { 
+    font-size: 16px !important;
   }
 
 /* assets/css/custom.css */
 .katex .base {
-    font-size: 0.8em; /* Increase base font size by 20% */
+    font-size: 1em; /* Increase base font size by 20% */
   }
   
   .katex .display { /* Target display mode math specifically */
