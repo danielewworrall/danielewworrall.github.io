@@ -62,15 +62,16 @@ $$
 The 3th derivative is
 $$
 \begin{align}
-    \frac{\partial^3 f^i}{\partial x^j \partial x^k \partial x^\ell} &= f^i_{\alpha \beta \gamma} g^\alpha_j g^\beta_k g^\gamma_\ell + f^i_{\alpha \beta} g^\alpha_{j\ell} g^\beta_k + + f^i_{\alpha \beta} g^\alpha_{j} g^\beta_{k\ell} + f^i_{\alpha \beta} g^\alpha_{jk} g^\beta_\ell + f^i_{\alpha} g^\alpha_{jk\ell} \newline
+    \frac{\partial^3 f^i}{\partial x^j \partial x^k \partial x^\ell} &= f^i_{\alpha \beta \gamma} g^\alpha_j g^\beta_k g^\gamma_\ell + f^i_{\alpha \beta} g^\alpha_{j\ell} g^\beta_k + f^i_{\alpha \beta} g^\alpha_{j} g^\beta_{k\ell} \nonumber \\
+    & \qquad + f^i_{\alpha \beta} g^\alpha_{jk} g^\beta_\ell + f^i_{\alpha} g^\alpha_{jk\ell} \newline
     &= f^i_{\alpha \beta \gamma} g^\alpha_j g^\beta_k g^\gamma_\ell + 3 \cdot  f^i_{\alpha \beta} g^\alpha_j g^\beta_{k\ell} + f^i_{\alpha} g^\alpha_{jk\ell}
 \end{align}
 $$
 These expressions get very unwieldy for higher order derivatives. Let's try one fourth!
 $$
 \begin{align}
-    \frac{\partial^4 f^i}{\partial x^j \partial x^k \partial x^\ell \partial x^m} &= f^i_{\alpha \beta \gamma \delta} g^\alpha_j g^\beta_k g^\gamma_\ell g^\delta_m + 6 \cdot f^i_{\alpha \beta \gamma} g^\alpha_j g^\beta_k g^\gamma_{\ell m} + 3 \cdot  f^i_{\alpha \beta} g^\alpha_{j\ell} g^\beta_{km}
-    + 4 \cdot  f^i_{\alpha \beta} g^\alpha_{j} g^\beta_{k \ell m} + f^i_{\alpha} g^\alpha_{jk\ell m}.
+    \frac{\partial^4 f^i}{\partial x^j \partial x^k \partial x^\ell \partial x^m} &= f^i_{\alpha \beta \gamma \delta} g^\alpha_j g^\beta_k g^\gamma_\ell g^\delta_m + 6 \cdot f^i_{\alpha \beta \gamma} g^\alpha_j g^\beta_k g^\gamma_{\ell m} + 3 \cdot  f^i_{\alpha \beta} g^\alpha_{j\ell} g^\beta_{km} \nonumber \\
+    & \qquad + 4 \cdot  f^i_{\alpha \beta} g^\alpha_{j} g^\beta_{k \ell m} + f^i_{\alpha} g^\alpha_{jk\ell m}.
 \end{align}
 $$
 OK, what is going on? This is tedious and confusing and it is not obvious if there is any structure to this. In fact there is a very simple structure and we can derive all the above with some simple rules involving *special labeled rooted trees*. To make the connection, we make two observations. Each derivative is a sum of factors of the form $f^i_{\alpha\beta...}g^\alpha_{ij...}g^\beta_{k\ell...} \cdots$ where there is a:
