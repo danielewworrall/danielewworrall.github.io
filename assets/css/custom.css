@@ -21,6 +21,14 @@ p {
 font-size: 1em; /* Increase font size further for display math */
 }
 
-li {  /* Targets all list items in unordered lists */
-  @apply text-sm; 
+li p { /* Targets all <p> tags within any <li> */
+    font-size: 16px !important;
+}
+  
+ul li p { /* Targets <p> tags within <li> within <ul> only */
+    font-size: 16px !important;
+}
+  
+ol li p { /* Targets <p> tags within <li> within <ol> only */
+    font-size: 16px !important;
 }
