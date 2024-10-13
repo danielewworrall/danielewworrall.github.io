@@ -14,11 +14,11 @@ p {
 
 /* assets/css/custom.css */
 .katex .base {
-    font-size: 1em; /* Increase base font size by 20% */
+    font-size: 16px; /* Increase base font size by 20% */
   }
   
 .katex-display { /* Target display mode math specifically */
-font-size: 0.6em; /* Increase font size further for display math */
+font-size: 16px; /* Increase font size further for display math */
 }
 
 li p { /* Targets all <p> tags within any <li> */
