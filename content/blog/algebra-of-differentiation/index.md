@@ -18,9 +18,11 @@ $$
 \end{align}
 $$
 where $f$ and $g$ are vector-in vector-out functions. We can introduce an intermediate variable $\textbf{y} = g(\textbf{x})$ so that $\textbf{z} = f(\textbf{y})$. The derivative of $\textbf{z}$ with respect to $\textbf{x}$ is then
-$${align}
+$$
+\begin{align}
     \frac{\partial \textbf{z}}{\partial \textbf{x}} = \frac{\partial \textbf{z}}{\partial \textbf{y}} \frac{\partial \textbf{y}}{\partial \textbf{x}}.
 \end{align}
+$$
 In any contemporary machine learning masters course, this is about as far as we go. Couple the chain rule with dynamic programming and you get the backpropagation algorithm and forward-mode differentiation. And for most practitioners, we do not even need to know as much. With the advent of packages like [JAX](https://jax.readthedocs.io/en/latest/notebooks/quickstart.html) all this machinery is hidden away. Well not today!
 
 Now while vector notation is neat, it's actually really unhelpful when we wish to do calculus. Each Jacobian in the above expression is a matrix and I always forget how to order the rows and columns properly. Furthermore, the following is going to involve a lot of vector derivatives, matrix derivatives, and higher order tensor derivatives, which can all be very unwieldy, so to ease notation we shall adopt index notation instead. As we shall see, switching up our notation frequently is going to help our understanding and aid our ability to generalize.
