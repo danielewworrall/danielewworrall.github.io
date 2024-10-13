@@ -4,6 +4,7 @@ excerpt: "About me"
 author_profile: true
 hide_date: true
 reading_time: false
+style: 'text-align: justify; font-size: 0.8em;'
 ---
 **I am** a Senior Research Scientist in Pete Battaglia's Structured Intelligence
 Team at DeepMind, London.

@@ -6,8 +6,6 @@ hide_date: true
 reading_time: false
 ---
 
-{% include base_path %}
-
 **Bayesian Statistics for Machine Learning**, 2018 & 2019\
 Bachelor Kunstmatige Intelligentie, University of Amsterdam\
 Code: 5082PTFM6Y\
