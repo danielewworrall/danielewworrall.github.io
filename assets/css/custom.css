@@ -14,7 +14,7 @@ p {
 
 /* assets/css/custom.css */
 .katex {
-    font-size: 18px; /* Increase base font size by 20% */
+    font-size: 16px; /* Increase base font size by 20% */
   }
   
 .katex-display { /* Target display mode math specifically */
