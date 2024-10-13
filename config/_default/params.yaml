@@ -7,8 +7,9 @@
 appearance:
   mode: system
   color: blue
-  font: minimal
-  font_size: s
+
+font: minimal
+font_size: s
 
 # SEO
 marketing:
