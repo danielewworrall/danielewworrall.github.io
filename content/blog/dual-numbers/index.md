@@ -11,7 +11,7 @@ extract: "There is a generalisation of the complex numbers with a nilpotent imag
 
 # Dual numbers I
 
-**TL;DR**: There is a generalisation of the complex numbers where {{< math >}}$i^2=0${{< /math >}} instead of {{< math >}}$i^2=-1${{< /math >}}. Functions extended to this _dual number_ system have the curious property that we can read off their derivatives (at a point {{< math >}}$x${{< /math >}}) if we evaluate them at the dual number {{< math >}}$x + i${{< /math >}}. This has implications for automatic differentiation frameworks.
+**TL;DR**: There is a generalisation of the complex numbers where $i^2=0$ instead of {{< math >}}$i^2=-1${{< /math >}}. Functions extended to this _dual number_ system have the curious property that we can read off their derivatives (at a point {{< math >}}$x${{< /math >}}) if we evaluate them at the dual number {{< math >}}$x + i${{< /math >}}. This has implications for automatic differentiation frameworks.
 
 I found writing this next post is a real treat. It's about *dual numbers*. Dual numbers are a bit strange, to say the least, and at first they seem like an abstract mathematical fancy, but as you will see they serve quite a useful purpose in the realm of automatic differentiation. We're going to start by reviewing what we know about the complex numbers. It will turn out that by tweaking them a wee bit we end up with the dual numbers, which, as mentioned, have some strikingly elegant properties when it comes to evaluating derivatives on computation graphs.
 
