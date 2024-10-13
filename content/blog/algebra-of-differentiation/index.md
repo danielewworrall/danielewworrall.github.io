@@ -86,6 +86,7 @@ We begin by drawing the simplest tree $f^i$ as
 <p align="center">
   <img src="images/aod_1.svg" width="80px">
 </p>
+
 This is just a root node of a tree---hence special labeled *rooted* tree. Every time we differentiate $f^i$ we will draw a branch emanating from the root node. In other words, for every subscript of $f^i$ we draw a branch. The first derivative $f^i_{\alpha} g^\alpha_j$ we thus draw as
 
 <p align="center">
