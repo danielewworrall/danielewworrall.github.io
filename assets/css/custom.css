@@ -14,9 +14,9 @@ p {  /* Targets all paragraphs within blog posts */
 
 /* assets/css/custom.css */
 .katex .base {
-    font-size: 1.2em; /* Increase base font size by 20% */
+    font-size: 0.8em; /* Increase base font size by 20% */
   }
   
   .katex .display { /* Target display mode math specifically */
-    font-size: 1.5em; /* Increase font size further for display math */
+    font-size: 0.8em; /* Increase font size further for display math */
   }
