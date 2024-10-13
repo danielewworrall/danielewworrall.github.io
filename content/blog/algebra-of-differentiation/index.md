@@ -84,7 +84,7 @@ We are going to replace each term in $f$ or $g$ with parts of a special rooted t
 We begin by drawing the simplest tree $f^i$ as
 
 <p align="center">
-  <img src="images/aod_1.svg" width="92px">
+  <img src="images/aod_1.svg" width="61px">
 </p>
 This is just a root node of a tree---hence special labeled *rooted* tree. Every time we differentiate $f^i$ we will draw a branch emanating from the root node. In other words, for every subscript of $f^i$ we draw a branch. The first derivative $f^i_{\alpha} g^\alpha_j$ we thus draw as
 
@@ -163,7 +163,7 @@ What would be the expression for the $5$th order derivative?
 So we can study higher order derivatives of compositions of functions via special rooted trees! This process of adding and extending branches can be applied recursively very easily and a list of the first few special rooted trees looks like
 
 <p align="center">
-  <img src="images/aod_11.svg" width="6520px">
+  <img src="images/aod_11.svg" width="520px">
 </p>
 
 The theory of rooted trees goes very deep. We have only considered the *special* variety, for which branching can only occur at the root node. People have gone far into defining entire algebras over rooted trees, defining operations such as multiplication and addition. This comes in handy when studying order conditions of Runge-Kutta solvers and renormalization in quantum field theory. I personally think this area is extremely beautiful and am even more happy that I have a quick trick to derive expressions for higher order derivatives of composed functions.
