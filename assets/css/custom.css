@@ -11,3 +11,12 @@ h3 {
 p {  /* Targets all paragraphs within blog posts */
     font-size: 16px;
   }
+
+/* assets/css/custom.css */
+.katex .base {
+    font-size: 1.2em; /* Increase base font size by 20% */
+  }
+  
+  .katex .display { /* Target display mode math specifically */
+    font-size: 1.5em; /* Increase font size further for display math */
+  }
