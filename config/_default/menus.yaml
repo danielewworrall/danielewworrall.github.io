@@ -8,3 +8,6 @@ main:
   - name: About
     url: about/
     weight: 20
+  - name: Teaching
+    url: teaching/
+    weight: 30
