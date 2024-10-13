@@ -18,7 +18,7 @@ p {
   }
   
 .katex-display { /* Target display mode math specifically */
-font-size: 16px; /* Increase font size further for display math */
+font-size: 18px; /* Increase font size further for display math */
 }
 
 li p { /* Targets all <p> tags within any <li> */
@@ -34,5 +34,5 @@ ol li p { /* Targets <p> tags within <li> within <ol> only */
 }
 
 .prose {
-    max-width: 120ch;
+    max-width: 160ch;
   }
