@@ -15,9 +15,9 @@
   --bg-card-hover: rgba(255, 255, 255, 0.065);
   --bg-glass: rgba(28, 30, 38, 0.88);
 
-  --text-primary: #e6e1dc;
-  --text-secondary: #9c9690;
-  --text-muted: #6b6660;
+  --text-primary: #f0ece7;
+  --text-secondary: #b5afa8;
+  --text-muted: #807a74;
 
   --accent-primary: #d4956b;
   /* Warm copper */
@@ -1151,6 +1151,11 @@ section {
   height: auto;
   border-radius: var(--radius-sm);
   margin: 1rem 0;
+}
+
+/* Invert black-on-white diagrams in dark mode */
+:root:not([data-theme="light"]) .blog-post__content img[src$=".svg"] {
+  filter: invert(0.88);
 }
 
 .blog-post__content blockquote {
