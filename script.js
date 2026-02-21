@@ -223,3 +223,56 @@
   };
   document.head.appendChild(script);
 })();
+
+// ── Citation Counts (Semantic Scholar) ───────────────────────
+(function loadCitations() {
+  const cards = document.querySelectorAll('.pub-card');
+  if (!cards.length) return;
+
+  const AUTHOR_ID = '3471551'; // Daniel E. Worrall
+  const API = `https://api.semanticscholar.org/graph/v1/author/${AUTHOR_ID}/papers?fields=title,citationCount,url&limit=100`;
+
+  function normalise(s) {
+    return s.toLowerCase().replace(/[^a-z0-9]/g, '');
+  }
+
+  fetch(API)
+    .then(r => r.json())
+    .then(data => {
+      const papers = data.data || [];
+      cards.forEach(card => {
+        const titleEl = card.querySelector('.pub-card__title');
+        if (!titleEl) return;
+        const cardTitle = normalise(titleEl.textContent);
+
+        // Find best match
+        let best = null, bestScore = 0;
+        papers.forEach(p => {
+          const pTitle = normalise(p.title);
+          // Check if one contains the other (handles slight differences)
+          const shorter = cardTitle.length < pTitle.length ? cardTitle : pTitle;
+          const longer = cardTitle.length < pTitle.length ? pTitle : cardTitle;
+          if (longer.includes(shorter) && shorter.length > 10) {
+            const score = shorter.length / longer.length;
+            if (score > bestScore) { bestScore = score; best = p; }
+          }
+        });
+
+        if (best && best.citationCount > 0) {
+          let linksRow = card.querySelector('.pub-card__links');
+          if (!linksRow) {
+            linksRow = document.createElement('div');
+            linksRow.className = 'pub-card__links';
+            card.appendChild(linksRow);
+          }
+          const badge = document.createElement('a');
+          badge.className = 'pub-card__cite-badge';
+          badge.href = best.url || '#';
+          badge.target = '_blank';
+          badge.textContent = `Cited by ${best.citationCount}`;
+          linksRow.appendChild(badge);
+        }
+      });
+    })
+    .catch(() => { }); // fail silently
+})();
