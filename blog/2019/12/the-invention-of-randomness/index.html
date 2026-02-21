@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>On the 'invention' of randomness — Daniel Worrall</title>
+    <meta name="description"
+        content="Jaynes essentially claims that randomness simply does not exist. It is a human invention. After lecturing a Bayesian statistics course for two years, I felt fairly confident in my understanding — it seems I was wrong.">
+    <link rel="stylesheet" href="/style.css">
+    <link rel="icon" href="/images/profile.png" type="image/png">
+    <script>
+        MathJax = {
+            tex: { inlineMath: [['$', '$']], displayMath: [['$$', '$$'], ['\\[', '\\]'], ['\\begin{align}', '\\end{align}']], processEscapes: true, tags: 'ams' },
+            options: { skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'] }
+        };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async></script>
+</head>
+
+<body>
+
+    <canvas id="neural-canvas"></canvas>
+
+    <nav class="nav" role="navigation">
+        <div class="nav__inner">
+            <a href="/" class="nav__logo">d<span>.</span>worrall</a>
+            <ul class="nav__links" id="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/publications.html">Publications</a></li>
+                <li><a href="/talks.html">Talks</a></li>
+                <li><a href="/teaching.html">Teaching</a></li>
+            </ul>
+            <div style="display:flex;align-items:center;gap:0.5rem;">
+                <button class="nav__theme-toggle" id="theme-toggle" aria-label="Toggle dark/light mode">☀️</button>
+                <button class="nav__hamburger" id="hamburger" aria-label="Toggle menu">
+                    <span></span><span></span><span></span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="page-content">
+        <div class="container">
+
+            <article class="blog-post reveal">
+                <header class="blog-post__header">
+                    <p class="section-header__label">Writing</p>
+                    <h1 class="blog-post__title">On the 'invention' of randomness</h1>
+                    <div class="blog-post__meta">
+                        <time>15 December 2019</time>
+                        <div class="blog-card__tags">
+                            <span class="blog-card__tag">probability</span>
+                            <span class="blog-card__tag">bayesianism</span>
+                            <span class="blog-card__tag">Jaynes</span>
+                            <span class="blog-card__tag">philosophy</span>
+                        </div>
+                    </div>
+                </header>
+
+                <div class="blog-post__content">
+
+                    <div style="float:right; margin-left:20px; margin-bottom:10px; max-width:25%;">
+                        <img src="/media/jaynes-himself.jpg" alt="E.T. Jaynes" style="width:100%; border-radius:8px;">
+                    </div>
+
+                    <p>Recently in AMLAB we started a Jaynes reading group. <a
+                            href="https://en.wikipedia.org/wiki/Edwin_Thompson_Jaynes">E T Jaynes'</a> posthumous book
+                        and general all-round cult classic <em>Probability Theory: The Logic of Science</em> is the
+                        focus of our study. After having lectured a Bayesian statistics course for the last two years, I
+                        felt fairly confident in my understanding of the subject matter. It seems that while I am at
+                        ease with performing computations I have far from grasped Bayesianism from a conceptual, and
+                        some might say doctrinal, standpoint. And after a couple of conversations with others in a
+                        similar situation to me, it seems I may not be alone.</p>
+
+                    <p>Now this book is littered with gems and Jaynes' colourful written-style is literary gold, but I
+                        want to focus on a small snippet, which got me thinking hard about my understanding of what it
+                        means to be <em>random</em>. <strong>Jaynes essentially claims that randomness simply does not
+                            exist</strong>. It is a human invention, which you can find in Digression 3.8.1. Let's step
+                        through the logic.</p>
+
+                    <h2>My truth versus your truth</h2>
+                    <p>In true statistical tradition, we are going to consider coin tosses. Let's assume that randomness
+                        does exist. What do I mean by randomness? I mean that when I throw the coin in the air it will
+                        land heads or tails in a 100% unpredictable fashion. Some intrinsically indeterminate process
+                        will drive the coin to come to rest in a state, independent of when it left my fingers. In this
+                        unpredictable world an observer would be unable to make any sure judgements about the outcome.
+                        She may assume the prior probability of the coin landing heads or tails is 50%. This is not some
+                        weird quantum-y line of reasoning, the coin will land either heads or either tails, but we just
+                        cannot say beforehand. Some would argue, that maintaining a uniform probability distribution
+                        over the outcome of the coin toss is really the best she can do. It is a reflection of the truth
+                        of the world she lives in.</p>
+
+                    <p>Let's now pretend that the world is 100% deterministic. Say I flip a coin and I happen to know
+                        its mass, moment of angular inertia, air resistance, initial momentum, etc. In this perfect
+                        world, an observer gifted with this knowledge would be able to predict with 100% accuracy
+                        whether it lands heads or tails. Even if the computations are intractable and we are reduced to
+                        brute-forcing over possible futures, we could at least agree that the outcome is calculable in
+                        principle. No randomness here. Now let's add a twist. Let's say that we do not tell the observer
+                        any of this privileged information about the physics of the coin-toss. In that case, the
+                        observer would be reduced to educated guesses about the outcome of the toss. Because she's a
+                        good Bayesian, she will continue to assume the prior probability of the coin landing heads or
+                        tails is 50%, but now her motivations are different. Or are they?</p>
+
+                    <p>Maintaining a probability distribution over the outcome of the coin toss is not just a cynically
+                        non-committal statement. It is a full and honest acknowledgement of her ignorance. She has not
+                        claimed that the world itself is random in any way—in fact she very well knows it's
+                        deterministic—but she is merely asserting that her knowledge of its physical parameters are
+                        unknown to her. Whichever way the coin lands, the outcome will be a surprise to her, because she
+                        is unable to predict it with her imperfect knowledge.</p>
+
+                    <p>This seemed a bit weird to me. In moving from the synthetically random world to the deterministic
+                        one, it would seem that modelled randomness is really just a statement of observer ignorance,
+                        rather than any innate property of the universe around us. The fascinating point for me is that
+                        from the point-of-view of the observer, <em>it does not matter whichever world she lives in (the
+                            inherently random or the inherently deterministic), in both cases she is forced to use the
+                            same mathematical reasoning!</em> To make a linguistic distinction between the intrinsic
+                        randomness of the outside world and the observer's perceived randomness, we will term them
+                        <em>intrinsic randomness</em> and <em>epistemic randomness</em>. Epistemic randomness is the
+                        uncertainty I have over the outside world because I simply do not have enough information. It
+                        seems that epistemic randomness is uncontroversial. Intrinsic randomness on the other hand is
+                        this very much controversial concept that Nature itself is indeterminate and unpredictable.</p>
+
+                    <p>Now this kind of thinking leads to a vast array of new questions. Could an observer ever
+                        determine whether the world she lives in is intrinsically random or just deterministic, given
+                        that her tools to analyse both are the same? If intrinsic randomness does not exist, is it then
+                        some kind of invention? What does this mean for the interpretation of stochastically derived
+                        quantities such as aleatoric and epistemic uncertainty? What about free will? <strong>I plan to
+                            devote a follow up blog to aleatoric and epistemic uncertainties.</strong></p>
+
+                    <h2>My gripe with Jaynes</h2>
+                    <p>Those acquainted with Jaynes' writings will be all too familiar with his grandiloquent rhetorical
+                        style. He really seems to believe that intrinsic randomness does not exist, that it is a sort of
+                        what he calls <em>mind projection fallacy</em>.</p>
+
+                    <blockquote>
+                        <p>The belief that 'randomness' is some kind of real property existing in Nature is a form of
+                            the mind projection fallacy which says, in effect, 'I don't know the detailed causes –
+                            therefore – Nature does not know them.</p>
+                    </blockquote>
+
+                    <p>Of course <em>he</em> would put (intrinsic) <em>randomness</em> in quotation marks. Mind
+                        projection fallacies, a very Jaynesian invention, are assertions wherein an observer states that
+                        how they see the world really is reality. My reality is your reality and everyone else's too.
+                        That someone should disagree on the nature of Nature itself is simple idiocy. Now my gripe with
+                        Jaynes' stance is that he himself appears to be stuck in a mind projection fallacy of his own.
+                        His assertion that intrinsic randomness does not exist is a projection of his reality on to the
+                        reader. Just for fun here is another, and I daresay somewhat salacious, Jaynes quote</p>
+
+                    <blockquote>
+                        <p>For some, declaring a problem to be 'randomized' is an incantation with the same purpose and
+                            effect as those uttered by an exorcist to drive out evil spirits; i.e. it cleanses their
+                            subsequent calculations and renders them immune to criticism. We agnostics often envy the
+                            True Believer, who thus acquires so easily that sense of security which is forever denied to
+                            us.</p>
+                    </blockquote>
+
+                    <h3>Quantum weirdness</h3>
+                    <p><strong>Disclaimer: in this next bit I talk about physics, but be under no illusions, I am far
+                            from knowledgeable on this subject.</strong></p>
+
+                    <p>So is the world deterministic? As far as I know the main source of randomness in the world rises
+                        out of the depths from the sub-atomic quantum world. The quantum world is very strange in that
+                        very small objects, called particles, such as electrons and neutrons, are described
+                        probabilistically and not using our everyday Newtonian world-view. Particles are seen to exhibit
+                        <em>wave-particle duality</em>—a behaviour where they act like waves, being able to be in
+                        multiple locations at once—until they are observed, at which point we observe a bizarre effect
+                        called <em>wavefunction collapse</em>, where they then assume a definite location in space.
+                        Wavefunction collapse has always been an incomprehensible phenomenon to me. Why should the act
+                        of observation change the nature of the underlying physics?</p>
+
+                    <p>The central apparatus for modelling particles is a <em>wavefunction</em>, a function extending
+                        over all space and time. The squared modulus of the wavefunction is equal to the probability
+                        that a particle will be observed at a specific location and time if a measurement is taken. One
+                        of the big problems in quantum mechanics is understanding how to interpret the wavefunction. Is
+                        it a fundamental physical object? If so, it is very strange indeed, since in the classical
+                        setting where we model big objects, we never observe an object to be in two places at once. In
+                        the quantum world, this happens by necessity.</p>
+
+                    <p>One school of thinking, in fact the one I learnt in secondary school (that's high school for
+                        everyone else), is that the wavefunction is a fundamental object of nature. It is part of
+                        reality. This is an unsettling idea, but if true it would indicate that our world is very weird
+                        indeed. Einstein famously rejected this interpretation claiming "God does not play dice". This
+                        is the (in)famous <em>Copenhagen interpretation</em> of quantum mechanics, which as it turns out
+                        is not universally accepted or rejected by all physicists. Some detractors indeed do subscribe
+                        to deterministic <em>hidden variable theories</em>, as I believe did Jaynes, in which random
+                        quantum effects are just disturbances caused by so-called hidden variables, unobserved by us
+                        humans (so far). But I think that one flavour of hidden variable theories, called local hidden
+                        variable theories, have been ruled out already by what is known as the Bell test experiments. A
+                        much more promising route is <em>QBism</em>, pronounced <em>cubism</em> like the artistic
+                        movement, championed by Christopher Fuchs. QBism was originally called Quantum Bayesianism, but
+                        apparently many hardcore Bayesians have pointed out it is not strictly Bayesian and QBism sounds
+                        cooler anyway. In this theory particles occupy one position at any one time, the wavefunction is
+                        just an expression of observer ignorance, and wavefunction collapse is analogous to making a
+                        measurement and updating our beliefs. Mystery resolved...if it's true.</p>
+
+                    <p>So whether intrinsic randomness does exist is an open and potentially unanswerable question. At
+                        least to determine the potentiality of intrinsic randomness would require us to step outside of
+                        the rôle of observer—a purely unscientific practice. All observers are bound to make world
+                        inferences via the methods of epistemic randomness and are thus at risk of succumbing to
+                        Jaynesian mind projection fallacies. Some might go as far to say that if something is
+                        unverifiable by experiment it cannot <em>exist</em>. Enter die-hard scientific methodists
+                        (theological pun intended). On a side note, the question of existence seems to be an argument I
+                        get into a lot nowadays with post-structuralists from the arts and humanities, who always tell
+                        me that scientists are mistaken in believing that what they study exists.</p>
+
+                    <p>Inevitably after reading a story about flipping coins, I seem to have found myself in quite the
+                        bind. If I have come to understand anything, it is that you can never be safe in thinking you
+                        know anything.</p>
+
+                </div>
+            </article>
+
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer__links">
+                <a href="https://scholar.google.com/citations?user=613GPbQAAAAJ&hl=en" target="_blank">Google
+                    Scholar</a>
+                <a href="https://github.com/danielewworrall" target="_blank">GitHub</a>
+                <a href="https://twitter.com/danielewworrall" target="_blank">Twitter</a>
+                <a href="https://www.linkedin.com/in/daniel-worrall-46a43238/" target="_blank">LinkedIn</a>
+            </div>
+            <p class="footer__text">© 2026 Daniel Worrall</p>
+        </div>
+    </footer>
+
+    <script src="/script.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>On rooted trees and differentiation — Daniel Worrall</title>
+    <meta name="description"
+        content="The chain rule for higher order derivatives boosts a wealth of beautiful mathematical structure touching the theory of special rooted trees, group theory, combinatorics of integer partitions, order theory, and many others.">
+    <link rel="stylesheet" href="/style.css">
+    <link rel="icon" href="/images/profile.png" type="image/png">
+    <!-- MathJax -->
+    <script>
+        MathJax = {
+            tex: { inlineMath: [['$', '$']], displayMath: [['$$', '$$'], ['\\[', '\\]'], ['\\begin{align}', '\\end{align}']], processEscapes: true, tags: 'ams' },
+            options: { skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'] }
+        };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async></script>
+</head>
+
+<body>
+
+    <canvas id="neural-canvas"></canvas>
+
+    <nav class="nav" role="navigation">
+        <div class="nav__inner">
+            <a href="/" class="nav__logo">d<span>.</span>worrall</a>
+            <ul class="nav__links" id="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/publications.html">Publications</a></li>
+                <li><a href="/talks.html">Talks</a></li>
+                <li><a href="/teaching.html">Teaching</a></li>
+            </ul>
+            <div style="display:flex;align-items:center;gap:0.5rem;">
+                <button class="nav__theme-toggle" id="theme-toggle" aria-label="Toggle dark/light mode">☀️</button>
+                <button class="nav__hamburger" id="hamburger" aria-label="Toggle menu">
+                    <span></span><span></span><span></span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="page-content">
+        <div class="container">
+
+            <article class="blog-post reveal">
+                <header class="blog-post__header">
+                    <p class="section-header__label">Writing</p>
+                    <h1 class="blog-post__title">On rooted trees and differentiation</h1>
+                    <div class="blog-post__meta">
+                        <time>22 November 2023</time>
+                        <div class="blog-card__tags">
+                            <span class="blog-card__tag">differentiation</span>
+                            <span class="blog-card__tag">algebra</span>
+                        </div>
+                    </div>
+                </header>
+
+                <div class="blog-post__content">
+
+                    <h2>Introduction</h2>
+                    <p>The chain rule lies at the heart of the backpropagation algorithm in deep learning. Unbeknownst
+                        to many though, the chain rule for higher order derivatives boasts a wealth of beautiful
+                        mathematical structure touching the theory of special rooted trees, group theory, combinatorics
+                        of integer partitions, order theory, and many others. I've been meaning to write this post for a
+                        long time, but in the last year work has been quite busy. I'm glad I can finally share with you
+                        the beautiful maths connecting special rooted trees and differentiation.</p>
+
+                    <h3>The chain rule</h3>
+                    <p>We start with a composition of functions</p>
+                    \begin{align}
+                    \textbf{z} = f(g(\textbf{x}))
+                    \end{align}
+                    <p>where $f$ and $g$ are vector-in vector-out functions. We can introduce an intermediate variable
+                        $\textbf{y} = g(\textbf{x})$ so that $\textbf{z} = f(\textbf{y})$. The derivative of
+                        $\textbf{z}$ with respect to $\textbf{x}$ is then</p>
+                    \begin{align}
+                    \frac{\partial \textbf{z}}{\partial \textbf{x}} = \frac{\partial \textbf{z}}{\partial \textbf{y}}
+                    \frac{\partial \textbf{y}}{\partial \textbf{x}}.
+                    \end{align}
+                    <p>In any contemporary machine learning masters course, this is about as far as we go. Couple the
+                        chain rule with dynamic programming and you get the backpropagation algorithm and forward-mode
+                        differentiation. And for most practitioners, we do not even need to know as much. With the
+                        advent of packages like <a
+                            href="https://jax.readthedocs.io/en/latest/notebooks/quickstart.html">JAX</a> all this
+                        machinery is hidden away. Well not today!</p>
+
+                    <p>Now while vector notation is neat, it's actually really unhelpful when we wish to do calculus.
+                        Each Jacobian in the above expression is a matrix and I always forget how to order the rows and
+                        columns properly. Furthermore, the following is going to involve a lot of vector derivatives,
+                        matrix derivatives, and higher order tensor derivatives, which can all be very unwieldy, so to
+                        ease notation we shall adopt index notation instead. As we shall see, switching up our notation
+                        frequently is going to help our understanding and aid our ability to generalize.</p>
+
+                    <p>So using $z^i$ to denote the $i$th component of a vector $\textbf{z}$, we could write</p>
+                    \begin{align}
+                    \frac{\partial z^i}{\partial x^j} = \sum_{\alpha} \frac{\partial z^i}{\partial y^\alpha}
+                    \frac{\partial y^\alpha}{\partial x^j}.
+                    \end{align}
+                    <p>As a second notational step, we are going to denote differentiation of a function $h$ with
+                        respect to the $\alpha$th dimension of its input as $h_\alpha$. Notice we do not need to make
+                        reference to $y$ in this notation, since it is understood at we differentiate with respect to
+                        the input of $f$, however we might wish to label it. So</p>
+                    \begin{align}
+                    \frac{\partial f^i}{\partial y^\alpha} = f^i_\alpha
+                    \end{align}
+                    <p>The chain rule is then just</p>
+                    \begin{align}
+                    \frac{\partial f^i}{\partial x^j} = \sum_{\alpha} f^i_\alpha g^\alpha_j.
+                    \end{align}
+                    <p>Notice how there is one $\alpha$ on the bottom and one $\alpha$ on the top. For this reason, as
+                        one final notational convenience, we will switch to Einstein notation, where we implicitly sum
+                        over repeated indices in upper–lower pairs, so the chain rule is</p>
+                    \begin{align}
+                    \frac{\partial f^i}{\partial x^j} = f^i_\alpha g^\alpha_j.
+                    \end{align}
+                    <p>I have always found this notation both very elegant and parsimonious. Back in my PhD, before
+                        automatic differentiation was commonplace in machine learning, I would often use this notation
+                        to work out gradients, because it is both uncluttered and unconfusing.</p>
+
+                    <p>You may have noticed that I am using Greek letters for the dummy variables we sum over. This is
+                        just a choice mainly for me to remember what we are summing over. With this highly compressed
+                        notation, let's write the 2nd derivative of $f^i$ with respect to $x$. It's</p>
+                    \begin{align}
+                    \frac{\partial^2 f^i}{\partial x^j \partial x^k} = f^i_{\alpha \beta} g^\alpha_j g^\beta_k +
+                    f^i_{\alpha} g^\alpha_{jk}.
+                    \end{align}
+                    <p>The 3rd derivative is</p>
+                    $$\begin{aligned}
+                    \frac{\partial^3 f^i}{\partial x^j \partial x^k \partial x^\ell} &= f^i_{\alpha \beta \gamma}
+                    g^\alpha_j g^\beta_k g^\gamma_\ell + f^i_{\alpha \beta} g^\alpha_{j\ell} g^\beta_k + f^i_{\alpha
+                    \beta} g^\alpha_{j} g^\beta_{k\ell} + f^i_{\alpha \beta} g^\alpha_{jk} g^\beta_\ell + f^i_{\alpha}
+                    g^\alpha_{jk\ell} \\
+                    &= f^i_{\alpha \beta \gamma} g^\alpha_j g^\beta_k g^\gamma_\ell + 3 \cdot f^i_{\alpha \beta}
+                    g^\alpha_j g^\beta_{k\ell} + f^i_{\alpha} g^\alpha_{jk\ell}
+                    \end{aligned}$$
+                    <p>These expressions get very unwieldy for higher order derivatives. Let's try one fourth!</p>
+                    $$\begin{aligned}
+                    \frac{\partial^4 f^i}{\partial x^j \partial x^k \partial x^\ell \partial x^m} &= f^i_{\alpha \beta
+                    \gamma \delta} g^\alpha_j g^\beta_k g^\gamma_\ell g^\delta_m + 6 \cdot f^i_{\alpha \beta \gamma}
+                    g^\alpha_j g^\beta_k g^\gamma_{\ell m} + 3 \cdot f^i_{\alpha \beta} g^\alpha_{j\ell} g^\beta_{km}
+                    + 4 \cdot f^i_{\alpha \beta} g^\alpha_{j} g^\beta_{k \ell m} + f^i_{\alpha} g^\alpha_{jk\ell m}.
+                    \end{aligned}$$
+                    <p>OK, what is going on? This is tedious and confusing and it is not obvious if there is any
+                        structure to this. In fact there is a very simple structure and we can derive all the above with
+                        some simple rules involving <em>special labeled rooted trees</em>. To make the connection, we
+                        make two observations. Each derivative is a sum of factors of the form
+                        $f^i_{\alpha\beta...}g^\alpha_{ij...}g^\beta_{k\ell...} \cdots$ where there is a:</p>
+                    <ol>
+                        <li>single term in $f^i_{\alpha\beta...}$ with multiple subscripts,</li>
+                        <li>multiple terms in $g^\alpha_{ij...}$ where $g$ has a single superscript and potentially many
+                            subscripts.</li>
+                    </ol>
+                    <p>We are going to replace each term in $f$ or $g$ with parts of a special rooted tree.</p>
+
+                    <h2>Special labeled rooted trees</h2>
+                    <p>We begin by drawing the simplest tree $f^i$ as</p>
+                    <p align="center"><img src="/media/2023/aod_1.svg" alt="Root node"></p>
+                    <p>This is just a root node of a tree—hence special labeled <em>rooted</em> tree. Every time we
+                        differentiate $f^i$ we will draw a branch emanating from the root node. In other words, for
+                        every subscript of $f^i$ we draw a branch. The first derivative $f^i_{\alpha} g^\alpha_j$ we
+                        thus draw as</p>
+                    <p align="center"><img src="/media/2023/aod_2.svg" alt="First derivative tree"></p>
+                    <p>This is simple enough. Note, we shall also label the nodes with the subscript of the attached
+                        branch—in this case $j$—so that we can keep track of what branch corresponds to what algebraïc
+                        terms. Hence special <em>labeled</em> rooted tree. We didn't write $i$ by the root node, since
+                        it is not a <em>sub</em>script. In fact, since $i$ only ever appears in the superscript of $f$,
+                        we could drop it entirely, leaving $f$ as a vector-in scalar-out mapping, which we choose to do
+                        from now on.</p>
+
+                    <p>Now what about the factor $f_{\alpha\beta} g^\alpha_j g^\beta_k$? It has two branches emanating
+                        from the root as</p>
+                    <p align="center"><img src="/media/2023/aod_3.svg" alt="Two-branch tree"></p>
+
+                    <p>What if $g$ has multiple subscripts? Well, we then extend the branch by as many subscripts in $g$
+                        so $f_{\alpha} g^\alpha_{jk}$ and $f_{\alpha\beta} g^\alpha_{jk}g^\beta_\ell$ look like</p>
+                    <p align="center"><img src="/media/2023/aod_4.svg" alt="Extended branches"></p>
+
+                    <p>This notation is a little weird at first, but as expressions get longer and more cumbersome, the
+                        tree representations become easier to handle. Now we have everything we need to differentiate
+                        the tree representation of our function $f(g(\textbf{x}))$. The 1st derivative of $f$ is
+                        $f_\alpha g^\alpha_j$, which is a single branched tree</p>
+                    <p align="center"><img src="/media/2023/aod_5.svg" alt="1st derivative tree"></p>
+
+                    <p>I have drawn the new branch in red to emphasize it. Differentiating again yields $f_{\alpha
+                        \beta} g^\alpha_j g^\beta_k + f_{\alpha} g^\alpha_{jk}$, so</p>
+                    <p align="center"><img src="/media/2023/aod_6.svg" alt="2nd derivative trees"></p>
+
+                    <p>What just happened? When differentiating $f_\alpha g^\alpha_j$, which in the literature is called
+                        an <em>elementary differential</em>, we applied the product rule and made two copies of
+                        $f_\alpha g^\alpha_j$. To the first copy we differentiated the $f_{\alpha}$ term, adding a new
+                        subscript $\beta$ and an extra $g^\beta_k$ branch to the root. To the second copy we
+                        differentiated the $g^\alpha_j$ term, raising it to a 2nd order derivative, and thus extending
+                        the already existing $g^\alpha_j$ branch to a length 2 $g^\alpha_{jk}$.</p>
+
+                    <p>We can easily see how this technique generalizes to higher order factors. We apply the product
+                        rule and make as many copies of our special labeled rooted tree as there are terms in the
+                        factor. To the first copy we add a branch corresponding to differentiating $f$ and to the
+                        remaining copies we extend each of the existing branches, one by one. Let's apply this technique
+                        to differentiate again, either adding a new branch to root or extending existing branches. This
+                        yields</p>
+                    <p align="center"><img src="/media/2023/aod_7.svg" alt="3rd derivative trees"></p>
+
+                    <p>Now, noticing that the middle three trees are topologically the same, with permuted labels, we
+                        can rewrite this, but we need to strip the labels. This results in</p>
+                    <p align="center"><img src="/media/2023/aod_8.svg" alt="3rd derivative simplified"></p>
+
+                    <p>which corresponds to the expression $f_{\alpha \beta \gamma} g^\alpha_j g^\beta_k g^\gamma_\ell +
+                        3 \cdot f_{\alpha \beta} g^\alpha_j g^\beta_{k\ell} + f_{\alpha} g^\alpha_{jk\ell}$ that we
+                        derived earlier! These new label-less trees are referred to as simply as <em>special rooted
+                            trees</em>. In maths-speak, a special rooted tree is a representative of the equivalence
+                        class of special labeled rooted trees.</p>
+
+                    <h2>Aside: Where does that 3 come from?</h2>
+                    <p>That 3 we see popping up in front is the <em>cardinality</em> of the equivalence class—the total
+                        number of valid labelings of the tree. Without getting too distracted, for a labeling to be
+                        valid labels need to increase from the root, so</p>
+                    <p align="center"><img src="/media/2023/aod_9.svg" alt="Invalid labeling"></p>
+
+                    <p>is an invalid labeling, assuming we have chosen alphabetical ordering of labels. On the surface,
+                        it's not very obvious why the coefficients that precede the elementary differentials in higher
+                        derivative expressions would naturally be the number of valid labelings. But staring at the
+                        diagram of how we differentiate special labeled rooted trees, we see that each row essentially
+                        generated all possible special rooted labeled trees. So all possible labelings of each special
+                        rooted labeled tree are enumerated. And hence these coefficients have a very beautiful origin.
+                    </p>
+
+                    <p>For those with a background in combinatorics, you will probably be quick to realize that there is
+                        a bijection between special rooted labeled trees and integer partitions of sets. We can
+                        associate each of the following 4-node trees with partitions with integer partitions of the set
+                        $\{j, k, \ell\}$</p>
+                    <p align="center"><img src="/media/2023/aod_10.svg" alt="Partitions"></p>
+
+                    <p>Each branch in the diagram is a grouping of letters into a subset. While each branch has to be
+                        ordered alphabetically from its root, there is only one such valid ordering, so the subset can
+                        just be left unordered. We could go deeper into partitions of sets, but Wikipedia is your friend
+                        here.</p>
+
+                    <h2>Back to differentiation</h2>
+                    <p>For me I would say the tree representation is much easier to parse than the algebraïc
+                        representation, which, mind you, is still shorthand for</p>
+                    \begin{align}
+                    \frac{\partial^3 f}{\partial y^\alpha \partial y^\beta \partial y^\gamma}\frac{\partial
+                    g^\alpha}{\partial y^j}\frac{\partial g^\beta}{\partial y^k}\frac{\partial g^\gamma}{\partial
+                    y^\ell} + 3\frac{\partial^2 f}{\partial y^\alpha \partial y^\beta}\frac{\partial g^\alpha}{\partial
+                    y^j}\frac{\partial^2 g^\beta}{\partial y^k \partial y^\ell}+ \frac{\partial f}{\partial
+                    y^\alpha}\frac{\partial^3 g^\alpha}{\partial y^j \partial y^k \partial y^\ell}.
+                    \end{align}
+                    <p>What would be the expression for the 5th order derivative?</p>
+
+                    <p>So we can study higher order derivatives of compositions of functions via special rooted trees!
+                        This process of adding and extending branches can be applied recursively very easily and a list
+                        of the first few special rooted trees looks like</p>
+                    <p align="center"><img src="/media/2023/aod_11.svg" alt="First few special rooted trees"></p>
+
+                    <p>The theory of rooted trees goes very deep. We have only considered the <em>special</em> variety,
+                        for which branching can only occur at the root node. People have gone far into defining entire
+                        algebras over rooted trees, defining operations such as multiplication and addition. This comes
+                        in handy when studying order conditions of Runge-Kutta solvers and renormalization in quantum
+                        field theory. I personally think this area is extremely beautiful and am even more happy that I
+                        have a quick trick to derive expressions for higher order derivatives of composed functions.</p>
+
+                </div>
+            </article>
+
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer__links">
+                <a href="https://scholar.google.com/citations?user=613GPbQAAAAJ&hl=en" target="_blank">Google
+                    Scholar</a>
+                <a href="https://github.com/danielewworrall" target="_blank">GitHub</a>
+                <a href="https://twitter.com/danielewworrall" target="_blank">Twitter</a>
+                <a href="https://www.linkedin.com/in/daniel-worrall-46a43238/" target="_blank">LinkedIn</a>
+            </div>
+            <p class="footer__text">© 2026 Daniel Worrall</p>
+        </div>
+    </footer>
+
+    <script src="/script.js"></script>
+</body>
+
+</html>

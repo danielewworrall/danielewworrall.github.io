@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daniel Worrall — Machine Learning Research Scientist</title>
+  <meta name="description"
+    content="Senior Research Scientist at Google DeepMind. Research on learning physical simulations, equivariance, AI4Science, and combinatorial optimization.">
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="images/profile.png" type="image/png">
+</head>
+
+<body>
+
+  <canvas id="neural-canvas"></canvas>
+
+  <!-- ── Navigation ──────────────────────────────────────── -->
+  <nav class="nav" role="navigation">
+    <div class="nav__inner">
+      <a href="/" class="nav__logo">d<span>.</span>worrall</a>
+      <ul class="nav__links" id="nav-links">
+        <li><a href="/" class="active">Home</a></li>
+        <li><a href="publications.html">Publications</a></li>
+        <li><a href="talks.html">Talks</a></li>
+        <li><a href="teaching.html">Teaching</a></li>
+      </ul>
+      <div style="display:flex;align-items:center;gap:0.5rem;">
+        <button class="nav__theme-toggle" id="theme-toggle" aria-label="Toggle dark/light mode">☀️</button>
+        <button class="nav__hamburger" id="hamburger" aria-label="Toggle menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="page-content">
+    <div class="container">
+
+      <!-- ── Hero ───────────────────────────────────────── -->
+      <section class="hero">
+        <div class="hero__grid">
+          <div>
+            <p class="hero__greeting">Research Scientist</p>
+            <h1 class="hero__name">Daniel <span class="accent">Worrall</span></h1>
+            <p class="hero__role">Senior Research Scientist · <strong>Google DeepMind</strong></p>
+
+            <div class="interests">
+              <span class="tag">AI4Science</span>
+              <span class="tag tag--cyan">Equivariance</span>
+              <span class="tag tag--purple">Neural PDE Solvers</span>
+              <span class="tag">Physical Simulation</span>
+              <span class="tag tag--cyan">Combinatorial Optimization</span>
+            </div>
+
+            <p class="hero__bio">
+              My research focuses on learning physical simulations of the world we inhabit.
+              A key challenge I obsess about is how to build high precision machine learning models,
+              with controllable error down to physics simulator accuracy, while leveraging the power of data-driven
+              techniques.
+            </p>
+
+            <div class="hero__links">
+              <a href="https://scholar.google.com/citations?user=613GPbQAAAAJ&hl=en" target="_blank">🎓 Scholar</a>
+              <a href="https://github.com/danielewworrall" target="_blank">⌨️ GitHub</a>
+              <a href="https://twitter.com/danielewworrall" target="_blank">𝕏 Twitter</a>
+              <a href="https://www.linkedin.com/in/daniel-worrall-46a43238/" target="_blank">💼 LinkedIn</a>
+              <a href="mailto:daniel.e.w.worrall@gmail.com">✉️ Email</a>
+            </div>
+          </div>
+
+          <div class="hero__photo-wrapper">
+            <img src="images/me.jpg" alt="Daniel Worrall" class="hero__photo" />
+          </div>
+        </div>
+      </section>
+
+
+      <!-- ── Blog Posts (front & center) ─────────────────── -->
+      <section class="reveal">
+        <div class="section-header">
+          <p class="section-header__label">Writing</p>
+          <h2 class="section-header__title">Blog</h2>
+          <div class="section-header__line"></div>
+        </div>
+
+        <div class="blog-grid">
+
+          <article class="blog-card">
+            <span class="blog-card__date">2023.11.22</span>
+            <h3 class="blog-card__title">
+              <a href="/blog/2023/11/rooted-trees-and-differentiation/">On rooted trees and differentiation</a>
+            </h3>
+            <p class="blog-card__excerpt">
+              The chain rule for higher order derivatives boasts a wealth of beautiful mathematical
+              structure touching the theory of special rooted trees, group theory, combinatorics of
+              integer partitions, order theory, and many others.
+            </p>
+            <div class="blog-card__tags">
+              <span class="blog-card__tag">differentiation</span>
+              <span class="blog-card__tag">algebra</span>
+            </div>
+          </article>
+
+          <article class="blog-card">
+            <span class="blog-card__date">2021.08.09</span>
+            <h3 class="blog-card__title">
+              <a href="/blog/2021/08/dual-numbers/">Dual numbers</a>
+            </h3>
+            <p class="blog-card__excerpt">
+              There is a generalisation of the complex numbers where i²=0 instead of i²=−1.
+              Functions extended to this dual number system have the curious property that we
+              can read off their derivatives if we evaluate them at the dual number x + i.
+            </p>
+            <div class="blog-card__tags">
+              <span class="blog-card__tag">automatic differentiation</span>
+              <span class="blog-card__tag">algebra</span>
+            </div>
+          </article>
+
+          <article class="blog-card">
+            <span class="blog-card__date">2020.12.20</span>
+            <h3 class="blog-card__title">
+              <a href="/blog/2020/12/reversible-optimisers/">Reversible optimisers</a>
+            </h3>
+            <p class="blog-card__excerpt">
+              Reversible neural architectures have been a popular research area in the last few years,
+              but reversibility is also built into many modern day neural optimisers, perhaps serendipitously.
+            </p>
+            <div class="blog-card__tags">
+              <span class="blog-card__tag">optimisation</span>
+              <span class="blog-card__tag">reversibility</span>
+            </div>
+          </article>
+
+          <article class="blog-card">
+            <span class="blog-card__date">2019.12.15</span>
+            <h3 class="blog-card__title">
+              <a href="/blog/2019/12/the-invention-of-randomness/">On the 'invention' of randomness</a>
+            </h3>
+            <p class="blog-card__excerpt">
+              Jaynes essentially claims that randomness simply does not exist. It is a human invention.
+              After lecturing a Bayesian statistics course for two years, I felt fairly confident in
+              my understanding — it seems I was wrong.
+            </p>
+            <div class="blog-card__tags">
+              <span class="blog-card__tag">probability</span>
+              <span class="blog-card__tag">bayesianism</span>
+              <span class="blog-card__tag">Jaynes</span>
+            </div>
+          </article>
+
+        </div>
+      </section>
+
+
+      <!-- ── Latest News ─────────────────────────────────── -->
+      <section class="reveal">
+        <div class="section-header">
+          <p class="section-header__label">Updates</p>
+          <h2 class="section-header__title">Latest News</h2>
+          <div class="section-header__line"></div>
+        </div>
+
+        <ul class="news-list">
+          <li class="news-item">
+            <div class="news-item__dot"></div>
+            <span class="news-item__date">Jul 2022</span>
+            <p class="news-item__text">Lecturing at <strong>PALMS 2022</strong> Machine Learning Summer School.</p>
+          </li>
+          <li class="news-item">
+            <div class="news-item__dot"></div>
+            <span class="news-item__date">Apr 2022</span>
+            <p class="news-item__text">Joined the Structured Intelligence Team at <a href="https://www.deepmind.com/"
+                target="_blank">DeepMind</a> as a <strong>Senior Research Scientist</strong>.</p>
+          </li>
+          <li class="news-item">
+            <div class="news-item__dot"></div>
+            <span class="news-item__date">Mar 2021</span>
+            <p class="news-item__text">Talk at <a
+                href="https://ellis.eu/events/ellis-symposium-workshop-on-geometric-deep-learning-for-medical-imaging"
+                target="_blank">ELLIS Symposium on Geometric Deep Learning for Medical Imaging</a> — <em>Equivariance:
+                Trends and Challenges</em>. <a href="https://www.youtube.com/watch?v=_A8Hbzhr0yc" target="_blank">Watch
+                →</a></p>
+          </li>
+          <li class="news-item">
+            <div class="news-item__dot"></div>
+            <span class="news-item__date">Feb 2021</span>
+            <p class="news-item__text">Talk at <strong>IBM Research</strong> on <em>Exploiting Symmetries for Deep
+                Learning</em>.</p>
+          </li>
+          <li class="news-item">
+            <div class="news-item__dot"></div>
+            <span class="news-item__date">Sep 2020</span>
+            <p class="news-item__text">Joined <a
+                href="https://www.qualcomm.com/invention/artificial-intelligence/ai-research" target="_blank">Qualcomm
+                AI Research</a> as a <strong>Staff Engineer</strong>.</p>
+          </li>
+          <li class="news-item">
+            <div class="news-item__dot"></div>
+            <span class="news-item__date">Aug 2020</span>
+            <p class="news-item__text">Lectured at the <a href="https://mlss.telkomuniversity.ac.id/"
+                target="_blank">Machine Learning Summer School Indonesia</a>.</p>
+          </li>
+        </ul>
+      </section>
+
+
+      <!-- ── Bio ─────────────────────────────────────────── -->
+      <section class="reveal">
+        <div class="section-header">
+          <p class="section-header__label">Background</p>
+          <h2 class="section-header__title">Bio</h2>
+          <div class="section-header__line"></div>
+        </div>
+
+        <div class="bio-grid">
+          <div class="bio-card">
+            <p class="bio-card__years">2022 — present</p>
+            <h3 class="bio-card__title">Senior Research Scientist</h3>
+            <p class="bio-card__desc">Structured Intelligence Team, Google DeepMind, London</p>
+          </div>
+          <div class="bio-card">
+            <p class="bio-card__years">2020 — 2022</p>
+            <h3 class="bio-card__title">Staff Engineer</h3>
+            <p class="bio-card__desc">Machine Learning for Combinatorial Optimization, Qualcomm AI Research, Amsterdam
+            </p>
+          </div>
+          <div class="bio-card">
+            <p class="bio-card__years">2018 — 2020</p>
+            <h3 class="bio-card__title">Postdoctoral Researcher</h3>
+            <p class="bio-card__desc">Amsterdam Machine Learning Lab with Max Welling. Lectured Bayesian Statistics for
+              ML. Lab manager for Philips Lab at UvA.</p>
+          </div>
+          <div class="bio-card">
+            <p class="bio-card__years">2014 — 2018</p>
+            <h3 class="bio-card__title">PhD in Computer Vision</h3>
+            <p class="bio-card__desc">University College London with Gabriel J. Brostow and Dr. Clare Wilson FRCOphth.
+            </p>
+          </div>
+          <div class="bio-card">
+            <p class="bio-card__years">2010 — 2014</p>
+            <h3 class="bio-card__title">MEng Engineering</h3>
+            <p class="bio-card__desc">Sidney Sussex College, University of Cambridge (Scholar).</p>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- ── Previous Students ───────────────────────────── -->
+      <section class="reveal">
+        <div class="section-header">
+          <p class="section-header__label">Mentoring</p>
+          <h2 class="section-header__title">Previous Masters Students</h2>
+          <div class="section-header__line"></div>
+        </div>
+
+        <div class="students-grid">
+          <div class="student-item">
+            <p class="student-item__name">Alessandra van Ree</p>
+            <p class="student-item__topic">Neural PDE Solvers</p>
+          </div>
+          <div class="student-item">
+            <p class="student-item__name">Eli de Smet</p>
+            <p class="student-item__topic">Saddle-Free Newton Descent</p>
+          </div>
+          <div class="student-item">
+            <p class="student-item__name">Jan Huiskes</p>
+            <p class="student-item__topic">Fast Fourier Transform Neural Networks</p>
+          </div>
+          <div class="student-item">
+            <p class="student-item__name">Rob Hesselink</p>
+            <p class="student-item__topic">Contrastive Equivariant Representations</p>
+          </div>
+          <div class="student-item">
+            <p class="student-item__name">Vivian van Oijen</p>
+            <p class="student-item__topic">Esophageal Histopathology</p>
+          </div>
+          <div class="student-item">
+            <p class="student-item__name">Bryan Cardenas</p>
+            <p class="student-item__topic">Esophageal Histopathology</p>
+          </div>
+          <div class="student-item">
+            <p class="student-item__name">Christina Winkler</p>
+            <p class="student-item__topic">Conditional Normalizing Flows</p>
+          </div>
+          <div class="student-item">
+            <p class="student-item__name"><a href="https://twitter.com/diacon995" target="_blank">Nichita Diaconu</a>
+            </p>
+            <p class="student-item__topic">Learning Convolutions</p>
+          </div>
+          <div class="student-item">
+            <p class="student-item__name">Jonas M J Braun</p>
+            <p class="student-item__topic">Non-geometric Equivariance</p>
+          </div>
+          <div class="student-item">
+            <p class="student-item__name"><a href="https://twitter.com/mfournarakis" target="_blank">Marios
+                Fournarakis</a></p>
+            <p class="student-item__topic">Equivariance for Tracking</p>
+          </div>
+          <div class="student-item">
+            <p class="student-item__name"><a href="https://github.com/tychovdo/" target="_blank">Tycho van der
+                Ouderaa</a></p>
+            <p class="student-item__topic">Reversible Networks for Medical Imaging</p>
+          </div>
+          <div class="student-item">
+            <p class="student-item__name"><a href="https://sakishinoda.github.io/" target="_blank">Saki Shinoda</a></p>
+            <p class="student-item__topic">Semi-supervised Learning</p>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+
+  <!-- ── Footer ──────────────────────────────────────────── -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer__links">
+        <a href="https://scholar.google.com/citations?user=613GPbQAAAAJ&hl=en" target="_blank">Google Scholar</a>
+        <a href="https://github.com/danielewworrall" target="_blank">GitHub</a>
+        <a href="https://twitter.com/danielewworrall" target="_blank">Twitter</a>
+        <a href="https://www.linkedin.com/in/daniel-worrall-46a43238/" target="_blank">LinkedIn</a>
+      </div>
+      <p class="footer__text">© 2026 Daniel Worrall</p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+
+</html>

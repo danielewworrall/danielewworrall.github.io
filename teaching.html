@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teaching — Daniel Worrall</title>
+    <meta name="description"
+        content="Teaching and courses by Daniel Worrall, including Bayesian Statistics for Machine Learning at the University of Amsterdam.">
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="images/profile.png" type="image/png">
+</head>
+
+<body>
+
+    <canvas id="neural-canvas"></canvas>
+
+    <nav class="nav" role="navigation">
+        <div class="nav__inner">
+            <a href="/" class="nav__logo">d<span>.</span>worrall</a>
+            <ul class="nav__links" id="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="publications.html">Publications</a></li>
+                <li><a href="talks.html">Talks</a></li>
+                <li><a href="teaching.html" class="active">Teaching</a></li>
+            </ul>
+            <div style="display:flex;align-items:center;gap:0.5rem;">
+                <button class="nav__theme-toggle" id="theme-toggle" aria-label="Toggle dark/light mode">☀️</button>
+                <button class="nav__hamburger" id="hamburger" aria-label="Toggle menu">
+                    <span></span><span></span><span></span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="page-content">
+        <div class="container">
+
+            <section class="hero" style="padding-bottom:2rem;">
+                <div class="section-header">
+                    <p class="section-header__label">Courses</p>
+                    <h1 class="section-header__title">Teaching</h1>
+                    <div class="section-header__line"></div>
+                </div>
+            </section>
+
+            <section>
+
+                <div class="course-card reveal">
+                    <h2 class="course-card__title">Bayesian Statistics for Machine Learning</h2>
+                    <div class="course-card__meta">
+                        <span>📅 2018 & 2019</span>
+                        <span>🏛️ Bachelor Kunstmatige Intelligentie, University of Amsterdam</span>
+                        <span>📋 Code: 5082PTFM6Y · 6EC · Semester 1, Period 1</span>
+                    </div>
+                    <p style="color:var(--text-secondary);margin-bottom:1.25rem;font-size:0.9rem;">
+                        Each lecture covers 6 hours of material.
+                    </p>
+
+                    <ul class="lecture-list">
+                        <li>
+                            <span class="lecture-list__num">01</span>
+                            <div class="lecture-list__content">
+                                <p class="lecture-list__title">Basic Probability</p>
+                                <p class="lecture-list__desc">Probability spaces, PMFs, PDFs, joint and conditional
+                                    probability, sum and product rule, Bayes' theorem</p>
+                            </div>
+                            <a href="docs/BSML1.pdf" class="lecture-list__link" target="_blank">slides →</a>
+                        </li>
+                        <li>
+                            <span class="lecture-list__num">02</span>
+                            <div class="lecture-list__content">
+                                <p class="lecture-list__title">Random Variables</p>
+                                <p class="lecture-list__desc">Expectations, moments, common distributions, estimators
+                                </p>
+                            </div>
+                            <a href="docs/BSML2.pdf" class="lecture-list__link" target="_blank">slides →</a>
+                        </li>
+                        <li>
+                            <span class="lecture-list__num">03</span>
+                            <div class="lecture-list__content">
+                                <p class="lecture-list__title">Manipulating Random Variables</p>
+                                <p class="lecture-list__desc">Moment generating functions, transformations of random
+                                    variables</p>
+                            </div>
+                            <a href="docs/BSML3.pdf" class="lecture-list__link" target="_blank">slides →</a>
+                        </li>
+                        <li>
+                            <span class="lecture-list__num">04</span>
+                            <div class="lecture-list__content">
+                                <p class="lecture-list__title">Maximum Likelihood</p>
+                                <p class="lecture-list__desc">Gradient descent, the exponential family</p>
+                            </div>
+                            <a href="docs/BSML4.pdf" class="lecture-list__link" target="_blank">slides →</a>
+                        </li>
+                        <li>
+                            <span class="lecture-list__num">05</span>
+                            <div class="lecture-list__content">
+                                <p class="lecture-list__title">Bayesian Inference</p>
+                                <p class="lecture-list__desc">The Bent Coin, conjugacy</p>
+                            </div>
+                            <a href="docs/BSML5.pdf" class="lecture-list__link" target="_blank">slides →</a>
+                        </li>
+                        <li>
+                            <span class="lecture-list__num">06</span>
+                            <div class="lecture-list__content">
+                                <p class="lecture-list__title">Model Comparison</p>
+                                <p class="lecture-list__desc">The evidence, Bayesian linear regression, mixture models
+                                </p>
+                            </div>
+                            <a href="docs/BSML6.pdf" class="lecture-list__link" target="_blank">slides →</a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="course-card reveal">
+                    <h2 class="course-card__title">UCL Machine Vision</h2>
+                    <div class="course-card__meta">
+                        <span>📅 2016 — 2017</span>
+                        <span>🏛️ University College London</span>
+                        <span>📋 COMPGI14/COMPM054 · Michaelmas Term</span>
+                    </div>
+                </div>
+
+            </section>
+
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer__links">
+                <a href="https://scholar.google.com/citations?user=613GPbQAAAAJ&hl=en" target="_blank">Google
+                    Scholar</a>
+                <a href="https://github.com/danielewworrall" target="_blank">GitHub</a>
+                <a href="https://twitter.com/danielewworrall" target="_blank">Twitter</a>
+                <a href="https://www.linkedin.com/in/daniel-worrall-46a43238/" target="_blank">LinkedIn</a>
+            </div>
+            <p class="footer__text">© 2026 Daniel Worrall</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reversible optimisers — Daniel Worrall</title>
+    <meta name="description"
+        content="Reversible neural architectures have been popular, but reversibility is also built into many modern day neural optimisers, perhaps serendipitously.">
+    <link rel="stylesheet" href="/style.css">
+    <link rel="icon" href="/images/profile.png" type="image/png">
+    <script>
+        MathJax = {
+            tex: { inlineMath: [['$', '$']], displayMath: [['$$', '$$'], ['\\[', '\\]'], ['\\begin{align}', '\\end{align}']], processEscapes: true, tags: 'ams' },
+            options: { skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'] }
+        };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async></script>
+</head>
+
+<body>
+
+    <canvas id="neural-canvas"></canvas>
+
+    <nav class="nav" role="navigation">
+        <div class="nav__inner">
+            <a href="/" class="nav__logo">d<span>.</span>worrall</a>
+            <ul class="nav__links" id="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/publications.html">Publications</a></li>
+                <li><a href="/talks.html">Talks</a></li>
+                <li><a href="/teaching.html">Teaching</a></li>
+            </ul>
+            <div style="display:flex;align-items:center;gap:0.5rem;">
+                <button class="nav__theme-toggle" id="theme-toggle" aria-label="Toggle dark/light mode">☀️</button>
+                <button class="nav__hamburger" id="hamburger" aria-label="Toggle menu">
+                    <span></span><span></span><span></span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="page-content">
+        <div class="container">
+
+            <article class="blog-post reveal">
+                <header class="blog-post__header">
+                    <p class="section-header__label">Writing</p>
+                    <h1 class="blog-post__title">Reversible optimisers</h1>
+                    <div class="blog-post__meta">
+                        <time>20 December 2020</time>
+                        <div class="blog-card__tags">
+                            <span class="blog-card__tag">optimisation</span>
+                            <span class="blog-card__tag">reversibility</span>
+                        </div>
+                    </div>
+                </header>
+
+                <div class="blog-post__content">
+
+                    <p>This post touches on a curious property of some common optimisers used by the machine learning
+                        community: <em>reversibility</em>.</p>
+
+                    <p>I tend to hate reading through lengthy introductions, so let's just dive in with an example. Take
+                        gradient descent with momentum, this has the following form</p>
+                    $$\begin{aligned}
+                    \mu_{t+1} &= \alpha \mu_t + \nabla_{x} f(x_{t}) \\
+                    x_{t+1} &= x_t - \lambda \mu_{t+1}.
+                    \end{aligned}$$
+                    <p>Here $x_t$ denotes the optimisation variable, or <em>position</em>, $x$ at time $t$, $\mu$ is the
+                        associated <em>momentum</em>, and $0 < \alpha < 1$ & $\lambda> 0$ are metaparameters, which
+                            govern the dynamics of the descent trajectory. I use the term <em>meta</em>parameters,
+                            instead of <em>hyper</em>parameters, to distinguish that they are part of the optimiser and
+                            not the model, even though some would nowadays say that the optimiser is in fact part of the
+                            model, implicitly regularising it.</p>
+
+                    <p>Anyway, interestingly we can reverse these equations, given the state $[x_{t+1}, \mu_{t+1}]$ as
+                    </p>
+                    $$\begin{aligned}
+                    x_t &= x_{t+1} + \lambda \mu_{t+1} \\
+                    \mu_{t} &= \frac{1}{\alpha} \left ( \mu_{t+1} - \nabla_{x} f(x_{t}) \right).
+                    \end{aligned}$$
+                    <p>This seemingly arbitrary property is useful from a practical standpoint.</p>
+
+                    <h3>Memory efficiency</h3>
+                    <p>An oft-lauded property of reversible systems is that we do not have to store intermediate
+                        computations, since they should be easily reconstructed from the system's end-state. Typically
+                        for reverse-mode differentiation to work (i.e. backpropagation), we have to store all the
+                        intermediate activations in the forward pass of a network. This has memory complexity, which
+                        scales linearly with the size of the computation graph. If we can dynamically reconstruct
+                        intermediate activations during the backward pass, then we instantly convert this linear memory
+                        complexity to a constant, which enables us to build (in theory) infinitely deep networks.</p>
+
+                    <h3>Momentum is additive coupling</h3>
+                    <p>Indeed, if you look a little closer at the momentum equations, then you may spot that they
+                        resemble an <a href="https://arxiv.org/pdf/1410.8516.pdf">additive coupling layer</a>. Here we
+                        have that a state, split into two parts $x$ and $\mu$ (to mimic the momentum optimiser
+                        notation), is reversible with the following computation graph</p>
+                    $$\begin{aligned}
+                    \mu_{t+1} &= \mu_t + g(x_t) \\
+                    x_{t+1} &= x_t + h(\mu_{t+1})
+                    \end{aligned}$$
+                    <p>To make a direct comparison, $g(x) = \nabla_x f(x)$ and $h(x) = \lambda x$. The one slight
+                        discrepancy is the factor of $\alpha$, but we can sweep that under the rug. The reverse
+                        equations for the additive coupling layer are</p>
+                    $$\begin{aligned}
+                    x_{t} &= x_{t-1} - h(\mu_{t+1}) \\
+                    \mu_{t} &= \mu_{t+1} - g(x_t).
+                    \end{aligned}$$
+
+                    <div style="text-align:center"><img src="/images/coupling.png" style="max-width:50%"
+                            alt="Additive coupling layer diagram"></div>
+                    <p><em>Source: <a href="https://arxiv.org/pdf/1902.02729.pdf">Reversible GANs for Memory-efficient
+                                Image-to-Image Translation</a>. This diagramme represents the additive coupling layer in
+                            its computation graph form. LEFT: forward pass. RIGHT: reverse pass.</em></p>
+
+                    <h3>Case study</h3>
+                    <p>Specifically in the case of optimisers, I was pointed towards this paper <a
+                            href="https://arxiv.org/pdf/1502.03492.pdf">Gradient-based Hyperparameter Optimization with
+                            Reversible Learning</a> (2015) by <a href="https://dougalmaclaurin.com/">Dougal
+                            Maclaurin</a>, <a href="http://www.cs.toronto.edu/~duvenaud/">David Duvenaud</a>, and <a
+                            href="https://www.cs.princeton.edu/~rpa/">Ryan Adams</a>. The authors exploited the
+                        reversibility property of SGD with momentum to train the optimiser metaparameters themselves.
+                        First they run the optimiser an arbitrary number of steps, say 100 iterations. This defines an
+                        optimisation trajectory $x_0, x_1, x_2, ..., x_{99}$. Now the clever part is that you can view
+                        the unrolled optimisation trajectory as a computation graph in itself. They compute a loss at
+                        the end of the trajectory, then they backpropagate the loss in the reverse direction with
+                        respect to the optimiser's metaparameters.</p>
+
+                    <div style="text-align:center"><img src="/images/reversibility.png" style="max-width:50%"
+                            alt="Reversible optimiser diagram"></div>
+                    <p><em>Source: <a href="https://arxiv.org/pdf/1502.03492.pdf">Gradient-based Hyperparameter
+                                Optimization with Reversible Learning</a>. The authors optimise metaparameters by
+                            backpropagating along optimisation roll outs.</em></p>
+
+                    <p>Could we not do this already, such as in <a href="https://arxiv.org/abs/1606.04474">Learning to
+                            learn by gradient descent by gradient descent</a> (Andrychowicz et al., 2016)? Well yes, but
+                        the crucial point is that you would usually have to store all the intermediate states $\{[x_t,
+                        \mu_t]\}_{t=0}^{99}$, which is costly memory-wise. Exploiting the reversibility property, this
+                        memory explosion falls away. Indeed there are issues with numerical stability of the inverse,
+                        which the paper dives into, but the principle is elegant.</p>
+
+                    <h3>Adam</h3>
+                    <p>So what other optimisers are reversible? Let's consider <a
+                            href="https://arxiv.org/pdf/1412.6980.pdf">Adam</a>, where</p>
+                    $$\begin{aligned}
+                    \mu_{t+1} &= \beta_1 \mu_t + (1-\beta_1) \nabla_{x} f(x_{t}) \\
+                    \nu_{t+1} &= \beta_2 \nu_t + (1-\beta_2) (\nabla_{x} f(x_{t}))^2 \\
+                    x_{t+1} &= x_t - \lambda \frac{\mu_{t+1}}{\sqrt{\nu_{t+1}} + \epsilon}.
+                    \end{aligned}$$
+                    <p>Given $x_{t+1}$, $\mu_{t+1}$ and $\nu_{t+1}$, we can easily reconstruct $x_t$ from the last line
+                        and from there, we can compute the gradient and recover $\mu_{t}$ and $\nu_{t}$. In maths</p>
+                    $$\begin{aligned}
+                    x_{t} &= x_{t+1} + \lambda \frac{\mu_{t+1}}{\sqrt{\nu_{t+1}} + \epsilon} \\
+                    \mu_{t} &= \frac{1}{\beta_1} \left ( \mu_{t+1} - (1-\beta_1) \nabla_{x} f(x_{t}) \right ) \\
+                    \nu_{t} &= \frac{1}{\beta_2} \left ( \nu_{t+1} - (1-\beta_2) (\nabla_{x} f(x_{t}))^2 \right).
+                    \end{aligned}$$
+                    <p>So Adam is reversible. We actually missed out the bias correction steps</p>
+                    $$\begin{aligned}
+                    \mu_{t+1} &\gets \mu_{t+1} / (1 - \beta_1^{t+1}) \\
+                    \nu_{t+1} &\gets \nu_{t+1} / (1 - \beta_2^{t+1}).
+                    \end{aligned}$$
+                    <p>You can also verify for yourself that these are reversible too.</p>
+
+                    <h3>Do we need reversibility in optimisers?</h3>
+                    <p>Well, no. In fact, in some ways, we would rather do without it. Optimisers are supposed to be
+                        many-to-one mappings. Starting from an infinity of initial conditions, we should converge to the
+                        global minimum of a convex function. This means we should discard information about
+                        initialisation along the way. To put it as Maclaurin et al. do:</p>
+                    <blockquote>
+                        <p>[O]ptimization moves a system from a high-entropy initial state to a low-entropy (hopefully
+                            zero entropy) optimized final state.</p>
+                    </blockquote>
+
+                    <p>It turns out that if you set $\alpha = 0$ for the momentum method; that is, you just run gradient
+                        descent, then this is not reversible. I think this may also be true for <a
+                            href="https://www.cs.toronto.edu/~fritz/absps/momentum.pdf">Nesterov accelerated
+                            momentum</a>, and <a
+                            href="http://www.cs.toronto.edu/~hinton/coursera/lecture6/lec6.pdf">RMSProp</a> which I
+                        couldn't make reversible (I call this <em>proof by fatigue</em>). So I'm left wondering, is
+                        reversibility just some extra curious property that can be useful sometimes, but is completely
+                        arbitrary when it comes to doing optimisation? Or is there some deeper meaning to it? Is it just
+                        some artifact of how we think of optimisation, in terms of balls rolling down hills? Maybe more
+                        interestingly, what does the lack of reversibility for standard gradient descent and Nesterov
+                        entail? Could this be another reason why Nesterov works better than classical momentum? Could we
+                        measure the information loss somehow? And if we could, what would this mean?</p>
+
+                </div>
+            </article>
+
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer__links">
+                <a href="https://scholar.google.com/citations?user=613GPbQAAAAJ&hl=en" target="_blank">Google
+                    Scholar</a>
+                <a href="https://github.com/danielewworrall" target="_blank">GitHub</a>
+                <a href="https://twitter.com/danielewworrall" target="_blank">Twitter</a>
+                <a href="https://www.linkedin.com/in/daniel-worrall-46a43238/" target="_blank">LinkedIn</a>
+            </div>
+            <p class="footer__text">© 2026 Daniel Worrall</p>
+        </div>
+    </footer>
+
+    <script src="/script.js"></script>
+</body>
+
+</html>
