@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 110" width="120" height="110">
+  <!-- Tree 1: f_αβ g^α_j g^β_k — two branches from root -->
+  <!-- Root node (open circle, TikZ rn style) -->
+  <circle cx="60" cy="15" r="5" fill="none" stroke="currentColor" stroke-width="1.5"/>
+  <!-- Left branch -->
+  <line x1="56" y1="19" x2="30" y2="65" stroke="currentColor" stroke-width="1"/>
+  <circle cx="30" cy="68" r="3" fill="currentColor"/>
+  <!-- Right branch -->
+  <line x1="64" y1="19" x2="90" y2="65" stroke="currentColor" stroke-width="1"/>
+  <circle cx="90" cy="68" r="3" fill="currentColor"/>
+  <!-- Labels -->
+  <text x="18" y="82" text-anchor="middle" font-size="14" font-family="serif" font-style="italic" fill="currentColor">j</text>
+  <text x="102" y="82" text-anchor="middle" font-size="14" font-family="serif" font-style="italic" fill="currentColor">k</text>
+</svg>

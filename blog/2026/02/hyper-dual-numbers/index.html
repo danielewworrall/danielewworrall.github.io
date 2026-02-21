@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hyper-dual numbers and higher-order derivatives — Daniel Worrall</title>
+    <meta name="description"
+        content="Extending dual numbers to higher-order automatic differentiation via independent infinitesimals and hyper-dual numbers, with connections to rooted trees and JAX.">
+    <link rel="stylesheet" href="/style.css">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <!-- MathJax -->
+    <script>
+        MathJax = {
+            tex: { inlineMath: [['$', '$']], displayMath: [['$$', '$$'], ['\\[', '\\]'], ['\\begin{align}', '\\end{align}']], processEscapes: true, tags: 'ams' },
+            options: { skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'] }
+        };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async></script>
+</head>
+
+<body>
+
+    <canvas id="neural-canvas"></canvas>
+
+    <nav class="nav" role="navigation">
+        <div class="nav__inner">
+            <a href="/" class="nav__logo">d<span>.</span>worrall</a>
+            <ul class="nav__links" id="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/blog/">Blog</a></li>
+                <li><a href="/publications.html">Publications</a></li>
+                <li><a href="/talks.html">Talks</a></li>
+                <li><a href="/teaching.html">Teaching</a></li>
+            </ul>
+            <div style="display:flex;align-items:center;gap:0.5rem;">
+                <button class="nav__theme-toggle" id="theme-toggle" aria-label="Toggle dark/light mode">☀️</button>
+                <button class="nav__hamburger" id="hamburger" aria-label="Toggle menu">
+                    <span></span><span></span><span></span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="page-content">
+        <div class="container">
+
+            <article class="blog-post reveal">
+                <header class="blog-post__header">
+                    <p class="section-header__label">Writing</p>
+                    <h1 class="blog-post__title">Dual numbers II</h1>
+                    <div class="blog-post__meta">
+                        <time>February 2026 · DRAFT</time>
+                        <div class="blog-card__tags">
+                            <span class="blog-card__tag">automatic differentiation</span>
+                            <span class="blog-card__tag">algebra</span>
+                        </div>
+                    </div>
+                </header>
+
+                <div class="blog-post__content">
+
+                    <h2>Dual numbers II</h2>
+
+                    <p><strong>TL;DR</strong>: <a href="/blog/2021/08/dual-numbers/">Dual numbers</a> (where
+                        $i^2 = 0$) give us first derivatives for free. To get higher-order
+                        derivatives we introduce independent infinitesimals $i_1, i_2, \ldots$, each
+                        with $i_k^2 = 0$ but $i_j i_k \neq 0$. This gives a clean, recursive route to higher-order
+                        automatic
+                        differentiation. And the labels on the infinitesimals turn out to be the
+                        very same labels we saw on
+                        <a href="/blog/2023/11/rooted-trees-and-differentiation/">special labeled rooted
+                            trees</a>, tying together algebraic number systems, autodiff, and
+                        combinatorics in one picture.
+                    </p>
+
+                    <p>In the <a href="/blog/2021/08/dual-numbers/">dual numbers post</a> we built a number
+                        system for first derivatives. In the
+                        <a href="/blog/2023/11/rooted-trees-and-differentiation/">rooted trees post</a> we saw
+                        that higher-order derivatives of composed functions are indexed by labeled trees.
+                        This post ties the two together: extending the dual number algebra to higher orders
+                        and showing that the infinitesimal labels are precisely the tree labels.
+                    </p>
+
+                    <h3>A quick recap</h3>
+
+                    <p>Recall the core idea. The dual numbers extend the reals with an infinitesimal
+                        $i$ satisfying $i^2 = 0$ (but $i \neq 0$). Evaluating a function at $x + i$ and
+                        Taylor expanding, the higher-order terms die and we get</p>
+
+                    $$
+                    f(x + i) = f(x) + i\,\color{red}{f'(x)}.
+                    $$
+
+                    <p>The derivative is just the $i$-component. And we get the chain rule for free:
+                        $f(g(x+i)) = f(g(x)) + i\,\color{red}{f'(g(x))\,g'(x)}$.</p>
+
+                    <h2>The goal: second derivatives of composed functions</h2>
+
+                    <p>What we would really like is to extend this to higher-order derivatives. To see what
+                        we are aiming for, recall from the
+                        <a href="/blog/2023/11/rooted-trees-and-differentiation/">rooted trees post</a> that the
+                        second derivative of a composition $f(g(\textbf{x}))$ is
+                    </p>
+
+                    $$
+                    \frac{\partial^2 f}{\partial x^j \partial x^k}
+                    = f_{\alpha\beta}\, g^\alpha_j\, g^\beta_k
+                    + f_\alpha\, g^\alpha_{jk}.
+                    $$
+
+                    <p>Notation recap: subscripts denote derivatives with respect to a function's
+                        input ($f_\alpha = \partial f / \partial y^\alpha$, $f_{\alpha\beta}$ its Hessian),
+                        superscripts label output components ($g^\alpha_j$ is the Jacobian, $g^\alpha_{jk}$
+                        the Hessian of $g$). Greek indices ($\alpha, \beta, \ldots$) are summed over;
+                        Latin indices ($j, k, \ldots$) are free.</p>
+
+                    <p>In words: the Hessian of $f$ pulled back through the Jacobian of $g$, plus
+                        the gradient of $f$ contracted with the Hessian of $g$. Can we design an algebraic
+                        system where this falls out as a coefficient?</p>
+
+                    <h2>First attempt: reusing the same infinitesimal</h2>
+
+                    <p>The most na&iuml;ve approach is to apply the dual number trick twice with the same $i$.
+                        Substituting $x + i$ for $x$ in $f(x+i) = f(x) + if'(x)$ gives
+                        $f(x + 2i) = f(x) + 2i f'(x)$. The $i$-component is $2f'(x)$, not $f''(x)$.
+                        Using the same $i$ twice, the system cannot tell the two perturbations apart. This
+                        is known as <strong>perturbation confusion</strong>.</p>
+
+                    <h2>The fix: independent infinitesimals</h2>
+
+                    <p>The fix is to give each differentiation its own infinitesimal. Introduce $i_1$ and
+                        $i_2$ with $i_1^2 = 0$ and $i_2^2 = 0$, but $i_1 i_2 \neq 0$. Each knows only about
+                        its own perturbation. A general number is</p>
+
+                    $$
+                    z = a + b\,i_1 + c\,i_2 + d\,i_1 i_2,
+                    $$
+
+                    <p>a 4-tuple $(a, b, c, d)$. These are <em>hyper-dual numbers</em>.
+                        The multiplication rule follows from distributing and setting squared terms to zero:</p>
+
+                    $$\begin{aligned}
+                    (a + b\,i_1 + c\,i_2 + d\,i_1 i_2)(e + f\,i_1 + g\,i_2 + h\,i_1 i_2)
+                    &= ae \\
+                    &\quad + (af + be)\,i_1 \\
+                    &\quad + (ag + ce)\,i_2 \\
+                    &\quad + (ah + bg + cf + de)\,i_1 i_2.
+                    \end{aligned}$$
+
+                    <h3>Evaluating a function</h3>
+
+                    <p>Evaluating $f$ at $x + i_1 + i_2$ and noting that
+                        $(i_1 + i_2)^2 = 2\,i_1 i_2$ (the self-interactions die), we get</p>
+
+                    $$
+                    f(x + i_1 + i_2) = f(x) + i_1\,f'(x) + i_2\,f'(x) + i_1 i_2\,f''(x).
+                    $$
+
+                    <p>The $i_1 i_2$ component is exactly $f''(x)$. Now the real test: does
+                        composition work?</p>
+
+                    <details>
+                        <summary>Derivation: expanding $f(g(x + i_1 + i_2))$</summary>
+
+                        <p>We already know $g(x + i_1 + i_2) = g + i_1 g' + i_2 g' + i_1 i_2\,g''$
+                            (dropping arguments for brevity). Taylor-expanding $f$ around $g$:</p>
+
+                        $$\begin{aligned}
+                        f(g + \underbrace{i_1 g' + i_2 g' + i_1 i_2\,g''}_{\delta})
+                        &= f(g) + \delta\,f'(g) + \tfrac{1}{2}\delta^2\,f''(g) + \cdots
+                        \end{aligned}$$
+
+                        <p>We need $\delta$ and $\delta^2$. The linear term is straightforward:</p>
+
+                        $$
+                        \delta\,f'(g) = i_1\,g'\,f'(g) + i_2\,g'\,f'(g) + i_1 i_2\,g''\,f'(g).
+                        $$
+
+                        <p>For $\delta^2$, every product $i_k^2 = 0$, so the only surviving
+                            cross-term is $2(i_1 g')(i_2 g') = 2\,i_1 i_2\,(g')^2$. Thus
+                            $\tfrac{1}{2}\delta^2 f''(g)$ contributes $i_1 i_2\,(g')^2\,f''(g)$.
+                            All higher powers of $\delta$ vanish.</p>
+                    </details>
+
+                    <p>Collecting terms:</p>
+
+                    $$
+                    f(g(x + i_1 + i_2)) =
+                    \color{gray}{f(g)}
+                    + \color{gray}{i_1\,f'(g)\,g'}
+                    + \color{gray}{i_2\,f'(g)\,g'}
+                    + i_1 i_2 \bigl[\,\underbrace{f''(g)\,(g')^2 + f'(g)\,g''}_{(f \circ g)''}\,\bigr].
+                    $$
+
+                    <p>The $i_1 i_2$ coefficient is precisely the second derivative of $f(g(x))$.</p>
+
+                    <h2>Nesting as composition of first-order algebras</h2>
+
+                    <p>Here is the really nice part. Hyper-dual numbers are not a new algebra. They are
+                        the first-order dual number algebra composed with itself. A hyper-dual number
+                        $a + b\,i_1 + c\,i_2 + d\,i_1 i_2$ can be regrouped as</p>
+
+                    $$
+                    \underbrace{(a + c\,i_2)}_{\text{primal}}
+                    + i_1 \underbrace{(b + d\,i_2)}_{\text{tangent}},
+                    $$
+
+                    <p>which is just a dual number in $i_1$ whose components are dual numbers in $i_2$.
+                        So we don't need a hyper-dual class at all. We reuse <code>Dual</code> from <a
+                            href="/blog/2021/08/dual-numbers/">part I</a>
+                        and nest it. This matters because a dedicated hyper-dual implementation only handles
+                        second derivatives; for thirds we would need yet another class. Nesting generalises for
+                        free.</p>
+
+                    <p>Here is the key insight.
+                        In <a href="/blog/2021/08/dual-numbers/">part I</a> we represented a dual
+                        number as a tuple of <em>floats</em>:</p>
+
+                    <pre><code class="language-python"># Part I: primal and tangent are floats
+def dtan(z):
+    x, y = z                  # x: float, y: float
+    return np.tan(x), y * (1 + np.tan(x)**2)</code></pre>
+
+                    <p>This works for first derivatives, but we can&rsquo;t nest it, because the components
+                        are locked to plain numbers. The fix is to make the arithmetic
+                        <em>generic</em>: let the primal and tangent be <em>anything</em> that supports
+                        <code>+</code> and <code>*</code>, including other <code>Dual</code>s.
+                        That single change turns a first-order system into an arbitrarily
+                        high-order one:
+                    </p>
+
+                    <pre><code class="language-python">class Dual:
+    def __init__(self, primal, tangent=0):
+        self.primal = primal       # f(x)
+        self.tangent = tangent     # f'(x)
+
+    # (a + b·i) + (c + d·i) = (a+c) + (b+d)·i
+    def __add__(self, other):
+        if not isinstance(other, Dual):  # promote scalar c → Dual(c, 0)
+            other = Dual(other)
+        return Dual(self.primal + other.primal,
+                    self.tangent + other.tangent)
+
+    # (a + b·i)(c + d·i) = ac + (ad + bc)·i
+    def __mul__(self, other):
+        if not isinstance(other, Dual):
+            other = Dual(other)
+        return Dual(self.primal * other.primal,
+                    self.primal * other.tangent
+                    + self.tangent * other.primal)
+
+    # __radd__, __rmul__ omitted for brevity</code></pre>
+
+                    <p>Some examples to build intuition:</p>
+
+                    <pre><code class="language-python">Dual(3, 1)                        # 3 + i          (first-order seed)
+Dual(Dual(3, 1), Dual(1, 0))     # (3 + i₂) + i₁(1 + 0·i₂)
+                                  # = 3 + i₁ + i₂  (second-order seed)
+Dual(Dual(Dual(3,1), Dual(1,0)),
+     Dual(Dual(1,0), Dual(0,0))) # = 3 + i₁ + i₂ + i₃  (third-order seed)</code></pre>
+
+                    <p>Notice the redundancy: the second-order seed has $2^2 = 4$ components,
+                        but only 3 distinct values ($x$, $1$, $0$). After evaluation,
+                        <code>result.primal.tangent</code> and <code>result.tangent.primal</code>
+                        both store $f'(x)$. The two $i_1$ and $i_2$ channels carry
+                        duplicate information. At order $n$ we are hauling $2^n$ components
+                        when only $n+1$ are distinct. We will return to this
+                        <a href="#truncated-polynomials">below</a>.
+                    </p>
+
+                    <p>And the primitives are defined recursively. If the input is a <code>Dual</code>,
+                        apply the chain rule; the components may themselves be <code>Dual</code>s:</p>
+
+                    <pre><code class="language-python">import numpy as np
+
+def tan(z):
+    if isinstance(z, Dual):
+        t = tan(z.primal)         # recurse on primal
+        dt = 1 + t * t            # tan'(x) = 1 + tan²(x)
+        return Dual(t, z.tangent * dt)
+    return np.tan(z)              # base case: plain float</code></pre>
+
+                    <p>The same <code>tan</code> function handles first, second, and third
+                        derivatives, because the recursion on <code>Dual</code> components
+                        naturally peels off one layer of nesting at a time. Let's test it.</p>
+
+                    <h3>First derivative</h3>
+
+                    <pre><code class="language-python">z = Dual(2.0, 1.0)      # x + i
+result = tan(z)
+print(f"tan'(2) = {result.tangent:.6f}")  # 5.774399</code></pre>
+
+                    <h3>Second derivative (nested)</h3>
+
+                    <p>The seed $x + i_1 + i_2$ is
+                        <code>Dual(Dual(x, 1), Dual(1, 0))</code>. The outer <code>Dual</code>
+                        carries $i_1$, the inner carries $i_2$:
+                    </p>
+
+                    <pre><code class="language-python">z = Dual(Dual(2.0, 1.0), Dual(1.0, 0.0))
+result = tan(z)
+print(f"tan''(2) = {result.tangent.tangent:.6f}")  # -25.234585</code></pre>
+
+                    <p>Composition works too: <code>tan(tan(z))</code> gives the correct
+                        second derivative of $\tan(\tan(x))$ with no extra effort.</p>
+
+                    <h3>Third derivative (triple nesting)</h3>
+
+                    <pre><code class="language-python">z = Dual(Dual(Dual(2.0, 1), Dual(1, 0)),
+         Dual(Dual(1, 0),    Dual(0, 0)))
+result = tan(z)
+print(f"tan'''(2) = {result.tangent.tangent.tangent:.4f}")  # 176.9645</code></pre>
+
+                    <p>No new classes, no new primitives. (Yes, <code>result.tangent.tangent.tangent</code>
+                        is cumbersome, but that is just syntax that can be cleaned up; the
+                        point is the algebra.) This is essentially what JAX does when you nest
+                        <code>jvp</code> calls: each call introduces a fresh perturbation tag.
+                    </p>
+
+                    <h2>The general pattern</h2>
+
+                    <p>For the $n$th derivative we nest $n$ layers, each with its own infinitesimal
+                        $i_1, \ldots, i_n$ ($i_k^2 = 0$). The seed is $x + i_1 + \cdots + i_n$ and
+                        the $n$th derivative lives in the coefficient of $i_1 i_2 \cdots i_n$.</p>
+
+                    <p>There are $2^n$ components in total, one per subset of $\{1, \ldots, n\}$.
+                        But most of them are redundant! Recall the second-derivative expansion:</p>
+
+                    $$
+                    f(x + i_1 + i_2) = f(x)
+                    + i_1\,{\color{#5b9bd5}f'(x)}
+                    + i_2\,{\color{#5b9bd5}f'(x)}
+                    + i_1 i_2\,f''(x).
+                    $$
+
+                    <p>The $i_1$ and $i_2$ components both store ${\color{#5b9bd5}f'(x)}$: the same value
+                        twice. In general, all $\binom{n}{k}$ subsets of size $k$
+                        store $f^{(k)}(x)/k!$. So of the $2^n$ components, only $n+1$ are
+                        distinct.</p>
+
+                    <h2 id="truncated-polynomials">Exploiting the symmetry</h2>
+
+                    <p>Mathematically, the infinitesimals $i_1$ and $i_2$ are interchangeable; swapping them
+                        changes nothing. We can see this directly in the <code>Dual</code> representation.
+                        After evaluating <code>tan</code> at the second-order seed:</p>
+
+                    <pre><code class="language-python">z = Dual(Dual(2.0, 1.0), Dual(1.0, 0.0))
+result = tan(z)
+print(result.primal.tangent)  # f'(x) via i₂
+print(result.tangent.primal)  # f'(x) via i₁  — same value!</code></pre>
+
+                    <p>This is not a mathematical issue. Both components <em>must</em> agree by
+                        the permutation symmetry of the infinitesimals. It is an implementational
+                        one: we are doing redundant work. The <em>truncated polynomial algebra</em>
+                        exploits this. Instead of $n$ independent infinitesimals, use a <em>single</em>
+                        one with the relaxed condition $i^{n+1} = 0$. A number is now just an
+                        $(n+1)$-tuple:</p>
+
+                    $$
+                    f(x + i) = f(x) + i\,f'(x) + \frac{i^2}{2!}\,f''(x) + \cdots
+                    + \frac{i^n}{n!}\,f^{(n)}(x).
+                    $$
+
+                    <p>This is $n+1$ components instead of $2^n$, a massive saving. Multiplication
+                        becomes polynomial convolution truncated at degree $n$, costing $O(n^2)$
+                        per primitive evaluation. In practice, most common primitives ($\exp$, $\sin$,
+                        $\tan$, etc.) have the nice property that higher-order derivatives can
+                        be expressed in terms of lower-order ones. For instance, $\tan'(x) = 1 + \tan^2(x)$,
+                        so the jet can be propagated cheaply from the primals within your set of primitives.
+                        Griewank and Walther (2008) cover this in detail.
+                        This is what JAX's <code>jet</code> transform implements.</p>
+
+                    <p>To summarise: nested dual numbers build higher-order differentiation
+                        from the first-order algebra alone, with no new rules, just nesting. Conceptually
+                        the cleanest, but $2^n$ scaling. Truncated
+                        polynomials collapse the redundancy to $n+1$ scaling, at the cost of
+                        dedicated higher-order rules per primitive.</p>
+
+                    <h2>The connection to rooted trees</h2>
+
+                    <p>Here is where things come full circle. In the
+                        <a href="/blog/2023/11/rooted-trees-and-differentiation/">rooted trees post</a> we saw that
+                        the higher-order chain rule for $f(g(x))$ is a sum over special labeled
+                        rooted trees. The second derivative is represented by two trees:
+                    </p>
+
+                    <p align="center"><img src="/media/2023/aod_6.svg" alt="Second derivative trees"></p>
+
+                    <p>The left tree is $f_{\alpha\beta}\,g^\alpha_j\,g^\beta_k$ (Hessian of $f$
+                        pulled back through the Jacobian of $g$) and the right is
+                        $f_\alpha\,g^\alpha_{jk}$ (gradient of $f$ contracted with the Hessian of $g$).
+                        The labels $j, k$ on the nodes are what make them <em>labeled</em> rooted trees.</p>
+
+                    <p>Now look at our nested dual numbers. In the rooted trees, the
+                        labels $j, k$ are input dimensions: they tell us which partial
+                        derivative we are taking. The infinitesimals $i_1, i_2$ seem different:
+                        they tag independent applications of the differential operator. How are
+                        these related?</p>
+
+                    <p>The bridge is the seed. To compute
+                        $\frac{\partial^2 f}{\partial x^j \partial x^k}$ with hyper-duals, we seed
+                        $\textbf{x} + i_1\,\textbf{e}_j + i_2\,\textbf{e}_k$, where
+                        $\textbf{e}_j$ is the $j$th basis vector. Now $i_1$ carries direction $j$
+                        and $i_2$ carries direction $k$. The infinitesimal index becomes the
+                        tree label. The algebra does the rest: $i_1^2 = i_2^2 = 0$ ensures
+                        each direction is differentiated at most once, while $i_1 i_2 \neq 0$
+                        lets the cross-derivatives survive. Look back at our expansion of
+                        $f(g(x + i_1 + i_2))$: the $i_1 i_2$ coefficient was
+                        $f''(g)(g')^2 + f'(g)g''$, which is exactly one term per
+                        second-derivative tree. Each leaf of a tree gets one infinitesimal label
+                        ($i_1$ or $i_2$), and the squaring rule prevents any label from appearing
+                        twice.</p>
+
+                    <p>Three perspectives on the same object:
+                        Fa&agrave; di Bruno's formula, labeled rooted trees, and nested dual numbers.</p>
+
+                    <h3>References</h3>
+                    <ul>
+                        <li>Fike, J.A. and Alonso, J.J. (2011). <em>The Development of Hyper-Dual Numbers for Exact
+                                Second-Derivative Calculations.</em> AIAA 2011-886.</li>
+                        <li>Griewank, A. and Walther, A. (2008). <em>Evaluating Derivatives: Principles and
+                                Techniques of Algorithmic Differentiation.</em> SIAM.</li>
+                        <li>Bettencourt, J. et al. (2019). <em>Taylor-Mode Automatic Differentiation for
+                                Higher-Order Derivatives in JAX.</em></li>
+                        <li><a href="/blog/2021/08/dual-numbers/">Dual numbers I</a></li>
+                        <li><a href="/blog/2023/11/rooted-trees-and-differentiation/">On rooted trees and
+                                differentiation</a></li>
+                    </ul>
+
+                </div>
+            </article>
+
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer__links">
+                <a href="https://scholar.google.com/citations?user=613GPbQAAAAJ&hl=en" target="_blank">Google
+                    Scholar</a>
+                <a href="https://github.com/danielewworrall" target="_blank">GitHub</a>
+                <a href="https://twitter.com/danielewworrall" target="_blank">Twitter</a>
+                <a href="https://www.linkedin.com/in/daniel-worrall-46a43238/" target="_blank">LinkedIn</a>
+            </div>
+            <p class="footer__text">© 2026 Daniel Worrall</p>
+        </div>
+    </footer>
+
+    <script src="/script.js"></script>
+</body>
+
+</html>

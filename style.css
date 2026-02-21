@@ -1204,6 +1204,59 @@ section {
   font-size: inherit;
 }
 
+/* Prism.js overrides — use site palette instead of default white */
+.blog-post__content pre[class*="language-"],
+.blog-post__content code[class*="language-"] {
+  background: var(--bg-secondary) !important;
+  color: var(--text-primary) !important;
+  font-size: 0.85rem !important;
+  line-height: 1.6 !important;
+}
+
+:root:not([data-theme="light"]) .token.comment,
+:root:not([data-theme="light"]) .token.prolog,
+:root:not([data-theme="light"]) .token.doctype {
+  color: #8292a2 !important;
+}
+
+:root:not([data-theme="light"]) .token.keyword {
+  color: #c792ea !important;
+}
+
+:root:not([data-theme="light"]) .token.function {
+  color: #82aaff !important;
+}
+
+:root:not([data-theme="light"]) .token.string {
+  color: #c3e88d !important;
+}
+
+:root:not([data-theme="light"]) .token.number {
+  color: #f78c6c !important;
+}
+
+:root:not([data-theme="light"]) .token.operator {
+  color: #89ddff !important;
+  background: none !important;
+}
+
+
+:root:not([data-theme="light"]) .token.builtin {
+  color: #ffcb6b !important;
+}
+
+:root:not([data-theme="light"]) .token.class-name {
+  color: #ffcb6b !important;
+}
+
+:root:not([data-theme="light"]) .token.boolean {
+  color: #f78c6c !important;
+}
+
+:root:not([data-theme="light"]) .token.punctuation {
+  color: #bfc7d5 !important;
+}
+
 .blog-post__content ul,
 .blog-post__content ol {
   padding-left: 1.5rem;
@@ -1226,6 +1279,39 @@ section {
 /* MathJax overrides — horizontal scroll on narrow screens */
 .blog-post__content .MathJax {
   font-size: 1em !important;
+}
+
+.blog-post__content details {
+  margin: 1.5rem 0;
+  border: 1px solid var(--text-secondary);
+  border-radius: 12px;
+  padding: 0 1.4rem;
+  background: rgba(128, 128, 128, 0.04);
+}
+
+.blog-post__content details[open] {
+  padding-bottom: 1rem;
+}
+
+.blog-post__content details summary {
+  cursor: pointer;
+  padding: 0.8rem 0;
+  font-weight: 600;
+  font-style: italic;
+  color: var(--text-secondary);
+  list-style: none;
+}
+
+.blog-post__content details summary::before {
+  content: '▸ ';
+}
+
+.blog-post__content details[open] summary::before {
+  content: '▾ ';
+}
+
+.blog-post__content details summary::-webkit-details-marker {
+  display: none;
 }
 
 mjx-container[jax="output-chtml"][display="true"] {
