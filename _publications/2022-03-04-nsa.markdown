@@ -1,0 +1,12 @@
+---
+title: "Neural Simulated Annealing"
+date: 2022-03-04
+authors: Alvaro H.C. Correia*, Daniel E. Worrall*, Roberto Bondesan
+venue: Preprint
+paperurl: https://arxiv.org/abs/2203.02201
+excerpt: Combinatorial optimization, Simulated annealing
+---
+### Abstract
+Simulated annealing (SA) is a stochastic global optimisation technique applicable to a wide range of discrete and continuous variable problems. Despite its simplicity, the development of an effective SA optimiser for a given problem hinges on a handful of carefully handpicked components; namely, neighbour proposal distribution and temperature annealing schedule. In this work, we view SA from a reinforcement learning perspective and frame the proposal distribution as a policy, which can be optimised for higher solution quality given a fixed computational budget. We demonstrate that this Neural SA with such a learnt proposal distribution, parametrised by small equivariant neural networks, outperforms SA baselines on a number of problems: Rosenbrock’s function, the Knapsack problem, the Bin Packing problem, and the Travelling Salesperson problem. We also show that Neural SA scales well to large problems—generalising to significantly larger problems than the ones seen during training—while achieving comparable performance to popular off-the-shelf solvers and other machine learning methods in terms of solution quality and wall-clock time.
+
+{% bibliography --query @*[title={{ page.title }}] %}
