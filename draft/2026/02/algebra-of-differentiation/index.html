@@ -1,0 +1,2348 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Algebra of differentiation — Daniel Worrall</title>
+    <meta name="description"
+        content="The higher-order chain rule has a beautiful algebraic structure: each derivative term corresponds to a rooted tree, and differentiation itself becomes a pair of tree operations. We explore labeled trees, elementary differentials, the Butcher group, and jets.">
+    <link rel="stylesheet" href="/style.css">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <!-- MathJax -->
+    <script>
+        MathJax = {
+            tex: { inlineMath: [['$', '$']], displayMath: [['$$', '$$'], ['\\[', '\\]']], processEscapes: true, tags: 'ams' },
+            options: { skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'] }
+        };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async></script>
+    <!-- Prism.js syntax highlighting -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-python.min.js" defer></script>
+</head>
+
+<body>
+
+    <canvas id="neural-canvas"></canvas>
+
+    <nav class="nav" role="navigation">
+        <div class="nav__inner">
+            <a href="/" class="nav__logo">d<span>.</span>eworrall</a>
+            <ul class="nav__links" id="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/blog/">Blog</a></li>
+                <li><a href="/publications.html">Publications</a></li>
+                <li><a href="/talks.html">Talks</a></li>
+                <li><a href="/teaching.html">Teaching</a></li>
+            </ul>
+            <div style="display:flex;align-items:center;gap:0.5rem;">
+                <button class="nav__theme-toggle" id="theme-toggle" aria-label="Toggle dark/light mode">☀️</button>
+                <button class="nav__hamburger" id="hamburger" aria-label="Toggle menu">
+                    <span></span><span></span><span></span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="page-content">
+        <div class="container">
+
+            <article class="blog-post reveal">
+                <header class="blog-post__header">
+                    <p class="section-header__label">Writing</p>
+                    <h1 class="blog-post__title">The algebra of differentiation</h1>
+                    <div class="blog-post__meta">
+                        <time>February 2026 &middot; DRAFT</time>
+                        <div class="blog-card__tags">
+                            <span class="blog-card__tag">rooted trees</span>
+                            <span class="blog-card__tag">Faà di Bruno</span>
+                            <span class="blog-card__tag">Butcher group</span>
+                        </div>
+                    </div>
+                </header>
+
+                <div class="blog-post__content">
+
+                    <h2>Series navigation</h2>
+
+                    <p>This post is part of a series on rooted trees and differentiation:</p>
+                    <ol>
+                        <li><a href="/blog/2021/08/dual-numbers/">Dual numbers</a> — first-order
+                            forward-mode autodiff via $i^2 = 0$.</li>
+                        <li><a href="/blog/2023/11/rooted-trees-and-differentiation/">On rooted trees
+                                and differentiation</a> — the higher-order chain rule,
+                            Einstein index notation ($f^i_\alpha$, $g^\alpha_j$),
+                            and the tree → derivative correspondence.</li>
+                        <li><strong>This post</strong> — the algebraic structure of the trees:
+                            grafting, elementary differentials, the Butcher group, and jets.</li>
+                        <li><a href="/blog/2026/02/hyper-dual-numbers/">Hyper-dual numbers</a> — higher-order
+                            autodiff via nested infinitesimals.</li>
+                        <li><a href="/blog/2026/02/b-series/">B-series, trees, and Runge-Kutta</a> — how
+                            tree coefficients index ODE solver accuracy.</li>
+                        <li><a href="/blog/2026/02/rk-order-conditions/">RK order conditions</a> — HNW
+                            Section II.2 in index notation.</li>
+                    </ol>
+
+
+                    <!-- ============================================================ -->
+                    <h2>1. Introduction</h2>
+
+                    <p>In the <a href="/blog/2023/11/rooted-trees-and-differentiation/">previous
+                            post</a> we discovered that the higher-order chain rule for
+                        $f(g(\mathbf{x}))$ produces terms indexed by rooted trees. Each
+                        tree encodes a distinct contraction pattern of the derivative
+                        tensors $f^i_\alpha$, $f^i_{\alpha\beta}$, $g^\alpha_j$,
+                        $g^\alpha_{jk}$ and so on.</p>
+
+                    <p>But we only scratched the surface. There is a <em>deep algebraic
+                            structure</em> hiding here. The set of rooted trees forms an
+                        algebra — with a natural multiplication (grafting), an identity element,
+                        and even a group structure when you allow formal
+                        power series over trees. This algebra is not a curiosity: it
+                        governs the mechanics of differentiation itself, and shows up in
+                        fields ranging from numerical ODE solvers (the Butcher group) to
+                        renormalization in quantum field theory (the Connes–Kreimer Hopf
+                        algebra).</p>
+
+                    <p>This post is a deep dive into these structures. We'll cover:</p>
+                    <ul>
+                        <li><strong>§2.</strong> A quick recap of the index notation and the
+                            chain rule</li>
+                        <li><strong>§3.</strong> Two tree operations — <em>graft</em> and
+                            <em>grow</em> — and how they correspond to differentiation
+                        </li>
+                        <li><strong>§4.</strong> Labeled vs. unlabeled trees, cardinalities,
+                            and integer partitions</li>
+                        <li><strong>§5.</strong> Elementary differentials as an algebra
+                            homomorphism $F$</li>
+                        <li><strong>§6.</strong> Beyond compositions: general rooted trees</li>
+                        <li><strong>§7.</strong> B-series and the Butcher group</li>
+                        <li><strong>§8.</strong> Jets and function representations</li>
+                    </ul>
+
+
+                    <!-- ============================================================ -->
+                    <h2>2. Recap: index notation and the chain rule</h2>
+
+                    <p>We write $f : \mathbb{R}^n \to \mathbb{R}^n$ and
+                        $g : \mathbb{R}^d \to \mathbb{R}^n$ with composition
+                        $\mathbf{z} = f(g(\mathbf{x}))$. In
+                        <a href="/blog/2023/11/rooted-trees-and-differentiation/">index
+                            notation</a>:
+                    </p>
+
+                    <ul>
+                        <li>$f^i_\alpha = \partial f^i / \partial y^\alpha$ — the Jacobian of
+                            $f$, one subscript per input dimension we differentiate with
+                            respect to.</li>
+                        <li>$g^\alpha_j = \partial g^\alpha / \partial x^j$ — the Jacobian of
+                            $g$.</li>
+                        <li>Einstein convention: sum over repeated Greek indices.</li>
+                    </ul>
+
+                    <p>The chain rule is:</p>
+
+                    $$
+                    \frac{\partial z^i}{\partial x^j} = f^i_\alpha\, g^\alpha_j.
+                    $$
+
+                    <p>The second derivative involves two terms:</p>
+
+                    $$
+                    \frac{\partial^2 z^i}{\partial x^j \partial x^k}
+                    = f^i_{\alpha\beta}\, g^\alpha_j\, g^\beta_k
+                    \;+\; f^i_\alpha\, g^\alpha_{jk}.
+                    $$
+
+                    <p>The third:</p>
+
+                    $$
+                    \frac{\partial^3 z^i}{\partial x^j \partial x^k \partial x^\ell}
+                    = f^i_{\alpha\beta\gamma}\, g^\alpha_j\, g^\beta_k\, g^\gamma_\ell
+                    \;+\; 3 \cdot f^i_{\alpha\beta}\, g^\alpha_j\, g^\beta_{k\ell}
+                    \;+\; f^i_\alpha\, g^\alpha_{jk\ell}.
+                    $$
+
+                    <p>And the fourth:</p>
+
+                    $$
+                    \frac{\partial^4 z^i}{\partial x^j \partial x^k \partial x^\ell \partial x^m}
+                    = f^i_{\alpha\beta\gamma\delta}\, g^\alpha_j\, g^\beta_k\, g^\gamma_\ell\, g^\delta_m
+                    \;+\; 6 \cdot f^i_{\alpha\beta\gamma}\, g^\alpha_j\, g^\beta_k\, g^\gamma_{\ell m}
+                    \;+\; 3 \cdot f^i_{\alpha\beta}\, g^\alpha_{j\ell}\, g^\beta_{km}
+                    \;+\; 4 \cdot f^i_{\alpha\beta}\, g^\alpha_j\, g^\beta_{k\ell m}
+                    \;+\; f^i_\alpha\, g^\alpha_{jk\ell m}.
+                    $$
+
+                    <p>These expressions get unwieldy fast. But every single term has the
+                        same structure: one factor $f^i_{\alpha\beta\ldots}$ with some number
+                        of subscripts, multiplied by several $g^{\alpha}_{jk\ldots}$ factors,
+                        each with one superscript and some subscripts. This is the key
+                        observation that leads to trees.</p>
+
+
+                    <!-- ============================================================ -->
+                    <h2>3. Differentiation as tree operations</h2>
+
+                    <h3>3.1. Drawing the first few trees</h3>
+
+                    <p>We represent each term as a <em>special labeled rooted tree</em>
+                        (SLRT). The rules:</p>
+                    <ul>
+                        <li>The <strong>root</strong> represents $f$. Each <strong>subscript</strong>
+                            of $f$ becomes a branch from the root.</li>
+                        <li>Each branch (factor of $g$) can itself have subscripts, extending
+                            the branch further.</li>
+                        <li>Labels on nodes = the free indices ($j$, $k$, $\ell$, …).</li>
+                    </ul>
+
+                    <p>So the term $f^i_\alpha g^\alpha_j$ (the first derivative) is a
+                        root with one child labeled $j$:</p>
+
+                    <div style="text-align: center; margin: 1rem 0;">
+                        <svg width="47" height="70" viewBox="4.0 -4.0 47.0 70.0">
+                            <circle cx="20" cy="50" r="4" fill="currentColor" />
+                            <circle cx="20" cy="50" r="7" fill="none" stroke="currentColor" stroke-width="1.5" />
+                            <line x1="20" y1="50" x2="20" y2="10" stroke="currentColor" stroke-width="2" />
+                            <circle cx="20" cy="10" r="5" fill="currentColor" />
+                            <text x="30" y="18" fill="currentColor" font-size="13" font-style="italic">j</text>
+                        </svg>
+                    </div>
+
+                    <p>The term $f^i_{\alpha\beta} g^\alpha_j g^\beta_k$ (root with two
+                        subscripts, each a single $g$) is a root with two children:</p>
+
+                    <div style="text-align: center; margin: 1rem 0;">
+                        <svg width="90" height="70" viewBox="-3.0 -4.0 90.0 70.0">
+                            <circle cx="40" cy="50" r="4" fill="currentColor" />
+                            <circle cx="40" cy="50" r="7" fill="none" stroke="currentColor" stroke-width="1.5" />
+                            <line x1="40" y1="50" x2="20" y2="10" stroke="currentColor" stroke-width="2" />
+                            <line x1="40" y1="50" x2="60" y2="10" stroke="currentColor" stroke-width="2" />
+                            <circle cx="20" cy="10" r="5" fill="currentColor" />
+                            <circle cx="60" cy="10" r="5" fill="currentColor" />
+                            <text x="6" y="18" fill="currentColor" font-size="13" font-style="italic">j</text>
+                            <text x="66" y="18" fill="currentColor" font-size="13" font-style="italic">k</text>
+                        </svg>
+                    </div>
+
+                    <p>And $f^i_\alpha g^\alpha_{jk}$ (one subscript of $f$, but $g$ has
+                        two subscripts) is a <em>chain</em> of three nodes:</p>
+
+                    <div style="text-align: center; margin: 1rem 0;">
+                        <svg width="45" height="110" viewBox="4.0 -4.0 45.0 110.0">
+                            <circle cx="20" cy="90" r="4" fill="currentColor" />
+                            <circle cx="20" cy="90" r="7" fill="none" stroke="currentColor" stroke-width="1.5" />
+                            <line x1="20" y1="90" x2="20" y2="50" stroke="currentColor" stroke-width="2" />
+                            <circle cx="20" cy="50" r="5" fill="currentColor" />
+                            <text x="28" y="58" fill="currentColor" font-size="13" font-style="italic">j</text>
+                            <line x1="20" y1="50" x2="20" y2="10" stroke="currentColor" stroke-width="2" />
+                            <circle cx="20" cy="10" r="5" fill="currentColor" />
+                            <text x="28" y="18" fill="currentColor" font-size="13" font-style="italic">k</text>
+                        </svg>
+                    </div>
+
+                    <h3>3.2. The two differentiation operations</h3>
+
+                    <p>When we differentiate a term (apply $\partial / \partial x^m$),
+                        the product rule creates multiple copies of the tree, each modified
+                        in one of two ways:</p>
+
+                    <ol>
+                        <li><strong>Graft at the root.</strong> Differentiating the outer
+                            $f^i_{\alpha_1 \ldots \alpha_n}$ adds a new subscript
+                            $\alpha_{n+1}$ and a corresponding new $g^{\alpha_{n+1}}_m$
+                            factor. In tree language: <strong>add a new child labeled
+                                $m$ to the root</strong>.</li>
+                        <li><strong>Grow a leaf.</strong> Differentiating one of the inner
+                            $g^{\alpha_k}_{j_1 \ldots j_p}$ raises it to $g^{\alpha_k}_{j_1 \ldots j_p m}$,
+                            adding one more subscript to that branch. In tree language:
+                            <strong>extend one existing branch by a new node labeled
+                                $m$</strong>.
+                        </li>
+                    </ol>
+
+                    <p>Let's watch this in action. Start with the single-node tree
+                        $f^i$ (order 0):</p>
+
+                    <div style="text-align: center; margin: 1rem 0; font-style: italic; color: var(--text-secondary);">
+                        Order 0: &emsp;
+                        <svg width="32" height="32" viewBox="-6.0 -6.0 32.0 32.0"
+                            style="vertical-align: middle; overflow: visible;">
+                            <circle cx="10" cy="10" r="4" fill="currentColor" />
+                            <circle cx="10" cy="10" r="7" fill="none" stroke="currentColor" stroke-width="1.5" />
+                        </svg>
+                        &emsp; $f^i$
+                    </div>
+
+                    <p><strong>Differentiate once</strong> (only one option: graft at root):</p>
+
+                    <div style="text-align: center; margin: 1rem 0; font-style: italic; color: var(--text-secondary);">
+                        Order 1: &emsp;
+                        <svg width="45" height="70" viewBox="4.0 -4.0 45.0 70.0"
+                            style="vertical-align: middle; overflow: visible;">
+                            <circle cx="20" cy="50" r="4" fill="currentColor" />
+                            <circle cx="20" cy="50" r="7" fill="none" stroke="currentColor" stroke-width="1.5" />
+                            <line x1="20" y1="50" x2="20" y2="10" stroke="currentColor" stroke-width="2" />
+                            <circle cx="20" cy="10" r="5" fill="red" />
+                            <text x="28" y="18" fill="red" font-size="12" font-style="italic">j</text>
+                        </svg>
+                        &emsp; $f^i_\alpha g^\alpha_j$
+                    </div>
+
+                    <p><strong>Differentiate again</strong> — the product rule gives two copies:</p>
+
+                    <div style="text-align: center; margin: 1rem 0; font-style: italic; color: var(--text-secondary);">
+                        Order 2: &emsp;
+                        <svg width="90" height="70" viewBox="-3.0 -4.0 90.0 70.0"
+                            style="vertical-align: middle; overflow: visible;">
+                            <circle cx="40" cy="50" r="4" fill="currentColor" />
+                            <circle cx="40" cy="50" r="7" fill="none" stroke="currentColor" stroke-width="1.5" />
+                            <line x1="40" y1="50" x2="20" y2="10" stroke="currentColor" stroke-width="2" />
+                            <line x1="40" y1="50" x2="60" y2="10" stroke="currentColor" stroke-width="2" />
+                            <circle cx="20" cy="10" r="5" fill="currentColor" />
+                            <text x="6" y="18" fill="currentColor" font-size="12" font-style="italic">j</text>
+                            <circle cx="60" cy="10" r="5" fill="red" />
+                            <text x="66" y="18" fill="red" font-size="12" font-style="italic">k</text>
+                        </svg>
+                        &emsp; $f^i_{\alpha\beta} g^\alpha_j g^\beta_k$
+                        &emsp; &emsp; &emsp;
+                        <svg width="45" height="110" viewBox="4.0 -4.0 45.0 110.0"
+                            style="vertical-align: middle; overflow: visible;">
+                            <circle cx="20" cy="90" r="4" fill="currentColor" />
+                            <circle cx="20" cy="90" r="7" fill="none" stroke="currentColor" stroke-width="1.5" />
+                            <line x1="20" y1="90" x2="20" y2="50" stroke="currentColor" stroke-width="2" />
+                            <circle cx="20" cy="50" r="5" fill="currentColor" />
+                            <text x="28" y="58" fill="currentColor" font-size="12" font-style="italic">j</text>
+                            <line x1="20" y1="50" x2="20" y2="10" stroke="currentColor" stroke-width="2" />
+                            <circle cx="20" cy="10" r="5" fill="red" />
+                            <text x="28" y="18" fill="red" font-size="12" font-style="italic">k</text>
+                        </svg>
+                        &emsp; $f^i_\alpha g^\alpha_{jk}$
+                    </div>
+
+                    <p>Red nodes show what was added. The left tree grafted at the root
+                        (new branch), the right tree grew the existing leaf (extended the
+                        branch). Together they give the two terms of the second derivative.</p>
+
+
+                    <h3>3.3. The third derivative: five labeled trees, three unlabeled</h3>
+
+                    <p>Differentiating once more, each of the two order-2 trees spawns
+                        copies. The bushy tree $f^i_{\alpha\beta} g^\alpha_j g^\beta_k$
+                        has three nodes that can be hit (root, child $j$, child $k$),
+                        giving three trees. The chain $f^i_\alpha g^\alpha_{jk}$ has two
+                        (root, the sole branch node), giving two trees. In total: five
+                        labeled trees of order 3. But three of them are topologically
+                        identical (just with different label placements), so there are only
+                        <strong>three unlabeled trees</strong>:
+                    </p>
+
+                    <div style="text-align: center; margin: 1.5rem 0;">
+                        <!-- Three-child bushy -->
+                        <svg width="88" height="70" viewBox="6.0 -4.0 88.0 70.0"
+                            style="vertical-align: middle; overflow: visible;">
+                            <circle cx="50" cy="50" r="4" fill="currentColor" />
+                            <circle cx="50" cy="50" r="7" fill="none" stroke="currentColor" stroke-width="1.5" />
+                            <line x1="50" y1="50" x2="20" y2="10" stroke="currentColor" stroke-width="2" />
+                            <line x1="50" y1="50" x2="50" y2="10" stroke="currentColor" stroke-width="2" />
+                            <line x1="50" y1="50" x2="80" y2="10" stroke="currentColor" stroke-width="2" />
+                            <circle cx="20" cy="10" r="5" fill="currentColor" />
+                            <circle cx="50" cy="10" r="5" fill="currentColor" />
+                            <circle cx="80" cy="10" r="5" fill="currentColor" />
+                        </svg>
+                        &emsp;
+                        <!-- Mixed: one long branch, one short -->
+                        <svg width="68" height="110" viewBox="6.0 -4.0 68.0 110.0"
+                            style="vertical-align: middle; overflow: visible;">
+                            <circle cx="40" cy="90" r="4" fill="currentColor" />
+                            <circle cx="40" cy="90" r="7" fill="none" stroke="currentColor" stroke-width="1.5" />
+                            <line x1="40" y1="90" x2="20" y2="50" stroke="currentColor" stroke-width="2" />
+                            <line x1="40" y1="90" x2="60" y2="50" stroke="currentColor" stroke-width="2" />
+                            <circle cx="20" cy="50" r="5" fill="currentColor" />
+                            <circle cx="60" cy="50" r="5" fill="currentColor" />
+                            <line x1="60" y1="50" x2="60" y2="10" stroke="currentColor" stroke-width="2" />
+                            <circle cx="60" cy="10" r="5" fill="currentColor" />
+                        </svg>
+                        &emsp;
+                        <!-- Tall chain -->
+                        <svg width="32" height="150" viewBox="4.0 -4.0 32.0 150.0"
+                            style="vertical-align: middle; overflow: visible;">
+                            <circle cx="20" cy="130" r="4" fill="currentColor" />
+                            <circle cx="20" cy="130" r="7" fill="none" stroke="currentColor" stroke-width="1.5" />
+                            <line x1="20" y1="130" x2="20" y2="90" stroke="currentColor" stroke-width="2" />
+                            <circle cx="20" cy="90" r="5" fill="currentColor" />
+                            <line x1="20" y1="90" x2="20" y2="50" stroke="currentColor" stroke-width="2" />
+                            <circle cx="20" cy="50" r="5" fill="currentColor" />
+                            <line x1="20" y1="50" x2="20" y2="10" stroke="currentColor" stroke-width="2" />
+                            <circle cx="20" cy="10" r="5" fill="currentColor" />
+                        </svg>
+                    </div>
+
+                    <p>These correspond to the three terms of the third derivative,
+                        with multiplicities $1$, $3$, $1$:</p>
+
+                    $$
+                    f^i_{\alpha\beta\gamma} g^\alpha_j g^\beta_k g^\gamma_\ell
+                    \;+\; 3 \cdot f^i_{\alpha\beta} g^\alpha_j g^\beta_{k\ell}
+                    \;+\; f^i_\alpha g^\alpha_{jk\ell}.
+                    $$
+
+
+                    <!-- ============================================================ -->
+                    <h2>4. Labeled trees, unlabeled trees, and cardinalities</h2>
+
+                    <h3>4.1. Why the multiplicity is 3</h3>
+
+                    <p>The middle tree (one short branch + one long branch from the root)
+                        can be labeled in three distinct valid ways: the labels $\{j,k,\ell\}$
+                        must <em>increase from root outward</em> along each branch, and at
+                        sibling nodes the ordering must be consistent. The three valid
+                        labelings correspond to which label gets placed on the long branch:</p>
+
+                    <ul>
+                        <li>$g^\alpha_j g^\beta_{k\ell}$ — $j$ short, $k\ell$ long</li>
+                        <li>$g^\alpha_k g^\beta_{j\ell}$ — $k$ short, $j\ell$ long</li>
+                        <li>$g^\alpha_\ell g^\beta_{jk}$ — $\ell$ short, $jk$ long</li>
+                    </ul>
+
+                    <p>In general, the coefficient in front of each unlabeled tree is
+                        the <em>cardinality</em> $\alpha(\tau)$: the number of valid
+                        monotone labelings of the tree. This is a well-defined quantity.</p>
+
+                    <blockquote
+                        style="border-left: 3px solid var(--accent-primary); padding-left: 1rem; margin: 1.5rem 0; color: var(--text-secondary); font-style: italic;">
+                        <strong>Definition (HNW 2.5).</strong> An <em>unlabeled rooted tree</em>
+                        (or just <em>tree</em>) is an equivalence class of labeled rooted trees
+                        under label permutations that preserve the root. The cardinality
+                        $\alpha(\tau)$ is the number of elements in this equivalence class.
+                    </blockquote>
+
+
+                    <details style="margin: 1.5rem 0; border-left: 3px solid var(--border-color); padding-left: 1rem;">
+                        <summary style="cursor: pointer; font-weight: 600; font-size: 1.1rem; margin-bottom: 0.5rem;">
+                            4.2. Aside: connection to integer partitions
+                        </summary>
+
+                        <p>There is a bijection between special rooted trees of order $n+1$
+                            (trees with branching only at the root) and <em>integer
+                                partitions</em> of the set $\{j_1, \ldots, j_n\}$. Each branch of
+                            the tree corresponds to a block of the partition:</p>
+
+                        <ul>
+                            <li>The bushy tree with 3 leaves: $\{\{j\}, \{k\}, \{\ell\}\}$ — each
+                                index is its own block.</li>
+                            <li>The mixed tree (1 leaf + 1 chain): $\{\{j\}, \{k, \ell\}\}$ —
+                                two indices share a branch.</li>
+                            <li>The tall chain: $\{\{j, k, \ell\}\}$ — all indices in one
+                                branch.</li>
+                        </ul>
+
+                        <p>The number of special rooted trees of order $n+1$ equals the number
+                            of <em>partitions of the integer $n$</em> (partition into parts, not
+                            of a set). This is the sequence $1, 1, 2, 3, 5, 7, 11, 15, \ldots$
+                            — one of the most studied sequences in combinatorics.</p>
+                    </details>
+
+
+                    <!-- ============================================================ -->
+                    <h2>5. Elementary differentials: from trees to vector fields</h2>
+
+                    <h3>5.1. The map $F$</h3>
+
+                    <p>Each tree $\tau$ of order $q$ corresponds to a specific expression
+                        in the derivatives of $f$ (and $g$, for compositions). This
+                        expression is called the <em>elementary differential</em>
+                        $F(\tau)$. Formally:</p>
+
+                    $$
+                    F : \{\text{rooted trees}\} \longrightarrow \{\text{vector fields on } \mathbb{R}^d\}.
+                    $$
+
+                    <p>The map is defined recursively. Remove the root from
+                        a tree $\tau$ to expose its $m$ child subtrees
+                        $\tau_1, \ldots, \tau_m$. Then:</p>
+
+                    $$
+                    F^i(\tau)(\mathbf{x}) = f^i_{\alpha_1 \ldots \alpha_m}\,
+                    F^{\alpha_1}(\tau_1) \cdots F^{\alpha_m}(\tau_m),
+                    $$
+
+                    <p>with base case: the single-node tree maps to $F^i = f^i$.</p>
+
+                    <p>The examples from §2:</p>
+                    <table style="margin: 1rem auto; border-collapse: collapse; font-size: 0.9rem;">
+                        <thead>
+                            <tr>
+                                <th
+                                    style="padding: 0.4rem 0.7rem; border-bottom: 2px solid var(--border-color); text-align: center;">
+                                    Tree $\tau$</th>
+                                <th
+                                    style="padding: 0.4rem 0.7rem; border-bottom: 2px solid var(--border-color); text-align: left;">
+                                    $F^i(\tau)$</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td
+                                    style="padding: 0.4rem 0.7rem; border-bottom: 1px solid var(--border-color); text-align: center;">
+                                    <svg width="32" height="32" viewBox="-9.0 -9.0 32.0 32.0"
+                                        style="vertical-align: middle; overflow: visible;">
+                                        <circle cx="7" cy="7" r="4" fill="currentColor" />
+                                        <circle cx="7" cy="7" r="7" fill="none" stroke="currentColor"
+                                            stroke-width="1.5" />
+                                    </svg>
+                                </td>
+                                <td style="padding: 0.4rem 0.7rem; border-bottom: 1px solid var(--border-color);">
+                                    $f^i$</td>
+                            </tr>
+                            <tr>
+                                <td
+                                    style="padding: 0.4rem 0.7rem; border-bottom: 1px solid var(--border-color); text-align: center;">
+                                    <svg width="32" height="56" viewBox="-9.0 -7.0 32.0 56.0"
+                                        style="vertical-align: middle; overflow: visible;">
+                                        <line x1="7" y1="33" x2="7" y2="7" stroke="currentColor" stroke-width="2" />
+                                        <circle cx="7" cy="33" r="4" fill="currentColor" />
+                                        <circle cx="7" cy="33" r="7" fill="none" stroke="currentColor"
+                                            stroke-width="1.5" />
+                                        <circle cx="7" cy="7" r="5" fill="currentColor" />
+                                    </svg>
+                                </td>
+                                <td style="padding: 0.4rem 0.7rem; border-bottom: 1px solid var(--border-color);">
+                                    $f^i_\alpha g^\alpha_j$</td>
+                            </tr>
+                            <tr>
+                                <td
+                                    style="padding: 0.4rem 0.7rem; border-bottom: 1px solid var(--border-color); text-align: center;">
+                                    <svg width="54" height="56" viewBox="-7.0 -7.0 54.0 56.0"
+                                        style="vertical-align: middle; overflow: visible;">
+                                        <line x1="20" y1="33" x2="7" y2="7" stroke="currentColor" stroke-width="2" />
+                                        <line x1="20" y1="33" x2="33" y2="7" stroke="currentColor" stroke-width="2" />
+                                        <circle cx="20" cy="33" r="4" fill="currentColor" />
+                                        <circle cx="20" cy="33" r="7" fill="none" stroke="currentColor"
+                                            stroke-width="1.5" />
+                                        <circle cx="7" cy="7" r="5" fill="currentColor" />
+                                        <circle cx="33" cy="7" r="5" fill="currentColor" />
+                                    </svg>
+                                </td>
+                                <td style="padding: 0.4rem 0.7rem; border-bottom: 1px solid var(--border-color);">
+                                    $f^i_{\alpha\beta} g^\alpha_j g^\beta_k$</td>
+                            </tr>
+                            <tr>
+                                <td
+                                    style="padding: 0.4rem 0.7rem; border-bottom: 1px solid var(--border-color); text-align: center;">
+                                    <svg width="32" height="82" viewBox="-9.0 -7.0 32.0 82.0"
+                                        style="vertical-align: middle; overflow: visible;">
+                                        <line x1="7" y1="59" x2="7" y2="33" stroke="currentColor" stroke-width="2" />
+                                        <line x1="7" y1="33" x2="7" y2="7" stroke="currentColor" stroke-width="2" />
+                                        <circle cx="7" cy="59" r="4" fill="currentColor" />
+                                        <circle cx="7" cy="59" r="7" fill="none" stroke="currentColor"
+                                            stroke-width="1.5" />
+                                        <circle cx="7" cy="33" r="5" fill="currentColor" />
+                                        <circle cx="7" cy="7" r="5" fill="currentColor" />
+                                    </svg>
+                                </td>
+                                <td style="padding: 0.4rem 0.7rem; border-bottom: 1px solid var(--border-color);">
+                                    $f^i_\alpha g^\alpha_{jk}$</td>
+                            </tr>
+                            <tr>
+                                <td
+                                    style="padding: 0.4rem 0.7rem; border-bottom: 1px solid var(--border-color); text-align: center;">
+                                    <svg width="80" height="56" viewBox="-7.0 -7.0 80.0 56.0"
+                                        style="vertical-align: middle; overflow: visible;">
+                                        <line x1="33" y1="33" x2="7" y2="7" stroke="currentColor" stroke-width="2" />
+                                        <line x1="33" y1="33" x2="33" y2="7" stroke="currentColor" stroke-width="2" />
+                                        <line x1="33" y1="33" x2="59" y2="7" stroke="currentColor" stroke-width="2" />
+                                        <circle cx="33" cy="33" r="4" fill="currentColor" />
+                                        <circle cx="33" cy="33" r="7" fill="none" stroke="currentColor"
+                                            stroke-width="1.5" />
+                                        <circle cx="7" cy="7" r="5" fill="currentColor" />
+                                        <circle cx="33" cy="7" r="5" fill="currentColor" />
+                                        <circle cx="59" cy="7" r="5" fill="currentColor" />
+                                    </svg>
+                                </td>
+                                <td style="padding: 0.4rem 0.7rem; border-bottom: 1px solid var(--border-color);">
+                                    $f^i_{\alpha\beta\gamma} g^\alpha_j g^\beta_k g^\gamma_\ell$</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+
+                    <h3>5.2. $F$ is an algebra homomorphism</h3>
+
+                    <p><strong>Grafting</strong> — joining subtrees $\tau_1, \ldots, \tau_m$
+                        under a new root — is the fundamental operation on trees. Given two
+                        trees, we can graft them under a fresh root to produce a new tree:</p>
+
+                    <div style="text-align: center; margin: 1.5rem 0;">
+                        <!-- tau_1 -->
+                        <svg width="32" height="56" viewBox="-9.0 -7.0 32.0 56.0"
+                            style="vertical-align: middle; overflow: visible;">
+                            <line x1="7" y1="33" x2="7" y2="7" stroke="currentColor" stroke-width="2" />
+                            <circle cx="7" cy="33" r="4" fill="currentColor" />
+                            <circle cx="7" cy="33" r="7" fill="none" stroke="currentColor" stroke-width="1.5" />
+                            <circle cx="7" cy="7" r="5" fill="currentColor" />
+                        </svg>
+                        &ensp; and &ensp;
+                        <svg width="32" height="32" viewBox="-9.0 -9.0 32.0 32.0"
+                            style="vertical-align: middle; overflow: visible;">
+                            <circle cx="7" cy="7" r="4" fill="currentColor" />
+                            <circle cx="7" cy="7" r="7" fill="none" stroke="currentColor" stroke-width="1.5" />
+                        </svg>
+                        &ensp; $\xrightarrow{\text{graft}}$ &ensp;
+                        <svg width="58" height="82" viewBox="1.0 -3.0 58.0 82.0"
+                            style="vertical-align: middle; overflow: visible;">
+                            <line x1="30" y1="63" x2="15" y2="37" stroke="currentColor" stroke-width="2" />
+                            <line x1="30" y1="63" x2="45" y2="37" stroke="currentColor" stroke-width="2" />
+                            <line x1="15" y1="37" x2="15" y2="11" stroke="currentColor" stroke-width="2" />
+                            <circle cx="30" cy="63" r="4" fill="var(--accent-primary)" />
+                            <circle cx="30" cy="63" r="7" fill="none" stroke="var(--accent-primary)"
+                                stroke-width="1.5" />
+                            <circle cx="15" cy="37" r="5" fill="currentColor" />
+                            <circle cx="45" cy="37" r="5" fill="currentColor" />
+                            <circle cx="15" cy="11" r="5" fill="currentColor" />
+                        </svg>
+                    </div>
+
+                    <p>The elementary differential $F$ <em>respects this operation</em>.
+                        In algebra language, $F$ is a <strong>homomorphism</strong>: grafting
+                        on the tree side maps to tensor contraction on the differential side.</p>
+
+                    <p>Concretely, each tree operation corresponds to a specific differential
+                        operation:</p>
+
+                    <table style="margin: 1rem auto; border-collapse: collapse; font-size: 0.9rem;">
+                        <thead>
+                            <tr>
+                                <th
+                                    style="padding: 0.4rem 0.7rem; border-bottom: 2px solid var(--border-color); text-align: left;">
+                                    Tree operation</th>
+                                <th
+                                    style="padding: 0.4rem 0.7rem; border-bottom: 2px solid var(--border-color); text-align: left;">
+                                    On the differential</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="padding: 0.4rem 0.7rem; border-bottom: 1px solid var(--border-color);">
+                                    <strong>Graft at root</strong> (new child branch)
+                                </td>
+                                <td style="padding: 0.4rem 0.7rem; border-bottom: 1px solid var(--border-color);">
+                                    Add subscript to outer $f$: &nbsp; $f^i_{\alpha_1\ldots\alpha_m} \to
+                                    f^i_{\alpha_1\ldots\alpha_m\alpha_{m+1}}$</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.4rem 0.7rem;">
+                                    <strong>Grow a leaf</strong> (extend a branch)
+                                </td>
+                                <td style="padding: 0.4rem 0.7rem;">
+                                    Chain rule on inner factor: &nbsp; $g^\alpha_{j_1\ldots j_p} \to g^\alpha_{j_1\ldots
+                                    j_p j_{p+1}}$</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <p>And the inverse operations:</p>
+
+                    <table style="margin: 1rem auto; border-collapse: collapse; font-size: 0.9rem;">
+                        <thead>
+                            <tr>
+                                <th
+                                    style="padding: 0.4rem 0.7rem; border-bottom: 2px solid var(--border-color); text-align: left;">
+                                    Tree operation</th>
+                                <th
+                                    style="padding: 0.4rem 0.7rem; border-bottom: 2px solid var(--border-color); text-align: left;">
+                                    On the differential</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="padding: 0.4rem 0.7rem; border-bottom: 1px solid var(--border-color);">
+                                    <strong>Prune a branch</strong> (remove child from root)
+                                </td>
+                                <td style="padding: 0.4rem 0.7rem; border-bottom: 1px solid var(--border-color);">
+                                    Remove a subscript + factor: &nbsp; $f^i_{\alpha\beta}\,F^\alpha\,F^\beta \to
+                                    f^i_\alpha\,F^\alpha$</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.4rem 0.7rem;">
+                                    <strong>Trim a leaf</strong> (shorten a branch)
+                                </td>
+                                <td style="padding: 0.4rem 0.7rem;">
+                                    Reduce inner derivative order: &nbsp; $g^\alpha_{jk} \to g^\alpha_j$</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <p>The tree is a <em>wiring diagram</em> for the contraction.
+                        The root's subscripts are the "slots" for its children, and
+                        Einstein summation over Greek indices glues each child tree's
+                        output into a slot.</p>
+
+
+                    <!-- ============================================================ -->
+                    <h2>6. Beyond compositions: general rooted trees</h2>
+
+                    <h3>6.1. Special vs. general trees</h3>
+
+                    <p>So far we've been studying <em>special</em> rooted trees:
+                        branching occurs <strong>only at the root</strong>. Each branch is a
+                        simple chain (representing higher derivatives of $g$). These arise
+                        naturally from the composition $f(g(\mathbf{x}))$, where $f$ and
+                        $g$ are distinct functions.</p>
+
+                    <p>But what happens if we consider an autonomous ODE $\dot{\mathbf{x}} = f(\mathbf{x})$?
+                        Here there is only <em>one</em> function $f$, and computing higher
+                        derivatives means repeatedly differentiating $f(f(\cdots))$ — $f$
+                        composed with itself. Now branching can occur at <em>any</em> node,
+                        not just the root:</p>
+
+                    <div style="text-align: center; margin: 1.5rem 0;">
+                        <!-- General tree: branching at non-root -->
+                        <svg width="68" height="110" viewBox="6.0 6.0 68.0 110.0"
+                            style="vertical-align: middle; overflow: visible;">
+                            <circle cx="40" cy="100" r="4" fill="currentColor" />
+                            <circle cx="40" cy="100" r="7" fill="none" stroke="currentColor" stroke-width="1.5" />
+                            <line x1="40" y1="100" x2="40" y2="60" stroke="currentColor" stroke-width="2" />
+                            <circle cx="40" cy="60" r="5" fill="currentColor" />
+                            <line x1="40" y1="60" x2="20" y2="20" stroke="currentColor" stroke-width="2" />
+                            <line x1="40" y1="60" x2="60" y2="20" stroke="currentColor" stroke-width="2" />
+                            <circle cx="20" cy="20" r="5" fill="currentColor" />
+                            <circle cx="60" cy="20" r="5" fill="currentColor" />
+                        </svg>
+                        &emsp; = &emsp;
+                        $f^i_\alpha f^\alpha_{\beta\gamma} f^\beta f^\gamma$
+                    </div>
+
+                    <p>This tree has branching at the second node (not the root). It
+                        corresponds to $f^i_\alpha f^\alpha_{\beta\gamma} f^\beta f^\gamma$
+                        — the Jacobian of $f$ contracted with the Hessian of $f$ applied to
+                        two copies of $f$. This term appears in the third derivative
+                        of the ODE solution.</p>
+
+                    <p>The set of all <em>general</em> rooted trees (branching allowed
+                        everywhere) is larger than the special ones. The count for the first
+                        few orders:</p>
+
+                    <table style="margin: 1rem auto; border-collapse: collapse; font-size: 0.9rem;">
+                        <thead>
+                            <tr>
+                                <th style="padding: 0.3rem 0.6rem; border-bottom: 2px solid var(--border-color);">
+                                    Order $q$</th>
+                                <th style="padding: 0.3rem 0.6rem; border-bottom: 2px solid var(--border-color);">
+                                    1</th>
+                                <th style="padding: 0.3rem 0.6rem; border-bottom: 2px solid var(--border-color);">
+                                    2</th>
+                                <th style="padding: 0.3rem 0.6rem; border-bottom: 2px solid var(--border-color);">
+                                    3</th>
+                                <th style="padding: 0.3rem 0.6rem; border-bottom: 2px solid var(--border-color);">
+                                    4</th>
+                                <th style="padding: 0.3rem 0.6rem; border-bottom: 2px solid var(--border-color);">
+                                    5</th>
+                                <th style="padding: 0.3rem 0.6rem; border-bottom: 2px solid var(--border-color);">
+                                    6</th>
+                                <th style="padding: 0.3rem 0.6rem; border-bottom: 2px solid var(--border-color);">
+                                    7</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="padding: 0.3rem 0.6rem; border-bottom: 1px solid var(--border-color);">
+                                    Special</td>
+                                <td style="padding: 0.3rem 0.6rem; border-bottom: 1px solid var(--border-color);">
+                                    1</td>
+                                <td style="padding: 0.3rem 0.6rem; border-bottom: 1px solid var(--border-color);">
+                                    1</td>
+                                <td style="padding: 0.3rem 0.6rem; border-bottom: 1px solid var(--border-color);">
+                                    2</td>
+                                <td style="padding: 0.3rem 0.6rem; border-bottom: 1px solid var(--border-color);">
+                                    3</td>
+                                <td style="padding: 0.3rem 0.6rem; border-bottom: 1px solid var(--border-color);">
+                                    5</td>
+                                <td style="padding: 0.3rem 0.6rem; border-bottom: 1px solid var(--border-color);">
+                                    7</td>
+                                <td style="padding: 0.3rem 0.6rem; border-bottom: 1px solid var(--border-color);">
+                                    11</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.3rem 0.6rem;">
+                                    General</td>
+                                <td style="padding: 0.3rem 0.6rem;">
+                                    1</td>
+                                <td style="padding: 0.3rem 0.6rem;">
+                                    1</td>
+                                <td style="padding: 0.3rem 0.6rem;">
+                                    2</td>
+                                <td style="padding: 0.3rem 0.6rem;">
+                                    4</td>
+                                <td style="padding: 0.3rem 0.6rem;">
+                                    9</td>
+                                <td style="padding: 0.3rem 0.6rem;">
+                                    20</td>
+                                <td style="padding: 0.3rem 0.6rem;">
+                                    48</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <p>At order 4, the first discrepancy: there are 4 general trees but
+                        only 3 special trees. The extra tree is precisely the one with
+                        branching at a non-root node — the "bushy subtree" tree shown above.</p>
+
+
+                    <h3>6.2. General trees by grafting</h3>
+
+                    <p>The elementary differential formula still works perfectly for
+                        general trees. When $f = g$ (self-composition), we drop the
+                        distinction between $f$ and $g$ subscripts. Every tree is still
+                        built from the single-node tree by iterated grafting:</p>
+
+                    <table style="margin: 1rem auto; border-collapse: collapse; font-size: 0.9rem;">
+                        <thead>
+                            <tr>
+                                <th
+                                    style="padding: 0.4rem 0.7rem; border-bottom: 2px solid var(--border-color); text-align: center;">
+                                    Tree</th>
+                                <th
+                                    style="padding: 0.4rem 0.7rem; border-bottom: 2px solid var(--border-color); text-align: left;">
+                                    $F^i(\tau)$</th>
+                                <th
+                                    style="padding: 0.4rem 0.7rem; border-bottom: 2px solid var(--border-color); text-align: left;">
+                                    Built by</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td
+                                    style="padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--border-color); text-align: center;">
+                                    <svg width="32" height="32" viewBox="-9.0 -9.0 32.0 32.0"
+                                        style="vertical-align: middle; overflow: visible;">
+                                        <circle cx="7" cy="7" r="4" fill="currentColor" />
+                                        <circle cx="7" cy="7" r="7" fill="none" stroke="currentColor"
+                                            stroke-width="1.5" />
+                                    </svg>
+                                </td>
+                                <td style="padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--border-color);">
+                                    $f^i$</td>
+                                <td style="padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--border-color);">
+                                    base case</td>
+                            </tr>
+                            <tr>
+                                <td
+                                    style="padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--border-color); text-align: center;">
+                                    <svg width="32" height="56" viewBox="-9.0 -7.0 32.0 56.0"
+                                        style="vertical-align: middle; overflow: visible;">
+                                        <line x1="7" y1="33" x2="7" y2="7" stroke="currentColor" stroke-width="2" />
+                                        <circle cx="7" cy="33" r="4" fill="currentColor" />
+                                        <circle cx="7" cy="33" r="7" fill="none" stroke="currentColor"
+                                            stroke-width="1.5" />
+                                        <circle cx="7" cy="7" r="5" fill="currentColor" />
+                                    </svg>
+                                </td>
+                                <td style="padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--border-color);">
+                                    $f^i_\alpha f^\alpha$</td>
+                                <td style="padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--border-color);">
+                                    graft at root</td>
+                            </tr>
+                            <tr>
+                                <td
+                                    style="padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--border-color); text-align: center;">
+                                    <svg width="54" height="56" viewBox="-7.0 -7.0 54.0 56.0"
+                                        style="vertical-align: middle; overflow: visible;">
+                                        <line x1="20" y1="33" x2="7" y2="7" stroke="currentColor" stroke-width="2" />
+                                        <line x1="20" y1="33" x2="33" y2="7" stroke="currentColor" stroke-width="2" />
+                                        <circle cx="20" cy="33" r="4" fill="currentColor" />
+                                        <circle cx="20" cy="33" r="7" fill="none" stroke="currentColor"
+                                            stroke-width="1.5" />
+                                        <circle cx="7" cy="7" r="5" fill="currentColor" />
+                                        <circle cx="33" cy="7" r="5" fill="currentColor" />
+                                    </svg>
+                                </td>
+                                <td style="padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--border-color);">
+                                    $f^i_{\alpha\beta} f^\alpha f^\beta$</td>
+                                <td style="padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--border-color);">
+                                    graft at root</td>
+                            </tr>
+                            <tr>
+                                <td
+                                    style="padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--border-color); text-align: center;">
+                                    <svg width="32" height="82" viewBox="-9.0 -7.0 32.0 82.0"
+                                        style="vertical-align: middle; overflow: visible;">
+                                        <line x1="7" y1="59" x2="7" y2="33" stroke="currentColor" stroke-width="2" />
+                                        <line x1="7" y1="33" x2="7" y2="7" stroke="currentColor" stroke-width="2" />
+                                        <circle cx="7" cy="59" r="4" fill="currentColor" />
+                                        <circle cx="7" cy="59" r="7" fill="none" stroke="currentColor"
+                                            stroke-width="1.5" />
+                                        <circle cx="7" cy="33" r="5" fill="currentColor" />
+                                        <circle cx="7" cy="7" r="5" fill="currentColor" />
+                                    </svg>
+                                </td>
+                                <td style="padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--border-color);">
+                                    $f^i_\alpha f^\alpha_\beta f^\beta$</td>
+                                <td style="padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--border-color);">
+                                    grow a leaf</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.5rem 0.7rem; text-align: center;">
+                                    <svg width="58" height="82" viewBox="1.0 -3.0 58.0 82.0"
+                                        style="vertical-align: middle; overflow: visible;">
+                                        <line x1="30" y1="63" x2="15" y2="37" stroke="currentColor" stroke-width="2" />
+                                        <line x1="30" y1="63" x2="45" y2="37" stroke="currentColor" stroke-width="2" />
+                                        <line x1="15" y1="37" x2="15" y2="11" stroke="currentColor" stroke-width="2" />
+                                        <circle cx="30" cy="63" r="4" fill="currentColor" />
+                                        <circle cx="30" cy="63" r="7" fill="none" stroke="currentColor"
+                                            stroke-width="1.5" />
+                                        <circle cx="15" cy="37" r="5" fill="currentColor" />
+                                        <circle cx="45" cy="37" r="5" fill="currentColor" />
+                                        <circle cx="15" cy="11" r="5" fill="currentColor" />
+                                    </svg>
+                                </td>
+                                <td style="padding: 0.5rem 0.7rem;">
+                                    $f^i_{\alpha\beta} f^\alpha_\gamma f^\gamma f^\beta$</td>
+                                <td style="padding: 0.5rem 0.7rem;">
+                                    <strong>new!</strong> graft + grow
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+
+                    <!-- ============================================================ -->
+                    <h2>7. B-series and the Butcher group</h2>
+
+                    <h3>7.1. B-series: formal power series over trees</h3>
+
+                    <p>A <em>B-series</em> is a formal power series indexed by rooted
+                        trees:</p>
+
+                    $$
+                    B(\mathbf{a}, \mathbf{x}, h) = \mathbf{x} + \sum_{\tau \in T}
+                    \frac{h^{|\tau|}}{\sigma(\tau)}\, a(\tau)\, F(\tau)(\mathbf{x}),
+                    $$
+
+                    <p>where the sum is over all (unlabeled) rooted trees $T$,
+                        $a(\tau) \in \mathbb{R}$ is a coefficient for each tree,
+                        $\sigma(\tau)$ is the symmetry factor, and $F(\tau)$ is the
+                        elementary differential. The key insight:</p>
+
+                    <ul>
+                        <li>The <strong>exact solution</strong> of $\dot{\mathbf{x}} = f(\mathbf{x})$
+                            is a B-series with $a(\tau) = 1/\gamma(\tau)$ for every tree
+                            (where $\gamma$ is the density).</li>
+                        <li>Any <strong>Runge-Kutta method</strong> applied to the same ODE
+                            produces a B-series with coefficients $a(\tau) = \Phi(\tau)$ (the
+                            RK weights, built from the Butcher tableau).</li>
+                        <li>A method has <strong>order $p$</strong> iff $\Phi(\tau) = 1/\gamma(\tau)$
+                            for all trees with $|\tau| \leq p$.</li>
+                    </ul>
+
+                    <p>B-series package the entire Taylor expansion of an ODE flow into
+                        a single algebraic object. They are the "Fourier transform" of
+                        numerical methods — they decompose the method into independent
+                        tree-by-tree components.</p>
+
+                    <h3>7.2. Why trees are the natural basis</h3>
+
+                    <p>Any smooth function $\varphi : \mathbb{R}^d \to \mathbb{R}^d$
+                        can be expanded as a convergent power series around a point
+                        $\mathbf{x}_0$. The question is: <em>in which basis?</em></p>
+
+                    <p>The standard choice — the <strong>monomial basis</strong> —
+                        decomposes the $k$th-order jet into components
+                        $\partial^k \varphi / \partial x^{j_1} \cdots \partial x^{j_k}$.
+                        This is a valid basis, but it doesn't respect the structure of
+                        the problem. For an ODE flow $\varphi_h$, these partial derivatives
+                        all depend on each other in complicated ways — they are not
+                        independent.</p>
+
+                    <p>The <strong>tree basis</strong> $\{F(\tau)\}$ does respect the
+                        structure. Each tree represents an <em>independent degree of freedom</em>
+                        in the Taylor expansion of the flow. The B-series
+                        decomposition</p>
+
+                    $$
+                    \varphi_h(\mathbf{x}) = \mathbf{x} + \sum_{\tau \in T}
+                    \frac{h^{|\tau|}}{\sigma(\tau)}\, a(\tau)\, F(\tau)(\mathbf{x})
+                    $$
+
+                    <p>is the <em>natural</em> decomposition in the following precise
+                        sense:</p>
+
+                    <ol>
+                        <li><strong>Universality.</strong> Both the exact flow and every
+                            Runge-Kutta method admit B-series expansions. The tree coefficients
+                            $a(\tau)$ are the only thing that differs between them.</li>
+                        <li><strong>Independence.</strong> The coefficient $a(\tau)$ for each
+                            tree can be chosen independently — there are no hidden constraints
+                            linking different trees. This is not true for the monomial basis.</li>
+                        <li><strong>Closure under composition.</strong> Composing two B-series
+                            produces another B-series (the Butcher group product). The monomial
+                            basis does not have this property.</li>
+                        <li><strong>Minimal redundancy.</strong> The tree basis has exactly
+                            one component per independent derivative pattern. The monomial basis
+                            over-counts because symmetric partial derivatives are equal
+                            ($\partial^2 / \partial x^j \partial x^k = \partial^2 / \partial x^k \partial x^j$).</li>
+                    </ol>
+
+                    <p>In short: trees are to ODE flows what Fourier modes are to
+                        periodic functions — the eigenbasis adapted to the problem's
+                        structure.</p>
+
+                    <p><strong>The diagonalization analogy.</strong> The Fourier comparison
+                        runs deeper than a metaphor. Recall that the Fourier basis
+                        <em>diagonalizes</em> the convolution operator: convolution in
+                        the spatial domain becomes pointwise multiplication in the
+                        frequency domain. The tree basis plays an analogous role.
+                        The Butcher group product — which encodes how compositions of
+                        diffeomorphisms interact — becomes a <em>triangular</em> operation
+                        in the tree basis. The coefficient $(a \star b)(\tau)$ depends
+                        only on trees of order $\leq |\tau|$, so the product is
+                        computable order-by-order. In the monomial basis, function
+                        composition produces a dense mess of cross-terms; in the tree
+                        basis, it becomes a structured, filtration-respecting operation.
+                        This is the closest analogue of "diagonalization" available for
+                        a noncommutative group.
+                    </p>
+
+
+                    <h3>7.3. Deriving the exact solution algebraically</h3>
+
+                    <p>We claimed that the exact flow of $\dot{\mathbf{x}} = f(\mathbf{x})$
+                        is a B-series with $a(\tau) = 1/\gamma(\tau)$. Instead of
+                        doing a brute-force Taylor expansion, we can derive this
+                        <em>algebraically</em> by working entirely with trees.
+                    </p>
+
+                    <p><strong>Setup.</strong> Suppose the exact solution is a B-series:</p>
+
+                    $$
+                    \mathbf{x}(h) = \mathbf{x}_0 + \sum_{\tau}
+                    \frac{h^{|\tau|}}{\sigma(\tau)}\, a(\tau)\, F(\tau)(\mathbf{x}_0).
+                    $$
+
+                    <p>We need $\dot{\mathbf{x}}(0) = f(\mathbf{x}_0)$, and more
+                        generally $\dot{\mathbf{x}}(h) = f(\mathbf{x}(h))$ for all $h$.
+                        Equating both sides order by order in $h$ gives a recurrence
+                        for $a(\tau)$.</p>
+
+                    <p><strong>Left side: differentiating the B-series.</strong>
+                        Taking $\frac{d}{dh}$ of the B-series is trivial — each
+                        $h^{|\tau|}$ term drops to $|\tau|\, h^{|\tau|-1}$:</p>
+
+                    $$
+                    \dot{\mathbf{x}}(h) = \sum_{\tau}
+                    \frac{|\tau|\, h^{|\tau|-1}}{\sigma(\tau)}\, a(\tau)\, F(\tau)(\mathbf{x}_0).
+                    $$
+
+                    <p><strong>Right side: substituting into $f$.</strong>
+                        This is where the tree algebra does the heavy lifting.
+                        Substituting a B-series $\mathbf{x}(h)$ into $f$ produces
+                        another B-series (this is the key closure property). The
+                        coefficient of $F(\tau)$ on the right side involves
+                        summing over all ways to "de-root" $\tau$ — i.e., to recognize
+                        $\tau$ as a root grafted onto subtrees, each of which
+                        contributes its own $a(\cdot)$ factor.</p>
+
+                    <p><strong>Equating coefficients.</strong> The result, for each tree
+                        $\tau = [\tau_1, \ldots, \tau_m]$:</p>
+
+                    $$
+                    |\tau|\cdot a(\tau) = \prod_{k=1}^{m} a(\tau_k).
+                    $$
+
+                    <p>With the base case $a(\bullet) = 1$, this gives the unique
+                        solution $a(\tau) = 1/\gamma(\tau)$, where the <strong>density</strong>
+                        $\gamma$ satisfies the same recurrence:
+                        $\gamma(\tau) = |\tau| \cdot \prod_k \gamma(\tau_k)$.</p>
+
+                    <p>The beauty is that the entire derivation is <em>algebraic</em>:
+                        no limits, no Taylor remainders, no epsilon-delta arguments.
+                        Differentiation of $F(\tau)$ with respect to the flow variable
+                        is encoded by the <strong>growth operator</strong> on trees,
+                        and composition with $f$ is encoded by <strong>grafting</strong>.
+                        The ODE becomes a recurrence on tree coefficients.</p>
+
+
+                    <h3>7.4. The Butcher group</h3>
+
+                    <p><strong>What does "composition" mean here?</strong> It means
+                        <em>solver composition</em>: applying one numerical method,
+                        then feeding the result into another. If method $A$ maps
+                        $\mathbf{x}_0 \mapsto B(\mathbf{a}, \mathbf{x}_0, h)$ and method $B$ maps
+                        $\mathbf{x}_0 \mapsto B(\mathbf{b}, \mathbf{x}_0, h)$, then applying
+                        $A$ first, then $B$ gives:
+                    </p>
+
+                    $$
+                    \mathbf{x}_0 \;\xrightarrow{\;A\;} \;\mathbf{x}_1
+                    \;\xrightarrow{\;B\;} \;\mathbf{x}_2
+                    = B(\mathbf{a} \star \mathbf{b}, \mathbf{x}_0, h).
+                    $$
+
+                    <p>The remarkable fact: $\mathbf{x}_2$ is itself a B-series with
+                        coefficients $\mathbf{a} \star \mathbf{b}$, the <strong>Butcher
+                            group product</strong>:</p>
+
+                    $$
+                    (a \star b)(\tau) = \sum_{c \in \text{cuts}(\tau)} a(R_c(\tau)) \cdot
+                    \prod_{i} b(P_c^i(\tau)),
+                    $$
+
+                    <p>where the sum is over all <em>admissible cuts</em> of $\tau$.
+                        An admissible cut removes a subset of edges; $R_c(\tau)$ is the
+                        subtree still connected to the root (the "trunk"), and the
+                        $P_c^i(\tau)$ are the pruned-off branches. The empty cut
+                        (removing no edges) gives the term $a(\tau) \cdot b(\emptyset)$;
+                        the full cut (removing all edges from the root) gives
+                        $a(\bullet) \cdot b(\tau_1) \cdots b(\tau_m)$.</p>
+
+                    <h4>Why is this a group?</h4>
+
+                    <p>We need to verify four axioms:</p>
+
+                    <table style="margin: 1rem auto; border-collapse: collapse; font-size: 0.9rem; max-width: 700px;">
+                        <thead>
+                            <tr>
+                                <th
+                                    style="padding: 0.5rem 0.7rem; border-bottom: 2px solid var(--border-color); text-align: left; width: 140px;">
+                                    Axiom</th>
+                                <th
+                                    style="padding: 0.5rem 0.7rem; border-bottom: 2px solid var(--border-color); text-align: left;">
+                                    Proof</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td
+                                    style="padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--border-color); vertical-align: top;">
+                                    <strong>Closure</strong>
+                                </td>
+                                <td style="padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--border-color);">
+                                    The product formula $(a \star b)(\tau)$ involves only
+                                    finite sums over cuts of $\tau$, so it always produces
+                                    a well-defined map $T \to \mathbb{R}$.</td>
+                            </tr>
+                            <tr>
+                                <td
+                                    style="padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--border-color); vertical-align: top;">
+                                    <strong>Associativity</strong>
+                                </td>
+                                <td style="padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--border-color);">
+                                    Inherited from function composition, which is
+                                    always associative: $(A \circ B) \circ C = A \circ (B \circ C)$.</td>
+                            </tr>
+                            <tr>
+                                <td
+                                    style="padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--border-color); vertical-align: top;">
+                                    <strong>Identity</strong>
+                                </td>
+                                <td style="padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--border-color);">
+                                    The identity element is $e(\emptyset) = 1$,
+                                    $e(\tau) = 0$ for all trees. This corresponds to the
+                                    "do nothing" method $\mathbf{x} \mapsto \mathbf{x}$.
+                                    Check: $(a \star e)(\tau) = a(\tau)$ because only the
+                                    empty cut contributes (all branches get $e = 0$).</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.5rem 0.7rem; vertical-align: top;">
+                                    <strong>Inverse</strong>
+                                </td>
+                                <td style="padding: 0.5rem 0.7rem;">
+                                    For any $a$, the inverse $a^{-1}$ is defined
+                                    recursively by order: $a^{-1}(\emptyset) = 1$, and
+                                    for each tree, $a^{-1}(\tau) = -a(\tau) - \sum_{\text{proper cuts}}
+                                    a^{-1}(R_c) \prod b(P_c^i)$. This always has a unique
+                                    solution because we solve in order of $|\tau|$.
+                                    The inverse corresponds to running the solver <em>backwards</em>:
+                                    it is the <strong>adjoint method</strong>.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h4>Worked example: composing Euler with itself</h4>
+
+                    <p>The forward Euler method has B-series coefficients
+                        $a(\tau) = 1$ for all trees. Composing two Euler steps gives
+                        coefficients $(a \star a)(\tau)$ by summing over cuts. For the
+                        smallest trees:</p>
+
+                    <ul>
+                        <li>$\bullet$ (single node): $(a \star a)(\bullet) = a(\bullet) = 1$.</li>
+                        <li>$[\bullet]$ (chain of 2): There are two cuts — empty and full.
+                            Empty: $a([\bullet]) \cdot 1 = 1$.
+                            Full: $a(\bullet) \cdot a(\bullet) = 1$.
+                            Sum: $(a \star a)([\bullet]) = 1 + 1 = 2$.</li>
+                        <li>The exact solution has $a(\tau) = 1/\gamma(\tau)$, so
+                            $a([\bullet]) = 1/2$. Two Euler steps give $2$, not $1/2$
+                            — the error is already visible at order 2.</li>
+                    </ul>
+
+                    <p>The group structure has deep consequences:</p>
+                    <ul>
+                        <li><strong>Substitution law</strong>: composing two B-series methods
+                            gives a B-series whose coefficients are computed by the group
+                            product.</li>
+                        <li><strong>Backward error analysis</strong>: a numerical method
+                            is the exact flow of a <em>modified equation</em>, whose B-series
+                            coefficients are obtained by the group inverse.</li>
+                        <li><strong>Renormalization</strong>: the Butcher group is isomorphic
+                            to the Connes–Kreimer group from perturbative quantum field
+                            theory. Trees index Feynman diagrams, and the group product
+                            performs renormalization.</li>
+                    </ul>
+
+
+                    <!-- ============================================================ -->
+                    <h2>8. Jets and function representations</h2>
+
+                    <h3>8.1. What is a jet?</h3>
+
+                    <p>A <em>$k$-jet</em> of a function $f$ at a point $\mathbf{x}_0$
+                        is the equivalence class of all functions that agree with $f$ up to
+                        order $k$ at $\mathbf{x}_0$. Concretely, a $k$-jet is the tuple of
+                        all partial derivatives of $f$ up to order $k$:</p>
+
+                    $$
+                    j^k_{\mathbf{x}_0} f = \bigl(f(\mathbf{x}_0),\;
+                    f^i_\alpha|_{\mathbf{x}_0},\;
+                    f^i_{\alpha\beta}|_{\mathbf{x}_0},\;
+                    \ldots,\;
+                    f^i_{\alpha_1 \ldots \alpha_k}|_{\mathbf{x}_0}\bigr).
+                    $$
+
+                    <p>Now here's the connection to trees: the elementary differentials
+                        $F(\tau)$ of order $|\tau| \leq k$ are exactly the $k$-jet of the
+                        ODE flow $\varphi_t$. The B-series representation says:</p>
+
+                    $$
+                    j^k_{\mathbf{x}_0} \varphi_h = \sum_{\substack{\tau \in T \\ |\tau| \leq k}}
+                    \frac{h^{|\tau|}}{\sigma(\tau)\,\gamma(\tau)}\, F(\tau)(\mathbf{x}_0).
+                    $$
+
+                    <p>Each tree $\tau$ contributes exactly one independent component of the
+                        jet. The trees form a <strong>basis</strong> for the space of jets of
+                        ODE flows — every jet can be decomposed uniquely into tree-indexed
+                        components.</p>
+
+                    <h3>8.2. Truncated polynomial algebras</h3>
+
+                    <p>In the <a href="/blog/2026/02/hyper-dual-numbers/">hyper-dual
+                            numbers</a> post, we used truncated polynomial algebras to compute
+                        jets: numbers of the form $a + b\,i_1 + c\,i_2 + d\,i_1 i_2$
+                        where $i_1^2 = i_2^2 = 0$. Each monomial $i_1^{a_1} i_2^{a_2} \cdots$
+                        corresponds to a specific tree, and the coefficient of that monomial
+                        in the output is exactly the elementary differential $F(\tau)$.</p>
+
+                    <p>This is why the hyper-dual number approach works: it
+                        <em>automatically</em> enumerates all trees by assigning one
+                        infinitesimal label per differentiation. The labels $i_1, i_2, \ldots$
+                        are exactly the labels on the labeled rooted trees, and the algebra of
+                        infinitesimals mirrors the algebra of trees.
+                    </p>
+
+
+                    <!-- ============================================================ -->
+                    <h2>9. Case study: <code>jax.experimental.jet</code></h2>
+
+                    <p>The ideas in this post are not merely theoretical — they are
+                        working code. JAX's <code>experimental.jet</code> module implements
+                        higher-order automatic differentiation by propagating exactly the
+                        objects we have been studying: <strong>truncated Taylor polynomials</strong>,
+                        a.k.a. jets.</p>
+
+                    <p>Perhaps surprisingly, the entire implementation is a
+                        <strong>single file</strong>:
+                        <a
+                            href="https://github.com/jax-ml/jax/blob/main/jax/experimental/jet.py"><code>jax/experimental/jet.py</code></a>,
+                        roughly 450 lines of Python. The breakdown is telling:
+                    </p>
+
+                    <ul>
+                        <li><strong>~30 lines</strong> for <code>JetTracer</code> /
+                            <code>JetTrace</code> — the tracing machinery.
+                        </li>
+                        <li><strong>~20 lines</strong> for the dispatch loop
+                            (<code>process_primitive</code>).</li>
+                        <li><strong>~30 lines</strong> for zero/linear rule registrations
+                            (the trivial cases).</li>
+                        <li><strong>~300 lines</strong> for hand-written nonlinear rules
+                            — one bespoke recurrence for each primitive (<code>exp</code>,
+                            <code>log</code>, <code>sin</code>, <code>mul</code>,
+                            <code>div</code>, <code>tanh</code>, etc.).
+                        </li>
+                        <li><strong>~50 lines</strong> for the public API, pytree handling,
+                            and <code>pjit</code> support.</li>
+                    </ul>
+
+                    <p>The simplicity is both impressive and revealing. All the
+                        complexity lives in those ~300 lines of per-primitive recurrences.
+                        A tree-aware version would replace them with a single generic
+                        tree-walking algorithm plus a cache — trading many small bespoke
+                        rules for one general algorithm over a richer data structure.</p>
+
+                    <h3>9.1. How it works</h3>
+
+                    <p>Given a function $f = g \circ h$, a point $\mathbf{x}$, and a
+                        tangent direction $v$, first-order AD (like <code>jax.jvp</code>)
+                        computes the pair $(f(\mathbf{x}),\, \partial f(\mathbf{x})[v])$.
+                        The <code>jet</code> function computes the higher-order analogue:
+                        given the $K$-jet of $h$,</p>
+
+                    $$
+                    (h_0, h_1, \ldots, h_K) = \bigl(h(\mathbf{x}),\;\partial h(\mathbf{x})[v],
+                    \;\ldots,\;\partial^K h(\mathbf{x})[v, \ldots, v]\bigr),
+                    $$
+
+                    <p>it returns the $K$-jet of $f$:</p>
+
+                    $$
+                    (f_0, f_1, \ldots, f_K) = \texttt{jet}(f,\; h_0,\; (h_1, \ldots, h_K)).
+                    $$
+
+                    <p>Internally, JAX wraps every value in a <code>JetTracer</code>
+                        that carries both a <strong>primal</strong> (the function value) and a list
+                        of <strong>Taylor coefficients</strong> $(t_1, \ldots, t_K)$. When the
+                        trace encounters a primitive operation, it dispatches to a rule
+                        that propagates the coefficients forward.</p>
+
+                    <h3>9.2. Three tiers of rules</h3>
+
+                    <p>The rules fall into a clean hierarchy:</p>
+
+                    <table style="margin: 1rem auto; border-collapse: collapse; font-size: 0.9rem; max-width: 750px;">
+                        <thead>
+                            <tr>
+                                <th
+                                    style="padding: 0.5rem 0.7rem; border-bottom: 2px solid var(--border-color); text-align: left; width: 120px;">
+                                    Category</th>
+                                <th
+                                    style="padding: 0.5rem 0.7rem; border-bottom: 2px solid var(--border-color); text-align: left;">
+                                    Rule</th>
+                                <th
+                                    style="padding: 0.5rem 0.7rem; border-bottom: 2px solid var(--border-color); text-align: left;">
+                                    Examples</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td
+                                    style="padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--border-color); vertical-align: top;">
+                                    <strong>Zero</strong>
+                                </td>
+                                <td style="padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--border-color);">
+                                    All higher-order terms vanish.
+                                    $f_k = 0$ for $k \geq 1$.</td>
+                                <td style="padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--border-color);">
+                                    Comparisons, <code>floor</code>, <code>sign</code></td>
+                            </tr>
+                            <tr>
+                                <td
+                                    style="padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--border-color); vertical-align: top;">
+                                    <strong>Linear</strong>
+                                </td>
+                                <td style="padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--border-color);">
+                                    $f_k = \text{op}(h_k)$. The operation
+                                    passes through each coefficient unchanged.</td>
+                                <td style="padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--border-color);">
+                                    <code>neg</code>, <code>add</code>, <code>reshape</code>,
+                                    <code>transpose</code>, <code>reduce_sum</code>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.5rem 0.7rem; vertical-align: top;">
+                                    <strong>Nonlinear</strong>
+                                </td>
+                                <td style="padding: 0.5rem 0.7rem;">
+                                    Uses the Faà di Bruno convolution recurrence
+                                    to propagate through the chain rule.</td>
+                                <td style="padding: 0.5rem 0.7rem;">
+                                    <code>exp</code>, <code>log</code>, <code>sin</code>,
+                                    <code>mul</code>, <code>div</code>, <code>tanh</code>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3>9.3. The Faà di Bruno convolution</h3>
+
+                    <p>The heart of every nonlinear rule is the same recurrence.
+                        For $v = \exp(u)$, the Taylor coefficients satisfy:</p>
+
+                    $$
+                    v_k = \frac{1}{k} \sum_{j=1}^{k} j \cdot v_{k-j} \cdot u_j.
+                    $$
+
+                    <p>This appears almost verbatim in the JAX source:</p>
+
+                    <pre><code class="language-python">def _exp_taylor(primals_in, series_in):
+    x, = primals_in
+    series, = series_in
+    u = [x] + series
+    v = [lax.exp(x)] + [None] * len(series)
+    for k in range(1, len(v)):
+        v[k] = sum(j * v[k-j] * u[j]
+                   for j in range(1, k+1)) / k
+    return v[0], v[1:]</code></pre>
+
+                    <p>The same pattern — with minor variations — handles
+                        <code>log</code>, <code>sin</code>/<code>cos</code>,
+                        <code>tanh</code>, <code>logistic</code>, <code>pow</code>,
+                        <code>atan2</code>, and <code>erf_inv</code>. Multiplication
+                        uses the <strong>Cauchy product</strong> (discrete convolution of
+                        Taylor coefficients): $v_k = \sum_{j=0}^{k} u_j \cdot w_{k-j}$,
+                        which is the Leibniz rule in series form.
+                    </p>
+
+                    <h3>9.4. Connection to the tree algebra</h3>
+
+                    <p>Through the lens of this blog, we can identify exactly which
+                        structures <code>jet</code> is using:</p>
+
+                    <table style="margin: 1rem auto; border-collapse: collapse; font-size: 0.9rem; max-width: 750px;">
+                        <thead>
+                            <tr>
+                                <th
+                                    style="padding: 0.5rem 0.7rem; border-bottom: 2px solid var(--border-color); text-align: left; width: 200px;">
+                                    Blog concept</th>
+                                <th
+                                    style="padding: 0.5rem 0.7rem; border-bottom: 2px solid var(--border-color); text-align: left;">
+                                    How <code>jet</code> uses it</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td
+                                    style="padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--border-color); vertical-align: top;">
+                                    <strong>Jets (§8)</strong>
+                                </td>
+                                <td style="padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--border-color);">
+                                    A <code>JetTracer</code> literally carries a $k$-jet:
+                                    the tuple $(f(\mathbf{x}_0), \partial f, \ldots, \partial^k f)$.
+                                    This is exactly the equivalence class from §8.1.</td>
+                            </tr>
+                            <tr>
+                                <td
+                                    style="padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--border-color); vertical-align: top;">
+                                    <strong>Faà di Bruno (§2–3)</strong>
+                                </td>
+                                <td style="padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--border-color);">
+                                    Every nonlinear rule. The convolution recurrence is
+                                    Faà di Bruno's formula, expressed as a flat recurrence
+                                    rather than as a sum over trees.</td>
+                            </tr>
+                            <tr>
+                                <td
+                                    style="padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--border-color); vertical-align: top;">
+                                    <strong>Decomposition (§5)</strong>
+                                </td>
+                                <td style="padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--border-color);">
+                                    The <code>def_comp</code> mechanism rewrites
+                                    <code>sqrt</code> as <code>x ** 0.5</code>,
+                                    <code>expm1</code> as <code>exp(x) - 1</code>, etc.
+                                    This is decomposing $f$ into a composition tree of
+                                    simpler functions.
+                                </td>
+                            </tr>
+                            <tr>
+                                <td
+                                    style="padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--border-color); vertical-align: top;">
+                                    <strong>Two operations (§3.2)</strong>
+                                </td>
+                                <td style="padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--border-color);">
+                                    The bilinear rule for <code>mul</code> implements
+                                    the <em>Leibniz/product rule</em> (graft at root).
+                                    The <code>deriv_prop</code> function implements the
+                                    <em>chain rule</em> (grow a leaf).
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.5rem 0.7rem; vertical-align: top;">
+                                    <strong>Recursive structure</strong>
+                                </td>
+                                <td style="padding: 0.5rem 0.7rem;">
+                                    The <code>erf_inv</code> and <code>logistic</code> rules
+                                    manually propagate through compositions of primitives
+                                    (square → exp → multiply), mirroring the recursive
+                                    tree structure of elementary differentials.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3>9.5. What's left to do</h3>
+
+                    <p>The module is still marked "experimental" after five years.
+                        Concretely:</p>
+                    <ul>
+                        <li><strong>Missing primitive rules.</strong> Many JAX primitives
+                            don't have jet rules yet
+                            (<a href="https://github.com/jax-ml/jax/issues/2431">issue #2431</a>).</li>
+                        <li><strong>Custom JVP/VJP ignored.</strong> The source contains the
+                            comment <code># TODO(mattjj): don't just ignore custom jvp
+                            rules?</code></li>
+                        <li><strong>No pytree support.</strong> Another inline TODO.</li>
+                    </ul>
+
+                    <p>But the deeper issue is not missing rules — it's missing
+                        <em>structure</em>.
+                    </p>
+
+                    <h3>9.6. The three levels of efficiency</h3>
+
+                    <p><strong><code>jet</code> is already a massive win.</strong>
+                        To understand what it achieves and what room remains,
+                        here is the cost hierarchy for computing the $K$-th order
+                        directional derivative of a function with $P$ primitives
+                        in its computation graph:</p>
+
+                    <table style="margin: 1rem auto; border-collapse: collapse; font-size: 0.9rem; max-width: 750px;">
+                        <thead>
+                            <tr>
+                                <th
+                                    style="padding: 0.5rem 0.7rem; border-bottom: 2px solid var(--border-color); text-align: left;">
+                                    Method</th>
+                                <th
+                                    style="padding: 0.5rem 0.7rem; border-bottom: 2px solid var(--border-color); text-align: left;">
+                                    Cost</th>
+                                <th
+                                    style="padding: 0.5rem 0.7rem; border-bottom: 2px solid var(--border-color); text-align: left;">
+                                    Why</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--border-color);">
+                                    <strong>Nested AD</strong><br>
+                                    <code>jvp(jvp(...))</code>
+                                </td>
+                                <td style="padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--border-color);">
+                                    $O(2^K \cdot P)$</td>
+                                <td style="padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--border-color);">
+                                    Each <code>jvp</code> layer roughly doubles the graph
+                                    (dual numbers propagate both value and tangent).
+                                    $K$ layers → $2^K$ blowup.</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--border-color);">
+                                    <strong>Taylor-mode</strong><br>
+                                    (<code>jet</code>)
+                                </td>
+                                <td style="padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--border-color);">
+                                    $O(P \cdot K^2)$</td>
+                                <td style="padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--border-color);">
+                                    Each primitive propagates $K$ Taylor coefficients.
+                                    The Faà di Bruno convolution at each primitive costs $O(K^2)$
+                                    (a nested sum from $1$ to $k$ for each $k \leq K$).</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.5rem 0.7rem;">
+                                    <strong>Tree-aware</strong><br>
+                                    (hypothetical)
+                                </td>
+                                <td style="padding: 0.5rem 0.7rem;">
+                                    $O(P \cdot K^2)$<br>with smaller constants</td>
+                                <td style="padding: 0.5rem 0.7rem;">
+                                    Same asymptotics, but symmetry halves redundant work,
+                                    caching avoids recomputing shared subtrees,
+                                    and incremental extension avoids re-deriving
+                                    lower orders.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <p>To put numbers on this: for order $K = 5$ with a graph of
+                        $P = 100$ primitives, nested AD does $\sim 2^5 \cdot 100 = 3200$
+                        primitive evaluations, while <code>jet</code> does
+                        $\sim 100 \cdot 25 = 2500$ multiply-adds — comparable at low
+                        order. At $K = 10$, nested AD does $\sim 102{,}400$ evaluations
+                        vs. <code>jet</code>'s $\sim 10{,}000$ — a 10× gap that keeps
+                        widening exponentially.</p>
+
+                    <p>But the $O(P \cdot K^2)$ figure hides an important caveat.
+                        That cost assumes every primitive uses the flat convolution
+                        recurrence — as <code>exp</code>, <code>log</code>, and
+                        <code>sin</code> do. But primitives that use
+                        <code>deriv_prop</code> (like <code>erf</code>) are worse:
+                        they launch a <strong>full nested <code>jet</code>
+                            trace</strong> to compute the Taylor series of the derivative
+                        function. If that derivative function itself contains
+                        <code>deriv_prop</code> primitives, the nesting cascades.
+                    </p>
+
+                    <p>Concretely, for <code>erf</code>: the derivative is
+                        $\frac{d}{dx}\text{erf}(x) = \frac{2}{\sqrt{\pi}} e^{-x^2}$.
+                        Computing its Taylor series launches a new <code>jet</code>
+                        trace through <code>square</code> → <code>negate</code> →
+                        <code>exp</code> → <code>scale</code>. Each of those
+                        inner primitive rules costs $O(K^2)$. The total for one
+                        <code>erf</code> primitive becomes $O(P' \cdot K^2)$ where
+                        $P'$ is the size of the derivative's subgraph — effectively
+                        $O(K^3)$ when the nesting depth grows with $K$.
+                    </p>
+
+                    <p>The expected speedups depend on which optimization:</p>
+
+                    <table style="margin: 1rem auto; border-collapse: collapse; font-size: 0.9rem; max-width: 750px;">
+                        <thead>
+                            <tr>
+                                <th
+                                    style="padding: 0.5rem 0.7rem; border-bottom: 2px solid var(--border-color); text-align: left;">
+                                    Optimization</th>
+                                <th
+                                    style="padding: 0.5rem 0.7rem; border-bottom: 2px solid var(--border-color); text-align: left;">
+                                    Speedup</th>
+                                <th
+                                    style="padding: 0.5rem 0.7rem; border-bottom: 2px solid var(--border-color); text-align: left;">
+                                    Type</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--border-color);">
+                                    <strong>Cauchy product symmetry</strong><br>
+                                    (e.g., squaring: $u = w$)
+                                </td>
+                                <td style="padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--border-color);">
+                                    ~2×</td>
+                                <td style="padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--border-color);">
+                                    Constant factor</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--border-color);">
+                                    <strong>Cross-primitive caching</strong><br>
+                                    (shared subexpressions)
+                                </td>
+                                <td style="padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--border-color);">
+                                    Up to $P / P_{\text{unique}}$</td>
+                                <td style="padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--border-color);">
+                                    Graph-dependent</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--border-color);">
+                                    <strong>Eliminating nested traces</strong><br>
+                                    (<code>deriv_prop</code> caching)
+                                </td>
+                                <td style="padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--border-color);">
+                                    $O(K^3) \to O(K^2)$</td>
+                                <td style="padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--border-color);">
+                                    <strong>Asymptotic</strong>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.5rem 0.7rem;">
+                                    <strong>Incremental extension</strong><br>
+                                    ($K \to K{+}1$)
+                                </td>
+                                <td style="padding: 0.5rem 0.7rem;">
+                                    $O(K^2) \to O(K)$</td>
+                                <td style="padding: 0.5rem 0.7rem;">
+                                    <strong>Asymptotic</strong>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <p>The last two are genuine asymptotic improvements, not just
+                        constant factors. For functions heavy in
+                        <code>deriv_prop</code> primitives (transcendental functions
+                        like <code>erf</code>, <code>erf_inv</code>,
+                        <code>bessel</code>), eliminating the nested trace cascade
+                        could turn a cubic computation into a quadratic one —
+                        a real speedup at moderate orders ($K \geq 5$).
+                    </p>
+
+                    <h4>The bigger prize: full tensor derivatives</h4>
+
+                    <p>All the above assumes you want <em>directional</em>
+                        derivatives — the jet contracted against a single tangent
+                        $v$, where tensors are never instantiated. But what if you
+                        need the <strong>full $K$-th order derivative tensor</strong>
+                        $\partial^K f_{i_1 \ldots i_K}$? This is common in physics
+                        (Taylor expanding potentials), uncertainty quantification
+                        (moment propagation), and geometry (curvature tensors).
+                        Here the tree-aware gains are far larger.</p>
+
+                    <p>To reconstruct the full tensor from <code>jet</code>, you
+                        must run it once per independent direction. The $K$-th
+                        derivative tensor is symmetric, so you need
+                        $\binom{d + K - 1}{K}$ directions — roughly $d^K / K!$
+                        for large $d$. Each run costs $O(P \cdot K^2)$. Total:</p>
+
+                    $$
+                    \text{Jet-based:} \quad O\!\left(\frac{d^K}{K!} \cdot P \cdot K^2\right).
+                    $$
+
+                    <p>A tree-aware approach works differently. The number of
+                        rooted trees of order $K$ is:</p>
+
+                    <table style="margin: 1rem auto; border-collapse: collapse; font-size: 0.9rem;">
+                        <tr>
+                            <td style="padding: 0.3rem 0.6rem; border-bottom: 1px solid var(--border-color);">$K$</td>
+                            <td style="padding: 0.3rem 0.6rem; border-bottom: 1px solid var(--border-color);">1</td>
+                            <td style="padding: 0.3rem 0.6rem; border-bottom: 1px solid var(--border-color);">2</td>
+                            <td style="padding: 0.3rem 0.6rem; border-bottom: 1px solid var(--border-color);">3</td>
+                            <td style="padding: 0.3rem 0.6rem; border-bottom: 1px solid var(--border-color);">4</td>
+                            <td style="padding: 0.3rem 0.6rem; border-bottom: 1px solid var(--border-color);">5</td>
+                            <td style="padding: 0.3rem 0.6rem; border-bottom: 1px solid var(--border-color);">6</td>
+                            <td style="padding: 0.3rem 0.6rem; border-bottom: 1px solid var(--border-color);">7</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 0.3rem 0.6rem;">$|T_K|$</td>
+                            <td style="padding: 0.3rem 0.6rem;">1</td>
+                            <td style="padding: 0.3rem 0.6rem;">1</td>
+                            <td style="padding: 0.3rem 0.6rem;">2</td>
+                            <td style="padding: 0.3rem 0.6rem;">4</td>
+                            <td style="padding: 0.3rem 0.6rem;">9</td>
+                            <td style="padding: 0.3rem 0.6rem;">20</td>
+                            <td style="padding: 0.3rem 0.6rem;">48</td>
+                        </tr>
+                    </table>
+
+                    <p>Crucially, $|T_K|$ is <strong>independent of $d$</strong>.
+                        Each tree $\tau$ contributes one elementary differential
+                        $F(\tau)$, computed as a tensor product of cached
+                        sub-results with the (cached) derivative tensors
+                        $f', f'', \ldots, f^{(K)}$. Total:</p>
+
+                    $$
+                    \text{Tree-aware:} \quad O\!\left(|T_K| \cdot d^K + K \cdot P \cdot d\right).
+                    $$
+
+                    <p>The second term is the cost of computing $f', \ldots,
+                        f^{(K)}$ at $\mathbf{x}$. For $d \gg K$,
+                        the tree approach eliminates the factor of
+                        $P \cdot K^2 / K!$ — because it never runs
+                        millions of separate forward passes through the graph.
+                        Concrete example: $d = 100$, $K = 4$. Jet needs
+                        $\binom{103}{4} \approx 4.6$ million runs.
+                        Tree-aware needs $|T_4| = 4$ tensor products, plus 4
+                        cached derivative tensors. That is a
+                        <strong>million-fold reduction in forward passes</strong>,
+                        at the cost of working with tensors of size $d^4 = 10^8$
+                        rather than scalar Taylor coefficients.
+                    </p>
+
+                    <p>With that context, here are the three specific savings in
+                        more detail:</p>
+
+                    <h4>Subexpression sharing</h4>
+
+                    <p>Many elementary differentials share common sub-computations.
+                        For example, both
+                        $F^i([\bullet, [\bullet]]) = f^i_{\alpha\beta}\,
+                        g^\alpha_j\, f^\beta_\gamma g^\gamma_k$ and
+                        $F^i([[\bullet]]) = f^i_\alpha\, f^\alpha_{\beta\gamma}\,
+                        g^\beta_j\, g^\gamma_k$ need the evaluation of $f$ and its
+                        derivatives at $\mathbf{x}$. In the flat recurrence, these
+                        shared sub-evaluations aren't cached — they are recomputed
+                        independently inside each primitive rule.</p>
+
+                    <h4>Symmetry exploitation</h4>
+
+                    <p>The tree $[\bullet, \bullet]$ has symmetry factor $\sigma = 2$
+                        — the two branches are interchangeable. Currently
+                        <code>jet</code> computes both branches independently. A
+                        tree-aware implementation would compute one branch and
+                        multiply by $\sigma(\tau)$, halving the work. For trees with
+                        larger symmetry groups, the savings compound.
+                    </p>
+
+                    <h4>Incremental order extension</h4>
+
+                    <p>Going from a $K$-jet to a $(K{+}1)$-jet, <code>jet</code>
+                        recomputes everything from order $0$. A tree-aware approach
+                        would only need the <em>new</em> elementary differentials
+                        (trees of order $K{+}1$), reusing all lower-order results.</p>
+
+                    <h3>9.7. The key insight: child elementals are derivatives of parents</h3>
+
+                    <p>The most powerful structural relationship that <code>jet</code>
+                        is blind to is this:</p>
+
+                    <blockquote>
+                        The elementary differentials of "grown" trees
+                        are the derivatives of their parent's elementary differential.
+                    </blockquote>
+
+                    <p>Concretely, for a tree $\tau = [\tau_1, \ldots, \tau_m]$,
+                        differentiating $F^i(\tau)$ with respect to $x^\beta$
+                        produces a sum over all trees obtained by <strong>growing
+                            $\tau$ by one node</strong>. The derivative splits into
+                        exactly the two operations from §3.2:</p>
+
+                    $$
+                    \frac{\partial F^i(\tau)}{\partial x^\beta} =
+                    \underbrace{f^i_{\alpha_1 \ldots \alpha_m \beta}
+                    \prod_{k} F^{\alpha_k}(\tau_k)}_{\text{graft at root}}
+                    \;+\; \underbrace{\sum_{j=1}^{m} f^i_{\alpha_1 \ldots \alpha_m}
+                    \left(\prod_{k \neq j} F^{\alpha_k}(\tau_k)\right)
+                    \frac{\partial F^{\alpha_j}(\tau_j)}{\partial x^\beta}}_{\text{grow a leaf (recurse)}}.
+                    $$
+
+                    <p>The first term adds a new branch labeled $\beta$ to the root
+                        (one contraction of $f$ with one more index). The second
+                        term extends each existing branch by one node, recursively.
+                        Together, these produce exactly the set of all order-$(|\tau|{+}1)$
+                        trees that can be obtained from $\tau$.</p>
+
+                    <p>This means: <strong>if you have already computed and cached
+                            $F(\tau)$, then every $F(\sigma)$ for $\sigma$ one node larger
+                            than $\tau$ costs only a single additional tensor
+                            contraction</strong> — not a full recomputation from the root.</p>
+
+                    <h3>9.8. What a tree-aware <code>jet</code> could look like</h3>
+
+                    <p>The computation of all elementary differentials up to order
+                        $K$ forms a <strong>DAG</strong>, not a flat sequence. Each
+                        edge is "grow by one node" — one tensor contraction:</p>
+
+                    <pre><code>Order 0:  •                           f^i
+            ↓ grow
+Order 1:  [•]                         f^i_α g^α_j
+            ↓ grow (2 ways)
+Order 2:  [•,•]     [[•]]            f^i_αβ g^α_j g^β_k     f^i_α f^α_βγ g^β_j g^γ_k
+            ↓ grow    ↓ grow
+Order 3:  [•,•,•]  [•,[•]]  [[[•]]]  (3 trees, each one contraction from parent)</code></pre>
+
+                    <p>A tree-aware implementation would:</p>
+
+                    <ol>
+                        <li><strong>Walk this DAG bottom-up</strong>, computing $F(\tau)$
+                            for each tree in order of $|\tau|$.</li>
+                        <li><strong>Memoize</strong>: once $F(\tau)$ is computed,
+                            cache it.</li>
+                        <li><strong>Derive children incrementally</strong>: $F(\text{child})$
+                            = one contraction from cached $F(\text{parent})$.</li>
+                        <li><strong>Exploit symmetry</strong>: identical subtrees share
+                            the cached result, weighted by $\sigma(\tau)$.</li>
+                    </ol>
+
+                    <p>The computational cost would drop from recomputing each tree's
+                        elementary differential from scratch to roughly $O(|T_K|)$ —
+                        proportional to the number of distinct trees of order
+                        $\leq K$, with each tree requiring only one incremental
+                        step from its parent.</p>
+
+                    <p>The flat recurrence in <code>jet</code> is <em>correct</em>
+                        but <em>blind to structure</em>. It does the same mathematics
+                        as the tree algebra, but without the tree indexing that enables
+                        sharing, symmetry, and incrementality. Let's see exactly where
+                        in the code this happens.</p>
+
+                    <h3>9.9. Anatomy of the dispatch loop</h3>
+
+                    <p>The core of <code>jet</code> is
+                        <code>JetTrace.process_primitive</code> — the function called
+                        every time JAX encounters a primitive operation during tracing.
+                        Here is the actual source (lightly edited for clarity):
+                    </p>
+
+                    <pre><code class="language-python">def process_primitive(self, primitive, tracers, params):
+    order = self.order
+    primals_in, series_in = unzip2(
+        map(self.to_primal_terms_pair, tracers))
+
+    # Fast path: if all inputs have zero series, skip
+    if all(t is zero_series for t in series_in):
+        primal_out = primitive.bind(primals_in, params)
+        return JetTracer(self, primal_out, zero_series)
+
+    # Materialize zeros for any missing series         <b>← Problem 1</b>
+    series_in = [[jnp.zeros(np.shape(x), ...)           # allocates K
+                  if t is zero_term else t               # zero arrays
+                  for t in series]                       # per input
+                 for x, series in zip(primals_in, series_in)]
+
+    rule = jet_rules[primitive]                          <b>← Problem 2</b>
+    primal_out, terms_out = rule(primals_in, series_in, **params)
+    return JetTracer(self, primal_out, terms_out)</code></pre>
+
+                    <p>Two structural issues are already visible:</p>
+
+                    <ol>
+                        <li><strong>Eager zero materialization.</strong> Every
+                            <code>zero_term</code> is replaced by a full-sized zero
+                            array before the rule is called. The comment
+                            <code># TODO(mattjj): avoid always instantiating zeros</code>
+                            is in the actual source — the authors know this is wasteful.
+                        </li>
+                        <li><strong>Per-primitive dispatch, no cross-primitive caching.</strong>
+                            Each primitive gets its own isolated call to
+                            <code>rule(primals_in, series_in)</code>. There is no
+                            mechanism to share computed Taylor coefficients between
+                            different primitive invocations — even if they appear in the
+                            same computation graph and share subexpressions.
+                        </li>
+                    </ol>
+
+                    <h3>9.10. Where the redundancy lives: annotated source</h3>
+
+                    <p>Let's examine the three most-used nonlinear rules and annotate
+                        exactly where work is being wasted.</p>
+
+                    <h4>The exponential rule</h4>
+
+                    <pre><code class="language-python">def _exp_taylor(primals_in, series_in):
+    x, = primals_in
+    series, = series_in
+    u = [x] + series                                     # input series
+    v = [lax.exp(x)] + [None] * len(series)              # output series
+
+    for k in range(1, len(v)):
+        v[k] = sum(j * v[k-j] * u[j]                    <b>← O(k) multiplications</b>
+                   for j in range(1, k+1)) / k           <b>   per order k</b>
+
+    return v[0], v[1:]</code></pre>
+
+                    <p>This is clean and correct. But notice: <strong>the entire
+                            computation is local</strong>. When this rule fires for an
+                        <code>exp</code> node in the computation graph, it has no
+                        access to the Taylor coefficients computed by any other node.
+                        If the graph contains <code>exp(x)</code> and later
+                        <code>exp(x) * y</code>, the values <code>v[0], ..., v[K]</code>
+                        computed here cannot be reused by the multiplication rule —
+                        they are trapped inside this function's local scope.
+                    </p>
+
+                    <h4>The multiplication rule (Cauchy product)</h4>
+
+                    <pre><code class="language-python">def _bilinear_taylor_rule(prim, primals_in, series_in, **params):
+    x, y = primals_in
+    x_terms, y_terms = series_in
+    u = [x] + x_terms                                   # left input
+    w = [y] + y_terms                                   # right input
+    v = [None] * len(u)
+    op = partial(prim.bind, **params)
+
+    for k in range(0, len(v)):
+        v[k] = sum(op(u[j], w[k-j])                     <b>← k+1 multiplications</b>
+                   for j in range(0, k+1))               <b>   per order k</b>
+
+    return v[0], v[1:]</code></pre>
+
+                    <p>This is the Cauchy product $v_k = \sum_{j=0}^{k} u_j \cdot w_{k-j}$.
+                        The inefficiency: <strong>if $u = w$ (squaring), this does
+                            $k{+}1$ multiplications instead of $\lceil(k{+}1)/2\rceil$</strong>.
+                        The symmetry $u_j \cdot u_{k-j} = u_{k-j} \cdot u_j$ is never exploited.
+                        More generally, when two branches of a tree are identical
+                        ($\sigma(\tau) > 1$), the Cauchy product does redundant work.</p>
+
+                    <h4>The chain rule via <code>deriv_prop</code></h4>
+
+                    <pre><code class="language-python">def deriv_prop(prim, deriv, primals_in, series_in):
+    x, = primals_in
+    series, = series_in
+    primal_out = prim.bind(x)
+
+    # Recursively compute Taylor series of the derivative
+    c0, cs = jet(deriv, primals_in, series_in)           <b>← full recursive jet call!</b>
+    c = [c0] + cs
+    u = [x] + series
+    v = [primal_out] + [None] * len(series)
+
+    for k in range(1, len(v)):
+        v[k] = sum(j * c[k-j] * u[j]
+                   for j in range(1, k + 1)) / k
+
+    return primal_out, v[1:]</code></pre>
+
+                    <p>This is where the cost can explode. For a function $f$ whose
+                        derivative $f'$ is known (e.g., <code>erf</code> with
+                        $f'(x) = \tfrac{2}{\sqrt{\pi}} e^{-x^2}$), the code
+                        <strong>launches an entirely new <code>jet</code> trace</strong>
+                        to compute the Taylor series of $f'$. That inner trace will
+                        itself encounter <code>exp</code>, <code>square</code>, etc.,
+                        each of which will fire its own rule — producing a cascade of
+                        nested traces.
+                    </p>
+
+                    <p>In tree language: when you compute $F(\tau)$ for a tree
+                        $\tau$ by first computing $F'$ (the derivative elementary
+                        differential) and then applying the Faà di Bruno recurrence,
+                        you are re-deriving $F$ for every subtree of $\tau$ from scratch.
+                        A memoized tree walk would look up the cached value instead.</p>
+
+                    <h4>The <code>erf_inv</code> rule: manual memoization</h4>
+
+                    <p>Interestingly, one rule <em>does</em> manually share
+                        intermediate computations. The <code>erf_inv</code> rule
+                        maintains three coupled series (<code>v</code>, <code>tmp_sq</code>,
+                        <code>tmp_exp</code>) and propagates them together:
+                    </p>
+
+                    <pre><code class="language-python">def _erf_inv_rule(primals_in, series_in):
+    ...
+    c = [deriv_y(primal_out)] + [None] * (len(series) - 1)
+    tmp_sq  = [lax.square(v[0])]  + [None] * (len(series) - 1)
+    tmp_exp = [lax.exp(tmp_sq[0])] + [None] * (len(series) - 1)
+
+    for k in range(1, len(series)):
+        v[k] = sum(j * c[k-j] * u[j] ...) / k           # chain rule
+        tmp_sq[k]  = sum(v[k-j] * v[j] ...)              # square
+        tmp_exp[k] = sum(j * tmp_exp[k-j] * tmp_sq[j] ...) / k  # exp
+        c[k] = deriv_const * tmp_exp[k]                   # combine</code></pre>
+
+                    <p>This is a hand-written fusion of three primitive rules
+                        (chain, square, exp) that would normally be three separate
+                        <code>jet</code> dispatches. It works — but it required a human
+                        to manually identify the sharing opportunity and fuse the
+                        loops. <strong>This is exactly what a tree-aware system
+                            would do automatically.</strong>
+                    </p>
+
+
+                    <h3>9.11. Toward a tree-aware implementation</h3>
+
+                    <p>What would it take to build the tree-indexed version? Here is
+                        a minimal sketch. First, a data structure for trees and a cache:</p>
+
+                    <pre><code class="language-python">from dataclasses import dataclass
+from typing import Optional
+from functools import lru_cache
+
+@dataclass(frozen=True)
+class RootedTree:
+    """A rooted tree, represented by the tuple of its children's trees."""
+    children: tuple['RootedTree', ...] = ()
+
+    @property
+    def order(self):
+        return 1 + sum(c.order for c in self.children)
+
+    @property
+    def symmetry(self):
+        """σ(τ): product of factorials of child multiplicities × child symmetries."""
+        from collections import Counter
+        from math import factorial
+        counts = Counter(self.children)
+        return (prod(factorial(n) for n in counts.values())
+                * prod(c.symmetry for c in self.children))
+
+# The single-node tree
+bullet = RootedTree(())
+
+# Enumerate all trees up to a given order
+@lru_cache
+def trees_up_to(order):
+    if order == 1:
+        return [bullet]
+    smaller = trees_up_to(order - 1)
+    result = list(smaller)
+    # ... generate all trees of exactly this order by
+    # grafting combinations of smaller trees onto a root
+    return result</code></pre>
+
+                    <p>Next, the key function — computing $F(\tau)$ incrementally
+                        from its parent:</p>
+
+                    <pre><code class="language-python">class ElementaryDifferentialCache:
+    """Cache for F(τ)(x), computed via the growth operator.
+
+    Key insight: we never build derivative tensors f^(m)(x) directly.
+    Instead, we compute F(τ) for each tree bottom-up, where each
+    step uses a SINGLE jax.jvp call — not nested jacfwd.
+    """
+
+    def __init__(self, f, x):
+        self.f = f          # the vector field f: R^d → R^d
+        self.x = x          # the evaluation point
+        self.cache = {}     # tree → F(τ)(x), a vector in R^d
+
+    def compute(self, tau):
+        """Compute F(τ)(x), using cached values for subtrees."""
+        if tau in self.cache:
+            return self.cache[tau]
+
+        if tau == bullet:
+            # Base case: F(•) = f(x)
+            result = self.f(self.x)
+        elif len(tau.children) == 1:
+            # F([τ₁]) = f'(x) · F(τ₁)  — one jvp call
+            child_val = self.compute(tau.children[0])     # cached!
+            _, result = jax.jvp(self.f, (self.x,), (child_val,))
+        else:
+            # F([τ₁,...,τₘ]) — use the Leibniz/product rule:
+            # split into F([τ₁,...,τₘ₋₁]) and grow by τₘ.
+            # Each split is one jvp on a cached intermediate.
+            left_tree = RootedTree(tau.children[:-1])
+            right_child = tau.children[-1]
+            left_val = self.compute(left_tree)            # cached!
+            right_val = self.compute(right_child)         # cached!
+
+            # Differentiate x ↦ (f'(x) · left_val) in direction right_val
+            g = lambda x: jax.jvp(self.f, (x,), (left_val,))[1]
+            _, result = jax.jvp(g, (self.x,), (right_val,))
+
+        self.cache[tau] = result                          # memoize
+        return result</code></pre>
+
+                    <p>Notice: <strong>no derivative tensor $f^{(m)}$ is ever
+                            formed</strong>. The single-child case
+                        $F([\tau_1]) = f'(\mathbf{x}) \cdot F(\tau_1)$ is just one
+                        <code>jax.jvp</code> call — it computes the Jacobian-vector
+                        product without materializing the Jacobian. The multi-child
+                        case $F([\tau_1, \ldots, \tau_m])$ builds up incrementally:
+                        each additional child needs one more <code>jvp</code> on a cached
+                        intermediate. The total cost for a tree of order $K$ is at most
+                        $K - 1$ calls to <code>jvp</code> — each of which is $O(P)$ —
+                        and the cache ensures shared subtrees are computed once.
+                    </p>
+
+                    <p>The crucial difference from <code>jet</code>: when computing
+                        $F([\bullet, [\bullet]])$ and $F([[\bullet]])$, both need
+                        $F([\bullet])$ — which is computed <strong>once</strong> and
+                        looked up from the cache. The nested
+                        <code>jet</code> trace in <code>deriv_prop</code> would
+                        recompute it from scratch.
+                    </p>
+
+                    <p>Finally, assembling the truncated Taylor expansion from the
+                        cached elementary differentials:</p>
+
+                    <pre><code class="language-python">def tree_aware_taylor(f, x, v, order):
+    """Compute the K-jet of f at x in direction v, tree-by-tree."""
+    cache = ElementaryDifferentialCache(f, x)
+    result = [f(x)]  # order 0
+
+    for k in range(1, order + 1):
+        # Sum over all trees of order k
+        total = 0
+        for tau in trees_of_order(k):
+            F_tau = cache.compute(tau)             # cached, incremental
+            weight = 1 / (tau.symmetry * density(tau))
+            total += weight * apply_tangent(F_tau, v, k)
+        result.append(total)
+
+    return result</code></pre>
+
+                    <p>This is a sketch, not production code. But it illustrates the
+                        architectural difference: <strong><code>jet</code> loops over
+                            primitives in the computation graph; a tree-aware version loops
+                            over trees in $T_K$</strong>. The former is blind to structure;
+                        the latter exploits it.</p>
+
+                    <h3>9.12. Prior work and open questions</h3>
+
+                    <p>The ideas here are not new — they come from several distinct
+                        research communities that have not yet fully connected.</p>
+
+                    <h4>The numerical analysis side</h4>
+
+                    <p>The connection between rooted trees and differentiation
+                        goes back to <strong>Cayley (1857)</strong> and was developed
+                        into a computational framework by <strong>John Butcher</strong>
+                        in the 1960s–70s. The modern algebraic treatment — Hopf
+                        algebras, the Connes–Kreimer group — was developed by
+                        Brouder, Connes, Kreimer, and others in the late 1990s.
+                        These ideas are standard in textbooks on geometric numerical
+                        integration (e.g., Hairer, Lubich, Wanner,
+                        <em>Geometric Numerical Integration</em>, 2006).
+                    </p>
+
+                    <p><strong>Chartier, Hairer, and Vilmart</strong> (2010) explicitly
+                        showed how to compute B-series using automatic differentiation
+                        techniques, with an algorithm whose cost scales linearly with
+                        the B-series order. This is the closest existing work to a
+                        "tree-aware AD" — but it targets ODE solver analysis, not
+                        general-purpose higher-order derivatives.</p>
+
+                    <h4>Existing libraries</h4>
+
+                    <p>Several libraries implement B-series and rooted tree
+                        computations, but <em>none</em> integrate them into an AD
+                        framework:</p>
+
+                    <ul>
+                        <li><a href="https://github.com/ranocha/BSeries.jl"><strong>BSeries.jl</strong></a>
+                            (Julia) — B-series as dictionaries mapping
+                            <code>RootedTree</code> objects to coefficients. Supports
+                            composition, substitution, backward error analysis.
+                            Built on <strong>RootedTrees.jl</strong> which provides
+                            tree enumeration, symmetry, and density computation.
+                        </li>
+                        <li><a href="https://pypi.org/project/pybs/"><strong>pybs</strong></a>
+                            (Python) — similar functionality to BSeries.jl, for
+                            computing and manipulating B-series over rooted trees.</li>
+                        <li><a href="https://github.com/ketch/nodepy"><strong>nodepy</strong></a>
+                            (Python) — uses Butcher's rooted tree notation to analyze
+                            order conditions for Runge-Kutta methods.</li>
+                    </ul>
+
+                    <p>These libraries know about trees, but not about AD. JAX's
+                        <code>jet</code> knows about AD, but not about trees. The
+                        gap between them is the open problem.
+                    </p>
+
+                    <h4>What do the JAX authors know?</h4>
+
+                    <p>The <code>jet</code> module is based on the paper
+                        <a href="https://openreview.net/pdf?id=SkxEF3FNPH"><em>Taylor-Mode
+                                Automatic Differentiation for Higher-Order Derivatives in
+                                JAX</em></a> by <strong>Bettencourt, Johnson, and Duvenaud</strong>
+                        (NeurIPS Program Transformations Workshop, 2019). They
+                        explicitly cite <strong>Griewank and Walther</strong>'s
+                        textbook <em>Evaluating Derivatives: Principles and Techniques
+                            of Algorithmic Differentiation</em> (2nd ed., 2008), which is
+                        the standard reference for Taylor-mode AD and the source of
+                        the per-primitive recurrences used in <code>jet</code>.
+                    </p>
+
+                    <p>The paper and the Griewank–Walther textbook know about
+                        Faà di Bruno's formula and the convolution recurrences — but
+                        <strong>neither references rooted trees, B-series, or the
+                            Butcher group</strong>. This is not an oversight; it reflects
+                        a genuine community divide. The numerical analysis community
+                        (Butcher, Hairer, Chartier, Vilmart) developed the tree theory
+                        for ODE solvers. The AD community (Griewank, Walther,
+                        Bettencourt, Duvenaud) developed the Taylor-mode propagation
+                        rules for general-purpose differentiation. They are solving
+                        related but different problems, and their literatures barely
+                        cite each other.
+                    </p>
+
+                    <p>The TODOs in the source
+                        (<code>avoid always instantiating zeros</code>,
+                        <code>don't just ignore custom jvp rules</code>) suggest the
+                        module was intended as a practical first implementation, not
+                        the final design. The efficiency gaps we identified — no
+                        cross-primitive caching, no symmetry exploitation, no
+                        incremental extension — are consequences of the
+                        per-primitive architecture, which was likely chosen for
+                        simplicity and JAX trace compatibility.
+                    </p>
+
+                    <h4>The open gap</h4>
+
+                    <p>To our knowledge, no existing system combines:</p>
+                    <ol>
+                        <li>A general-purpose AD framework (tracing arbitrary
+                            programs, JIT compilation, GPU support).</li>
+                        <li>Tree-indexed elementary differential caching.</li>
+                        <li>Symmetry-aware computation (exploiting $\sigma(\tau)$).</li>
+                        <li>Incremental order extension (computing order $K{+}1$
+                            from cached order $K$ results).</li>
+                    </ol>
+
+                    <p>Building this would require bridging the numerical analysis
+                        community (who have the tree theory) with the ML systems
+                        community (who have the AD infrastructure). The ingredients
+                        exist on both sides — they just haven't been combined.</p>
+
+
+                    <!-- ============================================================ -->
+                    <h2>10. Summary: the big picture</h2>
+
+                    <p>The algebraic structure of higher-order differentiation is governed
+                        by rooted trees at every level:</p>
+
+                    <table style="margin: 1.5rem auto; border-collapse: collapse; font-size: 0.88rem;">
+                        <thead>
+                            <tr>
+                                <th
+                                    style="padding: 0.4rem 0.8rem; border-bottom: 2px solid var(--border-color); text-align: left;">
+                                    Concept</th>
+                                <th
+                                    style="padding: 0.4rem 0.8rem; border-bottom: 2px solid var(--border-color); text-align: left;">
+                                    Tree interpretation</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="padding: 0.4rem 0.8rem; border-bottom: 1px solid var(--border-color);">
+                                    Terms of the higher-order chain rule</td>
+                                <td style="padding: 0.4rem 0.8rem; border-bottom: 1px solid var(--border-color);">
+                                    Individual trees $\tau$</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.4rem 0.8rem; border-bottom: 1px solid var(--border-color);">
+                                    Derivative expression $F(\tau)$</td>
+                                <td style="padding: 0.4rem 0.8rem; border-bottom: 1px solid var(--border-color);">
+                                    Elementary differential — index contraction along edges</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.4rem 0.8rem; border-bottom: 1px solid var(--border-color);">
+                                    Multiplicities (Faà di Bruno coefficients)</td>
+                                <td style="padding: 0.4rem 0.8rem; border-bottom: 1px solid var(--border-color);">
+                                    $\alpha(\tau)$ = number of valid labelings</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.4rem 0.8rem; border-bottom: 1px solid var(--border-color);">
+                                    Taylor expansion of ODE flow</td>
+                                <td style="padding: 0.4rem 0.8rem; border-bottom: 1px solid var(--border-color);">
+                                    B-series: formal sum over all trees</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.4rem 0.8rem; border-bottom: 1px solid var(--border-color);">
+                                    Composing two flows</td>
+                                <td style="padding: 0.4rem 0.8rem; border-bottom: 1px solid var(--border-color);">
+                                    Butcher group product (cuts and prunings)</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.4rem 0.8rem; border-bottom: 1px solid var(--border-color);">
+                                    $k$th-order jet of a flow</td>
+                                <td style="padding: 0.4rem 0.8rem; border-bottom: 1px solid var(--border-color);">
+                                    Trees of order $\leq k$ form a basis</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.4rem 0.8rem;">
+                                    Hyper-dual number components</td>
+                                <td style="padding: 0.4rem 0.8rem;">
+                                    Infinitesimal labels $i_1, i_2, \ldots$ = tree labels</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <blockquote
+                        style="border-left: 3px solid var(--accent-primary); padding-left: 1rem; margin: 1.5rem 0; color: var(--text-secondary); font-style: italic;">
+                        Rooted trees are not a notational trick. They are the
+                        <em>canonical</em> coordinate system for higher-order derivatives.
+                        Grafting subtrees under a new root is the fundamental operation
+                        of calculus in disguise — it generates all possible derivative
+                        patterns, and the elementary differential $F$ translates them into
+                        index contractions.
+                    </blockquote>
+
+
+                    <h3>References</h3>
+
+                    <ul style="font-size: 0.88rem; color: var(--text-secondary);">
+                        <li>E. Hairer, S.P. Nørsett, G. Wanner,
+                            <em>Solving Ordinary Differential Equations I: Nonstiff Problems</em>,
+                            Springer (1993). Chapter II, Section 2.
+                        </li>
+                        <li>J.C. Butcher, <em>An algebraic theory of integration methods</em>,
+                            Math. Comp. 26, 79-106 (1972).</li>
+                        <li>A. Connes, D. Kreimer, <em>Hopf algebras, renormalization and
+                                noncommutative geometry</em>, Comm. Math. Phys. 199, 203-242 (1998).
+                        </li>
+                        <li>C. Brouder, <em>Runge-Kutta methods and renormalization</em>,
+                            Eur. Phys. J. C 12, 521-534 (2000).</li>
+                        <li>R. Munthe-Kaas, W. Wright, <em>On the Hopf algebraic structure
+                                of Lie group integrators</em>, Found. Comput. Math. 8, 227-257
+                            (2008).</li>
+                    </ul>
+
+                </div>
+            </article>
+
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer__links">
+                <a href="https://scholar.google.com/citations?user=613GPbQAAAAJ&hl=en" target="_blank">Google
+                    Scholar</a>
+                <a href="https://github.com/danielewworrall" target="_blank">GitHub</a>
+                <a href="https://twitter.com/danielewworrall" target="_blank">Twitter</a>
+                <a href="https://www.linkedin.com/in/daniel-worrall-46a43238/" target="_blank">LinkedIn</a>
+            </div>
+            <p class="footer__text">&copy; 2026 Daniel Worrall</p>
+        </div>
+    </footer>
+
+    <script src="/script.js"></script>
+
+</body>
+
+</html>
