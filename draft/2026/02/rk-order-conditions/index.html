@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Runge-Kutta order conditions in ML notation — Daniel Worrall</title>
+    <meta name="description"
+        content="Section II.2 of Hairer-Nørsett-Wanner, translated into modern machine learning notation. Jacobians replace f', Hessian bilinear forms replace f'', and rooted trees index the accuracy conditions of ODE solvers.">
+    <link rel="stylesheet" href="/style.css">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <!-- MathJax -->
+    <script>
+        MathJax = {
+            tex: { inlineMath: [['$', '$']], displayMath: [['$$', '$$'], ['\\[', '\\]']], processEscapes: true, tags: 'ams' },
+            options: { skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'] }
+        };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async></script>
+</head>
+
+<body>
+
+    <canvas id="neural-canvas"></canvas>
+
+    <nav class="nav" role="navigation">
+        <div class="nav__inner">
+            <a href="/" class="nav__logo">d<span>.</span>worrall</a>
+            <ul class="nav__links" id="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/blog/">Blog</a></li>
+                <li><a href="/publications.html">Publications</a></li>
+                <li><a href="/talks.html">Talks</a></li>
+                <li><a href="/teaching.html">Teaching</a></li>
+            </ul>
+            <div style="display:flex;align-items:center;gap:0.5rem;">
+                <button class="nav__theme-toggle" id="theme-toggle" aria-label="Toggle dark/light mode">☀️</button>
+                <button class="nav__hamburger" id="hamburger" aria-label="Toggle menu">
+                    <span></span><span></span><span></span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="page-content">
+        <div class="container">
+
+            <article class="blog-post reveal">
+                <header class="blog-post__header">
+                    <p class="section-header__label">Writing</p>
+                    <h1 class="blog-post__title">Runge-Kutta order conditions, translated for ML people</h1>
+                    <div class="blog-post__meta">
+                        <time>February 2026 &middot; DRAFT</time>
+                        <div class="blog-card__tags">
+                            <span class="blog-card__tag">numerical methods</span>
+                            <span class="blog-card__tag">Jacobians</span>
+                            <span class="blog-card__tag">rooted trees</span>
+                        </div>
+                    </div>
+                </header>
+
+                <div class="blog-post__content">
+
+                    <h2>What this post covers</h2>
+
+                    <p>This post is part of a series on rooted trees and differentiation:</p>
+                    <ol>
+                        <li><a href="/blog/2021/08/dual-numbers/">Dual numbers</a> — first-order
+                            forward-mode autodiff via $i^2 = 0$.</li>
+                        <li><a href="/blog/2023/11/rooted-trees-and-differentiation/">On rooted trees
+                                and differentiation</a> — higher-order chain rule indexed by special
+                            labeled rooted trees, using Einstein index notation
+                            ($f^i_\alpha$, $g^\alpha_j$).</li>
+                        <li><a href="/blog/2026/02/hyper-dual-numbers/">Hyper-dual numbers</a> — higher-order
+                            autodiff via nested infinitesimals $i_1, i_2, \ldots$, connecting
+                            tree labels to perturbation tags.</li>
+                        <li><a href="/blog/2026/02/b-series/">B-series, trees, and Runge-Kutta</a> — how
+                            the same trees index ODE solver accuracy conditions.</li>
+                        <li><strong>This post</strong> — a translation of HNW Section II.2 into ML notation,
+                            bridging classical ODE numerics and modern autodiff.</li>
+                    </ol>
+
+                    <p>In the <a href="/blog/2023/11/rooted-trees-and-differentiation/">rooted trees
+                            post</a>, we used Einstein index notation:
+                        $f^i_\alpha g^\alpha_j$ for the chain rule,
+                        $f^i_{\alpha\beta} g^\alpha_j g^\beta_k$ for the Hessian pullback.
+                        Hairer, Nørsett &amp; Wanner (HNW) use yet another convention, writing
+                        $f'f$ and $f''(f,f)$ with primes. All three are the same maths — this
+                        post restates everything using <strong>Jacobian matrices</strong> and
+                        <strong>Hessian bilinear forms</strong>, the notation most familiar
+                        from ML and JAX.
+                    </p>
+
+                    <blockquote
+                        style="border-left: 3px solid var(--accent-primary); padding-left: 1rem; margin: 1.5rem 0; color: var(--text-secondary); font-style: italic;">
+                        <strong>Notation.</strong> Boldface $\mathbf{x} \in \mathbb{R}^d$ for state vectors.
+                        The vector field is $f : \mathbb{R}^d \to \mathbb{R}^d$, step size $h$.
+                        <br><br>
+                        <strong>Translation table from the rest of the series:</strong><br>
+                        &bull; $J_f(\mathbf{x})\,\mathbf{v}$ (Jacobian-vector product) =
+                        $f^i_\alpha v^\alpha$ in
+                        <a href="/blog/2023/11/rooted-trees-and-differentiation/"
+                            style="color: var(--accent-primary);">index notation</a>
+                        = $f'(y)\,v$ in HNW = <code>jax.jvp(f, (x,), (v,))</code><br>
+                        &bull; $H_f(\mathbf{x})[\mathbf{u}, \mathbf{v}]$ (Hessian bilinear form) =
+                        $f^i_{\alpha\beta} u^\alpha v^\beta$ in index notation
+                        = $f''(y)(u,v)$ in HNW<br>
+                        &bull; $\nabla^3\!f[\mathbf{u},\mathbf{v},\mathbf{w}]$ =
+                        $f^i_{\alpha\beta\gamma} u^\alpha v^\beta w^\gamma$
+                        = $f'''(y)(u,v,w)$ in HNW<br>
+                        &bull; The <a href="/blog/2021/08/dual-numbers/" style="color: var(--accent-primary);">dual
+                            number</a>
+                        tangent component of $f(x+i)$ is exactly $J_f \cdot \mathbf{1}$;
+                        the $i_1 i_2$ component from
+                        <a href="/blog/2026/02/hyper-dual-numbers/"
+                            style="color: var(--accent-primary);">hyper-duals</a>
+                        is $H_f[\mathbf{1},\mathbf{1}]$.
+                    </blockquote>
+
+
+                    <!-- ============================================================ -->
+                    <h2>1. The setup: ODEs as iterative refinement</h2>
+
+                    <p>You have a vector field $f : \mathbb{R}^d \to \mathbb{R}^d$ and
+                        an initial state $\mathbf{x}_0$. The ODE</p>
+
+                    $$
+                    \dot{\mathbf{x}}(t) = f(\mathbf{x}(t)), \qquad \mathbf{x}(0) = \mathbf{x}_0,
+                    $$
+
+                    <p>asks: where does the state end up at time $t$? In neural ODE
+                        language, $f$ is a neural network with parameters $\theta$,
+                        $\mathbf{x}_0$ is the input embedding, and "solving the ODE" is
+                        the forward pass.</p>
+
+                    <p>Since we can't solve this analytically for general $f$, we
+                        discretise. Pick a step size $h$ and compute
+                        $\mathbf{x}_0, \mathbf{x}_1, \mathbf{x}_2, \ldots$ at times
+                        $0, h, 2h, \ldots$ The question is: how to step from
+                        $\mathbf{x}_n$ to $\mathbf{x}_{n+1}$?</p>
+
+
+                    <!-- ============================================================ -->
+                    <h2>2. The Runge-Kutta update rule</h2>
+
+                    <p>An $s$-stage Runge-Kutta method computes $s$ "trial directions"
+                        $\mathbf{k}_1, \ldots, \mathbf{k}_s \in \mathbb{R}^d$, then takes
+                        a weighted average:</p>
+
+                    $$\begin{aligned}
+                    \mathbf{k}_i &= f\!\left(\mathbf{x} + h \sum_{j=1}^{s} a_{ij}\,\mathbf{k}_j\right),
+                    \quad i = 1, \ldots, s, \\[6pt]
+                    \mathbf{x}_{n+1} &= \mathbf{x}_n + h \sum_{i=1}^{s} b_i\,\mathbf{k}_i.
+                    \end{aligned}$$
+
+                    <p>The scalars $a_{ij}$, $b_i$, $c_i = \sum_j a_{ij}$ are arranged
+                        in the <em>Butcher tableau</em>:</p>
+
+                    $$
+                    \begin{array}{c|c}
+                    \mathbf{c} & A \\
+                    \hline
+                    & \mathbf{b}^T
+                    \end{array}
+                    $$
+
+                    <p>For an <em>explicit</em> method, $A$ is strictly lower-triangular:
+                        stage $i$ only uses stages $1, \ldots, i{-}1$. This means you can
+                        compute $\mathbf{k}_1, \mathbf{k}_2, \ldots$ sequentially — no
+                        fixed-point iteration needed. Think of it as a feedforward pass
+                        through $s$ layers, each of which calls $f$ once at a slightly
+                        shifted input.</p>
+
+                    <p>The fundamental question: <strong>which tableaux give
+                            high-accuracy methods?</strong> The answer comes from matching
+                        Taylor expansions, tree by tree.</p>
+
+
+                    <!-- ============================================================ -->
+                    <h2>3. Taylor-expanding the exact solution</h2>
+
+                    <p>Let $\mathbf{x}^* = \mathbf{x}(t+h)$ be the exact answer.
+                        Taylor-expand around $t$, writing $\mathbf{x}$ for $\mathbf{x}(t)$:</p>
+
+                    $$
+                    \mathbf{x}^* = \mathbf{x} + h\,\dot{\mathbf{x}}
+                    + \frac{h^2}{2}\,\ddot{\mathbf{x}}
+                    + \frac{h^3}{6}\,\dddot{\mathbf{x}} + \cdots
+                    $$
+
+                    <p>Since $\dot{\mathbf{x}} = f(\mathbf{x})$, the higher derivatives
+                        are all built from $f$ and its derivatives. Let's compute them
+                        in ML notation.</p>
+
+
+                    <h3>3.1. First derivative: just the vector field</h3>
+
+                    $$
+                    \dot{\mathbf{x}} = f(\mathbf{x}).
+                    $$
+
+                    <p>One term, one tree: a single node $\bullet$.</p>
+
+
+                    <h3>3.2. Second derivative: one Jacobian-vector product</h3>
+
+                    <p>Differentiate $\dot{\mathbf{x}} = f(\mathbf{x})$ with respect to $t$
+                        using the chain rule. In ML we write this as a JVP:</p>
+
+                    $$
+                    \ddot{\mathbf{x}} = \frac{d}{dt} f(\mathbf{x})
+                    = J_f(\mathbf{x})\,\dot{\mathbf{x}}
+                    = J_f(\mathbf{x})\,f(\mathbf{x}).
+                    $$
+
+                    <p>Or in the <a href="/blog/2023/11/rooted-trees-and-differentiation/">index
+                            notation</a> from Part II of the series, writing the $i$th component:</p>
+
+                    $$
+                    (\ddot{\mathbf{x}})^i = f^i_\alpha\, f^\alpha,
+                    $$
+
+                    <p>where $f^i_\alpha = \partial f^i / \partial x^\alpha$ is the Jacobian
+                        and we sum over repeated Greek indices (Einstein convention).
+                        As a tree: $[\bullet]$ — root with one child.</p>
+
+
+                    <h3>3.3. Third derivative: index notation takes over</h3>
+
+                    <p>Now differentiate $(\ddot{\mathbf{x}})^i = f^i_\alpha f^\alpha$
+                        using the product rule. Two things can be differentiated:
+                        $f^i_\alpha$ or the inner $f^\alpha$.</p>
+
+                    $$
+                    (\dddot{\mathbf{x}})^i =
+                    \underbrace{f^i_{\alpha\beta}\, f^\alpha f^\beta}_{\text{differentiate } f^i_\alpha}
+                    \;+\;
+                    \underbrace{f^i_\alpha\, f^\alpha_\beta\, f^\beta}_{\text{differentiate the inner } f^\alpha}.
+                    $$
+
+                    <p>This is exactly the expression from the
+                        <a href="/blog/2023/11/rooted-trees-and-differentiation/">rooted trees
+                            post</a>! The first term $f^i_{\alpha\beta} f^\alpha f^\beta$
+                        is the Hessian of $f$ contracted with two copies of $f$ — in ML
+                        matrix notation we'd write $H_f[f, f]$. The second term
+                        $f^i_\alpha f^\alpha_\beta f^\beta$ is the Jacobian applied twice:
+                        $J_f \, J_f \, f$. It is also the $i_1 i_2$ coefficient from the
+                        <a href="/blog/2026/02/hyper-dual-numbers/">hyper-dual numbers</a>:
+                        evaluate $f(\mathbf{x} + i_1 \mathbf{u} + i_2 \mathbf{v})$ and read
+                        off the $i_1 i_2$ component.
+                    </p>
+
+                    <p>Two terms, two trees:</p>
+                    <ul>
+                        <li>$f^i_{\alpha\beta} f^\alpha f^\beta$ — the <em>bushy</em>
+                            tree $[\bullet, \bullet]$: root with two leaf children.
+                            The root has two subscripts, one for each child.</li>
+                        <li>$f^i_\alpha f^\alpha_\beta f^\beta$ — the <em>tall</em>
+                            tree $[[\bullet]]$: a chain of 3 nodes. Each node passes
+                            its superscript as the subscript of its parent.</li>
+                    </ul>
+
+
+                    <h3>3.4. The pattern: one tree per derivative structure</h3>
+
+                    <p>Each further time-derivative of $\mathbf{x}$ applies the product
+                        rule to the previous expression, splitting each term. Every split
+                        grows the corresponding tree by one node. At order $n$ you get
+                        all rooted trees with $n$ nodes.</p>
+
+                    <table style="margin: 1.5rem auto; border-collapse: collapse; font-size: 0.86rem;">
+                        <thead>
+                            <tr>
+                                <th
+                                    style="padding: 0.5rem 0.7rem; border-bottom: 2px solid var(--border-color); text-align: center;">
+                                    $n$</th>
+                                <th
+                                    style="padding: 0.5rem 0.7rem; border-bottom: 2px solid var(--border-color); text-align: left;">
+                                    Tree $\tau$</th>
+                                <th
+                                    style="padding: 0.5rem 0.7rem; border-bottom: 2px solid var(--border-color); text-align: left;">
+                                    Classical notation</th>
+                                <th
+                                    style="padding: 0.5rem 0.7rem; border-bottom: 2px solid var(--border-color); text-align: left;">
+                                    Index notation</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td
+                                    style="padding: 0.4rem 0.7rem; text-align: center; border-bottom: 1px solid var(--border-color);">
+                                    1</td>
+                                <td style="padding: 0.4rem 0.7rem; border-bottom: 1px solid var(--border-color);">
+                                    $\bullet$</td>
+                                <td style="padding: 0.4rem 0.7rem; border-bottom: 1px solid var(--border-color);">$f$
+                                </td>
+                                <td style="padding: 0.4rem 0.7rem; border-bottom: 1px solid var(--border-color);">
+                                    $f^i$</td>
+                            </tr>
+                            <tr>
+                                <td
+                                    style="padding: 0.4rem 0.7rem; text-align: center; border-bottom: 1px solid var(--border-color);">
+                                    2</td>
+                                <td style="padding: 0.4rem 0.7rem; border-bottom: 1px solid var(--border-color);">
+                                    $[\bullet]$</td>
+                                <td style="padding: 0.4rem 0.7rem; border-bottom: 1px solid var(--border-color);">
+                                    $f'\,f$</td>
+                                <td style="padding: 0.4rem 0.7rem; border-bottom: 1px solid var(--border-color);">
+                                    $f^i_\alpha f^\alpha$ &ensp; (one JVP)</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.4rem 0.7rem; text-align: center; border-bottom: 1px solid var(--border-color);"
+                                    rowspan="2">3</td>
+                                <td style="padding: 0.4rem 0.7rem; border-bottom: 1px solid var(--border-color);">
+                                    $[\bullet,\bullet]$</td>
+                                <td style="padding: 0.4rem 0.7rem; border-bottom: 1px solid var(--border-color);">
+                                    $f''(f,f)$</td>
+                                <td style="padding: 0.4rem 0.7rem; border-bottom: 1px solid var(--border-color);">
+                                    $f^i_{\alpha\beta} f^\alpha f^\beta$</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.4rem 0.7rem; border-bottom: 1px solid var(--border-color);">
+                                    $[[\bullet]]$</td>
+                                <td style="padding: 0.4rem 0.7rem; border-bottom: 1px solid var(--border-color);">
+                                    $f'f'f$</td>
+                                <td style="padding: 0.4rem 0.7rem; border-bottom: 1px solid var(--border-color);">
+                                    $f^i_\alpha f^\alpha_\beta f^\beta$</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.4rem 0.7rem; text-align: center; border-bottom: 1px solid var(--border-color);"
+                                    rowspan="4">4</td>
+                                <td style="padding: 0.4rem 0.7rem; border-bottom: 1px solid var(--border-color);">
+                                    $[\bullet,\bullet,\bullet]$</td>
+                                <td style="padding: 0.4rem 0.7rem; border-bottom: 1px solid var(--border-color);">
+                                    $f'''(f,f,f)$</td>
+                                <td style="padding: 0.4rem 0.7rem; border-bottom: 1px solid var(--border-color);">
+                                    $f^i_{\alpha\beta\gamma} f^\alpha f^\beta f^\gamma$</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.4rem 0.7rem; border-bottom: 1px solid var(--border-color);">
+                                    $[[\bullet],\bullet]$</td>
+                                <td style="padding: 0.4rem 0.7rem; border-bottom: 1px solid var(--border-color);">
+                                    $f''(f'f,\,f)$</td>
+                                <td style="padding: 0.4rem 0.7rem; border-bottom: 1px solid var(--border-color);">
+                                    $f^i_{\alpha\beta} f^\alpha_\gamma f^\gamma f^\beta$</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.4rem 0.7rem; border-bottom: 1px solid var(--border-color);">
+                                    $[[\bullet,\bullet]]$</td>
+                                <td style="padding: 0.4rem 0.7rem; border-bottom: 1px solid var(--border-color);">
+                                    $f'\,f''(f,f)$</td>
+                                <td style="padding: 0.4rem 0.7rem; border-bottom: 1px solid var(--border-color);">
+                                    $f^i_\alpha f^\alpha_{\beta\gamma} f^\beta f^\gamma$</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.4rem 0.7rem; border-bottom: 1px solid var(--border-color);">
+                                    $[[[\bullet]]]$</td>
+                                <td style="padding: 0.4rem 0.7rem; border-bottom: 1px solid var(--border-color);">
+                                    $f'f'f'f$</td>
+                                <td style="padding: 0.4rem 0.7rem; border-bottom: 1px solid var(--border-color);">
+                                    $f^i_\alpha f^\alpha_\beta f^\beta_\gamma f^\gamma$</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <p><strong>Elementary differentials.</strong> Each rooted tree $\tau$ corresponds
+                        to a unique expression built from $f$ and its derivatives. This expression
+                        is called the <em>elementary differential</em> $F(\tau)$. Formally,
+                        $F$ is a map</p>
+
+                    $$
+                    F : \{\text{rooted trees}\} \;\longrightarrow\; \{\text{vector fields on } \mathbb{R}^d\},
+                    $$
+
+                    <p>sending each tree to a $d$-dimensional vector whose $i$th component
+                        $F^i(\tau)(\mathbf{x})$ is a specific contraction of the partial
+                        derivatives of $f$ at $\mathbf{x}$. The examples we've already seen
+                        — $f^i$, $f^i_\alpha f^\alpha$, $f^i_{\alpha\beta} f^\alpha f^\beta$,
+                        $f^i_\alpha f^\alpha_\beta f^\beta$ — are exactly $F(\bullet)$,
+                        $F([\bullet])$, $F([\bullet,\bullet])$, $F([[\bullet]])$
+                        respectively.</p>
+
+                    <p><strong>The recursive reading rule.</strong> Write a tree as
+                        $\tau = [\tau_1, \ldots, \tau_m]$, meaning: chop off the root, and
+                        $\tau_1, \ldots, \tau_m$ are the subtrees hanging from it ($m$ is the
+                        number of children of the root). Then $F(\tau)$ is given by taking the
+                        $m$th-order derivative tensor of $f$ and contracting it with
+                        the elementary differentials of the children. This is the same recursive
+                        structure we saw in the
+                        <a href="/blog/2023/11/rooted-trees-and-differentiation/">rooted trees
+                            post</a>, where each tree encoded a distinct contraction pattern:
+                    </p>
+
+                    $$
+                    F^i(\tau)(\mathbf{x}) = f^i_{\alpha_1 \ldots \alpha_m}\, F^{\alpha_1}(\tau_1) \cdots
+                    F^{\alpha_m}(\tau_m).
+                    $$
+
+                    <p>The base case is $F^i(\bullet) = f^i$ (the leaf: just $f$ itself).
+                        For $m=1$: $F^i([\tau_1]) = f^i_\alpha F^\alpha(\tau_1)$
+                        — one Jacobian contraction. For $m=2$:
+                        $F^i([\tau_1, \tau_2]) = f^i_{\alpha\beta}\,F^\alpha(\tau_1)\,F^\beta(\tau_2)$
+                        — a Hessian contraction with two inputs. In general, the number of
+                        children at each node determines the order of the derivative tensor there.
+                        The tree is literally the computation graph of higher-order autodiff.</p>
+
+                    <p><strong>Trees as an algebra.</strong> The bracket
+                        $[\tau_1, \ldots, \tau_m]$ is a <em>grafting</em> operation: take the
+                        trees $\tau_1, \ldots, \tau_m$ and join them under a fresh root.
+                        Every tree can be built this way from copies of the single-node tree
+                        $\bullet$ — for example $[[\bullet],\bullet] = $ "graft $[\bullet]$
+                        and $\bullet$ under a root". This makes the set of trees a free algebra
+                        generated by $\bullet$, and the elementary differential
+                        $F$ is a homomorphism from this tree algebra into the algebra of
+                        vector fields.</p>
+
+                    <p>Why this matches differentiation: when we differentiate
+                        $F^i(\tau)$ (by applying $d/dt$ one more time), two things happen
+                        at each node of $\tau$:</p>
+                    <ol>
+                        <li><strong>Graft at the root</strong> — differentiate the outer
+                            $f^i_{\alpha_1 \ldots \alpha_m}$, gaining one more subscript
+                            $\alpha_{m+1}$. This adds a new child to the root:
+                            $[\tau_1, \ldots, \tau_m] \mapsto [\tau_1, \ldots, \tau_m, \bullet]$.
+                        </li>
+                        <li><strong>Grow a leaf</strong> — differentiate one of the inner
+                            $F^{\alpha_k}(\tau_k)$ via the chain rule. This extends that subtree
+                            by one node: $\tau_k \mapsto [\tau_k]$.
+                        </li>
+                    </ol>
+                    <p>Together these two operations generate every tree of order $|\tau|+1$
+                        from every tree of order $|\tau|$ — each one exactly once. That's the
+                        inductive proof of Theorem 2.6 in HNW (Fig. 2.1): the derivatives
+                        of the exact solution at successive orders are indexed by
+                        precisely the set of rooted trees.</p>
+
+                    <p>The exact Taylor expansion is then:</p>
+
+                    $$
+                    \mathbf{x}(t+h) = \mathbf{x} + \sum_{\tau}
+                    \frac{h^{|\tau|}}{\sigma(\tau)\,\gamma(\tau)}\,F(\tau)(\mathbf{x}),
+                    $$
+
+                    <p>where $|\tau|$ = number of nodes, $\sigma(\tau)$ = symmetry factor
+                        (for repeated identical children), and $\gamma(\tau)$ = the
+                        <em>density</em> of the tree (from the Taylor coefficients
+                        $1/n!$).
+                    </p>
+
+
+                    <!-- ============================================================ -->
+                    <h2>4. Taylor-expanding the RK method</h2>
+
+                    <p>Now expand the numerical answer $\mathbf{x}_1 = \mathbf{x} + h \sum_i b_i \mathbf{k}_i$
+                        in powers of $h$. The idea: each stage $\mathbf{k}_i = f(\mathbf{x} + \boldsymbol{\delta}_i)$
+                        where $\boldsymbol{\delta}_i = h \sum_j a_{ij} \mathbf{k}_j$ is small,
+                        so Taylor-expand $f$ around $\mathbf{x}$.</p>
+
+                    <h3>4.1. Worked example: a 2-stage method</h3>
+
+                    <p>Take an explicit 2-stage method with tableau:</p>
+
+                    $$
+                    \begin{array}{c|cc}
+                    0 & \\
+                    c_2 & a_{21} \\
+                    \hline
+                    & b_1 & b_2
+                    \end{array}
+                    $$
+
+                    <p>The stages are:</p>
+                    $$\begin{aligned}
+                    \mathbf{k}_1 &= f(\mathbf{x}), \\
+                    \mathbf{k}_2 &= f(\mathbf{x} + h\,a_{21}\,\mathbf{k}_1)
+                    = f(\mathbf{x} + h\,a_{21}\,f(\mathbf{x})).
+                    \end{aligned}$$
+
+                    <p>Set $\boldsymbol{\delta} = h\,a_{21}\,f(\mathbf{x})$ and
+                        Taylor-expand $\mathbf{k}_2$:</p>
+
+                    $$\begin{aligned}
+                    \mathbf{k}_2 &= f(\mathbf{x} + \boldsymbol{\delta}) \\
+                    &= f + f^i_\alpha\,\delta^\alpha
+                    + \tfrac{1}{2}\,f^i_{\alpha\beta}\,\delta^\alpha \delta^\beta + \cdots \\
+                    &= f + h\,a_{21}\,f^i_\alpha f^\alpha
+                    + \tfrac{h^2}{2}\,a_{21}^2\,f^i_{\alpha\beta} f^\alpha f^\beta + O(h^3).
+                    \end{aligned}$$
+
+                    <p>Assemble $\mathbf{x}_1 = \mathbf{x} + h(b_1 \mathbf{k}_1 + b_2 \mathbf{k}_2)$:</p>
+
+                    $$\begin{aligned}
+                    \mathbf{x}_1 &= \mathbf{x}
+                    + h\,(b_1 + b_2)\,f \\
+                    &\quad + h^2\,b_2 a_{21}\,f^i_\alpha f^\alpha \\
+                    &\quad + \tfrac{h^3}{2}\,b_2 a_{21}^2\,f^i_{\alpha\beta} f^\alpha f^\beta \\
+                    &\quad + O(h^4).
+                    \end{aligned}$$
+
+                    <h3>4.2. Matching against the exact expansion</h3>
+
+                    <p>Compare this to the exact expansion
+                        $\mathbf{x}^* = \mathbf{x} + hf + \frac{h^2}{2}f^i_\alpha f^\alpha
+                        + \frac{h^3}{6}f^i_{\alpha\beta} f^\alpha f^\beta + \frac{h^3}{6}f^i_\alpha f^\alpha_\beta
+                        f^\beta + \cdots$
+                        term by term:</p>
+
+                    <table style="margin: 1.5rem auto; border-collapse: collapse; font-size: 0.84rem;">
+                        <thead>
+                            <tr>
+                                <th
+                                    style="padding: 0.4rem 0.6rem; border-bottom: 2px solid var(--border-color); text-align: center;">
+                                    $h^n$</th>
+                                <th
+                                    style="padding: 0.4rem 0.6rem; border-bottom: 2px solid var(--border-color); text-align: left;">
+                                    Tree → Expression</th>
+                                <th
+                                    style="padding: 0.4rem 0.6rem; border-bottom: 2px solid var(--border-color); text-align: left;">
+                                    Exact coeff</th>
+                                <th
+                                    style="padding: 0.4rem 0.6rem; border-bottom: 2px solid var(--border-color); text-align: left;">
+                                    RK coeff</th>
+                                <th
+                                    style="padding: 0.4rem 0.6rem; border-bottom: 2px solid var(--border-color); text-align: left;">
+                                    Condition</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td
+                                    style="padding: 0.4rem 0.6rem; text-align: center; border-bottom: 1px solid var(--border-color);">
+                                    $h^1$</td>
+                                <td style="padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--border-color);">
+                                    $\bullet \to f$</td>
+                                <td style="padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--border-color);">$1$
+                                </td>
+                                <td style="padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--border-color);">$b_1 +
+                                    b_2$</td>
+                                <td style="padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--border-color);">$b_1 +
+                                    b_2 = 1$</td>
+                            </tr>
+                            <tr>
+                                <td
+                                    style="padding: 0.4rem 0.6rem; text-align: center; border-bottom: 1px solid var(--border-color);">
+                                    $h^2$</td>
+                                <td style="padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--border-color);">
+                                    $[\bullet] \to f^i_\alpha f^\alpha$</td>
+                                <td style="padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--border-color);">
+                                    $\tfrac{1}{2}$</td>
+                                <td style="padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--border-color);">$b_2
+                                    a_{21}$</td>
+                                <td style="padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--border-color);">$b_2
+                                    a_{21} = \tfrac{1}{2}$</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.4rem 0.6rem; text-align: center; border-bottom: 1px solid var(--border-color);"
+                                    rowspan="2">$h^3$</td>
+                                <td style="padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--border-color);">
+                                    $[\bullet,\bullet] \to f^i_{\alpha\beta} f^\alpha f^\beta$</td>
+                                <td style="padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--border-color);">
+                                    $\tfrac{1}{3}$</td>
+                                <td style="padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--border-color);">
+                                    $\tfrac{1}{2}b_2 a_{21}^2$</td>
+                                <td style="padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--border-color);">$b_2
+                                    a_{21}^2 = \tfrac{2}{3}$</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--border-color);">
+                                    $[[\bullet]] \to f^i_\alpha f^\alpha_\beta f^\beta$</td>
+                                <td style="padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--border-color);">
+                                    $\tfrac{1}{6}$</td>
+                                <td style="padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--border-color);">$0$
+                                </td>
+                                <td style="padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--border-color);">$0
+                                    \neq \tfrac{1}{6}$ &#10007;</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <p>The tall-tree term $f^i_\alpha f^\alpha_\beta f^\beta$ requires two levels of
+                        index contraction. A 2-stage method can only produce one level
+                        (stage 2 calls $f$ at a point that depends on stage 1). You
+                        need a <em>third</em> stage $\mathbf{k}_3 = f(\mathbf{x} + \beta h \mathbf{k}_2)$
+                        to get the second level of nesting and generate $f^i_\alpha f^\alpha_\beta f^\beta$.
+                        <strong>Depth in the tree = depth in the stage-dependency graph.</strong>
+                    </p>
+
+
+
+                    <!-- ============================================================ -->
+                    <h2>5. The general formulas: $\Phi(\tau)$ and $\gamma(\tau)$</h2>
+
+                    <p>For a general $s$-stage method, the same pattern holds. Each tree
+                        $\tau$ with $|\tau|$ nodes contributes one order condition.
+                        The <em>exact</em> coefficient is $1/\gamma(\tau)$ and the
+                        <em>RK</em> coefficient is $\Phi(\tau)$. Both are defined
+                        recursively on the tree.
+                    </p>
+
+                    <h3>5.1. The density $\gamma(\tau)$ — from the exact side</h3>
+
+                    <p>The density absorbs the factorials from the Taylor expansion.
+                        It counts, roughly, "how many ways can you label
+                        the nodes of $\tau$ in post-order?"</p>
+
+                    $$\begin{aligned}
+                    \gamma(\bullet) &= 1, \\
+                    \gamma\bigl([\tau_1, \ldots, \tau_m]\bigr) &= |\tau| \cdot \prod_{k=1}^{m} \gamma(\tau_k).
+                    \end{aligned}$$
+
+                    <p>For example: $\gamma([\bullet]) = 2 \cdot 1 = 2$,
+                        $\gamma([\bullet,\bullet]) = 3 \cdot 1 \cdot 1 = 3$,
+                        $\gamma([[\bullet]]) = 3 \cdot 2 = 6$.</p>
+
+
+                    <h3>5.2. The RK weight $\Phi(\tau)$ — from the numerical side</h3>
+
+                    <p>$\Phi(\tau)$ is built by walking the tree bottom-up, accumulating
+                        sums and products through the Butcher tableau. Define a
+                        per-stage weight $\varphi_i(\tau)$ recursively:</p>
+
+                    $$\begin{aligned}
+                    \varphi_i(\bullet) &= 1, \\
+                    \varphi_i\bigl([\tau_1, \ldots, \tau_m]\bigr) &= \prod_{k=1}^{m}
+                    \underbrace{\sum_{j=1}^{s} a_{ij}\,\varphi_j(\tau_k)}_{\text{propagate each child through } A}.
+                    \end{aligned}$$
+
+                    <p>Then the global weight sums over stages with $\mathbf{b}$:</p>
+
+                    $$
+                    \Phi(\tau) = \sum_{i=1}^{s} b_i\,\varphi_i(\tau) = \mathbf{b}^T \boldsymbol{\varphi}(\tau).
+                    $$
+
+                    <p><strong>ML reading.</strong> Think of each node as a layer
+                        in a computation graph. A leaf outputs $1$.
+                        An internal node with children $\tau_1, \ldots, \tau_m$ takes
+                        the vectors $\boldsymbol{\varphi}(\tau_k) \in \mathbb{R}^s$
+                        (one per child), multiplies each by the matrix $A$ to get
+                        $A\,\boldsymbol{\varphi}(\tau_k) \in \mathbb{R}^s$, then
+                        takes the <em>elementwise product</em> across children.
+                        The final readout is a dot product with $\mathbf{b}$.
+                        The tree structure is the architecture of this
+                        "forward pass."</p>
+
+                    <p>Let's see this for the trees through order 3, writing
+                        $c_i = \sum_j a_{ij}$ (the row sums of $A$, or equivalently
+                        $\mathbf{c} = A\,\mathbf{1}$):</p>
+
+                    <table style="margin: 1.5rem auto; border-collapse: collapse; font-size: 0.84rem;">
+                        <thead>
+                            <tr>
+                                <th
+                                    style="padding: 0.4rem 0.6rem; border-bottom: 2px solid var(--border-color); text-align: left;">
+                                    Tree</th>
+                                <th
+                                    style="padding: 0.4rem 0.6rem; border-bottom: 2px solid var(--border-color); text-align: left;">
+                                    $F^i(\tau)$</th>
+                                <th
+                                    style="padding: 0.4rem 0.6rem; border-bottom: 2px solid var(--border-color); text-align: left;">
+                                    $\gamma$</th>
+                                <th
+                                    style="padding: 0.4rem 0.6rem; border-bottom: 2px solid var(--border-color); text-align: left;">
+                                    $\Phi$ in vector form</th>
+                                <th
+                                    style="padding: 0.4rem 0.6rem; border-bottom: 2px solid var(--border-color); text-align: left;">
+                                    Condition</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--border-color);">
+                                    $\bullet$</td>
+                                <td style="padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--border-color);">$f^i$
+                                </td>
+                                <td style="padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--border-color);">$1$
+                                </td>
+                                <td style="padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--border-color);">
+                                    $\mathbf{b}^T \mathbf{1}$</td>
+                                <td style="padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--border-color);">
+                                    $\mathbf{b}^T\mathbf{1} = 1$</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--border-color);">
+                                    $[\bullet]$</td>
+                                <td style="padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--border-color);">
+                                    $f^i_\alpha f^\alpha$</td>
+                                <td style="padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--border-color);">$2$
+                                </td>
+                                <td style="padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--border-color);">
+                                    $\mathbf{b}^T \mathbf{c}$</td>
+                                <td style="padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--border-color);">
+                                    $\mathbf{b}^T\mathbf{c} = \tfrac{1}{2}$</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--border-color);">
+                                    $[\bullet,\bullet]$</td>
+                                <td style="padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--border-color);">
+                                    $f^i_{\alpha\beta} f^\alpha f^\beta$</td>
+                                <td style="padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--border-color);">$3$
+                                </td>
+                                <td style="padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--border-color);">
+                                    $\mathbf{b}^T(\mathbf{c} \odot \mathbf{c})$</td>
+                                <td style="padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--border-color);">
+                                    $\mathbf{b}^T\mathbf{c}^2 = \tfrac{1}{3}$</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--border-color);">
+                                    $[[\bullet]]$</td>
+                                <td style="padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--border-color);">
+                                    $f^i_\alpha f^\alpha_\beta f^\beta$</td>
+                                <td style="padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--border-color);">$6$
+                                </td>
+                                <td style="padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--border-color);">
+                                    $\mathbf{b}^T\!A\,\mathbf{c}$</td>
+                                <td style="padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--border-color);">
+                                    $\mathbf{b}^T\!A\mathbf{c} = \tfrac{1}{6}$</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <p>The key insight in vectorised form:
+                        <strong>branching at a node becomes Hadamard (elementwise) products</strong>
+                        of $\mathbf{c}$-like vectors, while
+                        <strong>depth becomes matrix-vector multiplication by $A$</strong>.
+                        Every Φ condition is a formula built from $\mathbf{b}$, $A$, $\mathbf{c}$,
+                        Hadamard products $\odot$, and matrix-vector products — pure
+                        linear algebra.
+                    </p>
+
+
+                    <!-- ============================================================ -->
+                    <h2>6. Simplifying assumptions</h2>
+
+                    <p>HNW's key practical insight: many order conditions become
+                        redundant if the tableau satisfies certain
+                        <em>simplifying assumptions</em>.
+                    </p>
+
+                    <p><strong>$B(p)$:</strong> $\;\mathbf{b}^T \mathbf{c}^{q-1} = \tfrac{1}{q}$
+                        for $q = 1, \ldots, p$. These are the quadrature conditions —
+                        the weights integrate polynomials exactly. In
+                        ML terms: the readout vector $\mathbf{b}$ satisfies a
+                        Vandermonde-like system.</p>
+
+                    <p><strong>$C(\eta)$:</strong> $\;A\,\mathbf{c}^{q-1} = \tfrac{1}{q}\,\mathbf{c}^q$
+                        for $q = 1, \ldots, \eta$. This says each row of $A$ is itself
+                        a quadrature rule of order $\eta$. Geometrically: the
+                        intermediate stages are accurate sub-integrators.</p>
+
+                    <p><strong>$D(\zeta)$:</strong> $\;\mathbf{b}^T\!\operatorname{diag}(\mathbf{c}^{q-1})\,A
+                        = \tfrac{1}{q}\,\mathbf{b}^T\bigl(\mathbf{1} - \mathbf{c}^q\bigr)^T$
+                        for $q = 1, \ldots, \zeta$.</p>
+
+                    <p>The power of these assumptions: <strong>if $B(p)$, $C(\eta)$, and
+                            $D(\zeta)$ hold with $p \leq \eta + \zeta + 1$ and
+                            $p \leq 2\eta + 2$, then the method has order $p$.</strong>
+                        Instead of checking all trees up to size $p$ (which grows
+                        super-exponentially), you only need to check three families of
+                        linear equations. This is how practical high-order methods
+                        are actually designed.</p>
+
+
+                    <!-- ============================================================ -->
+                    <h2>7. Counting conditions: why high order is hard</h2>
+
+                    <p>The number of rooted trees (and hence order conditions) with
+                        $n$ nodes is sequence
+                        <a href="https://oeis.org/A000081" target="_blank">A000081</a>:
+                    </p>
+
+                    <table style="margin: 1.5rem auto; border-collapse: collapse; font-size: 0.88rem;">
+                        <thead>
+                            <tr>
+                                <th
+                                    style="padding: 0.4rem 0.8rem; border-bottom: 2px solid var(--border-color); text-align: center;">
+                                    Order $p$</th>
+                                <th
+                                    style="padding: 0.4rem 0.8rem; border-bottom: 2px solid var(--border-color); text-align: center;">
+                                    New conditions</th>
+                                <th
+                                    style="padding: 0.4rem 0.8rem; border-bottom: 2px solid var(--border-color); text-align: center;">
+                                    Total</th>
+                                <th
+                                    style="padding: 0.4rem 0.8rem; border-bottom: 2px solid var(--border-color); text-align: center;">
+                                    Min stages needed</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td
+                                    style="padding: 0.4rem 0.8rem; text-align: center; border-bottom: 1px solid var(--border-color);">
+                                    1</td>
+                                <td
+                                    style="padding: 0.4rem 0.8rem; text-align: center; border-bottom: 1px solid var(--border-color);">
+                                    1</td>
+                                <td
+                                    style="padding: 0.4rem 0.8rem; text-align: center; border-bottom: 1px solid var(--border-color);">
+                                    1</td>
+                                <td
+                                    style="padding: 0.4rem 0.8rem; text-align: center; border-bottom: 1px solid var(--border-color);">
+                                    1</td>
+                            </tr>
+                            <tr>
+                                <td
+                                    style="padding: 0.4rem 0.8rem; text-align: center; border-bottom: 1px solid var(--border-color);">
+                                    2</td>
+                                <td
+                                    style="padding: 0.4rem 0.8rem; text-align: center; border-bottom: 1px solid var(--border-color);">
+                                    1</td>
+                                <td
+                                    style="padding: 0.4rem 0.8rem; text-align: center; border-bottom: 1px solid var(--border-color);">
+                                    2</td>
+                                <td
+                                    style="padding: 0.4rem 0.8rem; text-align: center; border-bottom: 1px solid var(--border-color);">
+                                    2</td>
+                            </tr>
+                            <tr>
+                                <td
+                                    style="padding: 0.4rem 0.8rem; text-align: center; border-bottom: 1px solid var(--border-color);">
+                                    3</td>
+                                <td
+                                    style="padding: 0.4rem 0.8rem; text-align: center; border-bottom: 1px solid var(--border-color);">
+                                    2</td>
+                                <td
+                                    style="padding: 0.4rem 0.8rem; text-align: center; border-bottom: 1px solid var(--border-color);">
+                                    4</td>
+                                <td
+                                    style="padding: 0.4rem 0.8rem; text-align: center; border-bottom: 1px solid var(--border-color);">
+                                    3</td>
+                            </tr>
+                            <tr>
+                                <td
+                                    style="padding: 0.4rem 0.8rem; text-align: center; border-bottom: 1px solid var(--border-color);">
+                                    4</td>
+                                <td
+                                    style="padding: 0.4rem 0.8rem; text-align: center; border-bottom: 1px solid var(--border-color);">
+                                    4</td>
+                                <td
+                                    style="padding: 0.4rem 0.8rem; text-align: center; border-bottom: 1px solid var(--border-color);">
+                                    8</td>
+                                <td
+                                    style="padding: 0.4rem 0.8rem; text-align: center; border-bottom: 1px solid var(--border-color);">
+                                    4</td>
+                            </tr>
+                            <tr>
+                                <td
+                                    style="padding: 0.4rem 0.8rem; text-align: center; border-bottom: 1px solid var(--border-color);">
+                                    5</td>
+                                <td
+                                    style="padding: 0.4rem 0.8rem; text-align: center; border-bottom: 1px solid var(--border-color);">
+                                    9</td>
+                                <td
+                                    style="padding: 0.4rem 0.8rem; text-align: center; border-bottom: 1px solid var(--border-color);">
+                                    17</td>
+                                <td
+                                    style="padding: 0.4rem 0.8rem; text-align: center; border-bottom: 1px solid var(--border-color);">
+                                    6</td>
+                            </tr>
+                            <tr>
+                                <td
+                                    style="padding: 0.4rem 0.8rem; text-align: center; border-bottom: 1px solid var(--border-color);">
+                                    6</td>
+                                <td
+                                    style="padding: 0.4rem 0.8rem; text-align: center; border-bottom: 1px solid var(--border-color);">
+                                    20</td>
+                                <td
+                                    style="padding: 0.4rem 0.8rem; text-align: center; border-bottom: 1px solid var(--border-color);">
+                                    37</td>
+                                <td
+                                    style="padding: 0.4rem 0.8rem; text-align: center; border-bottom: 1px solid var(--border-color);">
+                                    7</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.4rem 0.8rem; text-align: center;">7</td>
+                                <td style="padding: 0.4rem 0.8rem; text-align: center;">48</td>
+                                <td style="padding: 0.4rem 0.8rem; text-align: center;">85</td>
+                                <td style="padding: 0.4rem 0.8rem; text-align: center;">9</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <p>Notice the "Butcher barriers": for $p \leq 4$, you need
+                        exactly $p$ stages. But from $p = 5$ onwards, you need
+                        <em>more</em> stages than the order. At order 5 you need 6 stages
+                        (one extra function evaluation wasted on satisfying the extra
+                        conditions). This is why RK4 is so popular: it sits right at
+                        the sweet spot where $s = p$.
+                    </p>
+
+
+                    <!-- ============================================================ -->
+                    <h2>8. Why this matters for ML</h2>
+
+                    <p>If you use <strong>neural ODEs</strong>
+                        (Chen et al., 2018) or <strong>continuous normalizing flows</strong>
+                        (Grathwohl et al., 2019), the forward pass is literally an
+                        ODE solve with $f = f_\theta$ a neural network. The backward
+                        pass (adjoint method) is <em>another</em> ODE solve.</p>
+
+                    <p>The order of your solver directly controls:</p>
+
+                    <ul>
+                        <li><strong>Training cost.</strong> A higher-order method takes
+                            fewer steps for the same accuracy, but each step costs more
+                            function evaluations. The sweet spot depends on $d$ and the
+                            Lipschitz constant of $f_\theta$.</li>
+                        <li><strong>Gradient quality.</strong> The adjoint method
+                            solves a reverse-time ODE. If the forward solver is order $p$,
+                            the adjoint is also order $p$ — but order conditions
+                            for the <em>adjoint</em> method involve the same trees,
+                            traversed in reverse.</li>
+                        <li><strong>Adaptive step control.</strong> Practical solvers
+                            like <code>dopri5</code> (Dormand-Prince, order 5(4)) use
+                            an embedded lower-order method for error estimation.
+                            The pair of methods shares a Butcher tableau, and the
+                            difference between their tree weights gives the local
+                            error estimate.</li>
+                    </ul>
+
+                    <p>The tree machinery also explains why
+                        <strong>symplectic integrators</strong> (used in Hamiltonian Monte Carlo)
+                        automatically satisfy certain order conditions for free:
+                        symplecticity is a constraint on the B-series coefficients
+                        that eliminates many trees.
+                    </p>
+
+
+                    <!-- ============================================================ -->
+                    <h2>9. Summary: the Rosetta Stone</h2>
+
+                    <p>Here is the translation table between HNW's notation and
+                        standard ML notation:</p>
+
+                    <table style="margin: 1.5rem auto; border-collapse: collapse; font-size: 0.86rem;">
+                        <thead>
+                            <tr>
+                                <th
+                                    style="padding: 0.4rem 0.8rem; border-bottom: 2px solid var(--border-color); text-align: left;">
+                                    HNW (primes)</th>
+                                <th
+                                    style="padding: 0.4rem 0.8rem; border-bottom: 2px solid var(--border-color); text-align: left;">
+                                    Index notation</th>
+                                <th
+                                    style="padding: 0.4rem 0.8rem; border-bottom: 2px solid var(--border-color); text-align: left;">
+                                    ML (matrix)</th>
+                                <th
+                                    style="padding: 0.4rem 0.8rem; border-bottom: 2px solid var(--border-color); text-align: left;">
+                                    JAX</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="padding: 0.4rem 0.8rem; border-bottom: 1px solid var(--border-color);">
+                                    $f'(y)\,v$</td>
+                                <td style="padding: 0.4rem 0.8rem; border-bottom: 1px solid var(--border-color);">
+                                    $f^i_\alpha v^\alpha$</td>
+                                <td style="padding: 0.4rem 0.8rem; border-bottom: 1px solid var(--border-color);">
+                                    $J_f\,\mathbf{v}$</td>
+                                <td style="padding: 0.4rem 0.8rem; border-bottom: 1px solid var(--border-color);">
+                                    <code>jax.jvp(f, (x,), (v,))</code>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.4rem 0.8rem; border-bottom: 1px solid var(--border-color);">
+                                    $f''(y)(u,v)$</td>
+                                <td style="padding: 0.4rem 0.8rem; border-bottom: 1px solid var(--border-color);">
+                                    $f^i_{\alpha\beta} u^\alpha v^\beta$</td>
+                                <td style="padding: 0.4rem 0.8rem; border-bottom: 1px solid var(--border-color);">
+                                    $H_f[\mathbf{u},\mathbf{v}]$</td>
+                                <td style="padding: 0.4rem 0.8rem; border-bottom: 1px solid var(--border-color);">
+                                    nested <code>jax.jvp</code>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.4rem 0.8rem; border-bottom: 1px solid var(--border-color);">$f'f$
+                                </td>
+                                <td style="padding: 0.4rem 0.8rem; border-bottom: 1px solid var(--border-color);">
+                                    $f^i_\alpha f^\alpha$</td>
+                                <td style="padding: 0.4rem 0.8rem; border-bottom: 1px solid var(--border-color);">
+                                    $J_f\,f$</td>
+                                <td style="padding: 0.4rem 0.8rem; border-bottom: 1px solid var(--border-color);">
+                                    <code>jax.jvp(f, (x,), (f(x),))[1]</code>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.4rem 0.8rem; border-bottom: 1px solid var(--border-color);">
+                                    $f''(f,f)$
+                                </td>
+                                <td style="padding: 0.4rem 0.8rem; border-bottom: 1px solid var(--border-color);">
+                                    $f^i_{\alpha\beta} f^\alpha f^\beta$</td>
+                                <td style="padding: 0.4rem 0.8rem; border-bottom: 1px solid var(--border-color);">
+                                    $H_f[f,f]$</td>
+                                <td style="padding: 0.4rem 0.8rem; border-bottom: 1px solid var(--border-color);">
+                                    $i_1 i_2$ coeff of hyper-dual
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.4rem 0.8rem; border-bottom: 1px solid var(--border-color);">
+                                    $f'f'f$
+                                </td>
+                                <td style="padding: 0.4rem 0.8rem; border-bottom: 1px solid var(--border-color);">
+                                    $f^i_\alpha f^\alpha_\beta f^\beta$</td>
+                                <td style="padding: 0.4rem 0.8rem; border-bottom: 1px solid var(--border-color);">
+                                    $J_f J_f f$</td>
+                                <td style="padding: 0.4rem 0.8rem; border-bottom: 1px solid var(--border-color);">
+                                    nested <code>jvp</code>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.4rem 0.8rem; border-bottom: 1px solid var(--border-color);">$y' =
+                                    f(y)$</td>
+                                <td style="padding: 0.4rem 0.8rem; border-bottom: 1px solid var(--border-color);">
+                                    $(y^i)' = f^i(y)$</td>
+                                <td style="padding: 0.4rem 0.8rem; border-bottom: 1px solid var(--border-color);">
+                                    $\dot{\mathbf{x}} = f(\mathbf{x})$</td>
+                                <td style="padding: 0.4rem 0.8rem; border-bottom: 1px solid var(--border-color);">
+                                    <code>diffrax.diffeqsolve</code>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.4rem 0.8rem;">$\Phi(\tau) = 1/\gamma(\tau)$</td>
+                                <td colspan="2" style="padding: 0.4rem 0.8rem;">$\mathbf{b}^T\boldsymbol{\varphi}(\tau)
+                                    =
+                                    1/\gamma(\tau)$</td>
+                                <td style="padding: 0.4rem 0.8rem;">one equation per tree</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <blockquote
+                        style="border-left: 3px solid var(--accent-primary); padding-left: 1rem; margin: 1.5rem 0; color: var(--text-secondary); font-style: italic;">
+                        A Runge-Kutta method has order $p$ if and only if
+                        $\mathbf{b}^T\boldsymbol{\varphi}(\tau) = 1/\gamma(\tau)$
+                        for every rooted tree $\tau$ with $|\tau| \leq p$.
+                        Each tree is a distinct pattern of $f^i_\alpha$, $f^i_{\alpha\beta}$,
+                        and higher-order index contractions. The Butcher tableau is the set
+                        of learnable parameters; the order conditions are the constraints.
+                    </blockquote>
+
+
+                    <h3>References</h3>
+
+                    <ul style="font-size: 0.88rem; color: var(--text-secondary);">
+                        <li>E. Hairer, S.P. Nørsett, G. Wanner,
+                            <em>Solving Ordinary Differential Equations I: Nonstiff Problems</em>,
+                            Springer (1993). Chapter II, Section 2.
+                        </li>
+                        <li>J.C. Butcher, <em>Coefficients for the study of Runge-Kutta
+                                integration processes</em>, J. Austral. Math. Soc. 3, 185-201 (1963).</li>
+                        <li>R.T.Q. Chen, Y. Rubanova, J. Bettencourt, D. Duvenaud,
+                            <em>Neural Ordinary Differential Equations</em>, NeurIPS (2018).
+                        </li>
+                        <li>W. Grathwohl, R.T.Q. Chen, J. Bettencourt, I. Sutskever, D. Duvenaud,
+                            <em>FFJORD: Free-form Continuous Dynamics for Scalable Reversible
+                                Generative Models</em>, ICLR (2019).
+                        </li>
+                        <li>P. Kidger, <em>On Neural Differential Equations</em>,
+                            DPhil thesis, Oxford (2022). — Excellent modern treatment
+                            with JAX code.</li>
+                    </ul>
+
+                </div>
+            </article>
+
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer__links">
+                <a href="https://scholar.google.com/citations?user=613GPbQAAAAJ&hl=en" target="_blank">Google
+                    Scholar</a>
+                <a href="https://github.com/danielewworrall" target="_blank">GitHub</a>
+                <a href="https://twitter.com/danielewworrall" target="_blank">Twitter</a>
+                <a href="https://www.linkedin.com/in/daniel-worrall-46a43238/" target="_blank">LinkedIn</a>
+            </div>
+            <p class="footer__text">&copy; 2026 Daniel Worrall</p>
+        </div>
+    </footer>
+
+    <script src="/script.js"></script>
+</body>
+
+</html>
