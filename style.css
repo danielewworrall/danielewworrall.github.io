@@ -1189,6 +1189,11 @@ section {
   margin-bottom: 0;
 }
 
+/* Long bare URLs in reference lists would otherwise run off narrow screens */
+.blog-post__content a {
+  overflow-wrap: anywhere;
+}
+
 .blog-post__content pre {
   background: var(--bg-secondary);
   border: 1px solid var(--border-color);
