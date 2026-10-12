@@ -1,6 +1,6 @@
 /* ============================================================
    script.js — Daniel Worrall Academic Site
-   Neural-net canvas, theme toggle, scroll reveals, mobile menu
+   Neural-net canvas, theme toggle, mobile menu
    ============================================================ */
 
 // ── Neural Network Canvas Background ─────────────────────────
@@ -130,27 +130,6 @@
     const theme = document.documentElement.getAttribute('data-theme');
     toggle.textContent = theme === 'light' ? '🌙' : '☀️';
   }
-})();
-
-
-// ── Scroll Reveal ────────────────────────────────────────────
-(function initReveal() {
-  const reveals = document.querySelectorAll('.reveal');
-  if (!reveals.length) return;
-
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('visible');
-        observer.unobserve(entry.target);
-      }
-    });
-  }, {
-    threshold: 0.01,
-    rootMargin: '0px 0px -40px 0px',
-  });
-
-  reveals.forEach((el) => observer.observe(el));
 })();
 
 
