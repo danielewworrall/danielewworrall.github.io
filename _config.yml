@@ -1,0 +1,10 @@
+# GitHub Pages builds this site with Jekyll only so that `exclude` works.
+# The pages are plain HTML with no front matter, so Jekyll copies them
+# unchanged. Files for maintainers and agents rather than visitors must be
+# listed here, or they are published on the site.
+# Dot-folders such as .claude/ are left out by Jekyll already.
+exclude:
+  - CLAUDE.md
+  - README.md
+  - docs/decisions.md
+  - docs/context.md
