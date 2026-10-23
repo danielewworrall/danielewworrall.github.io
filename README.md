@@ -8,7 +8,7 @@ Personal academic website for **Daniel Worrall** — scientific machine learning
 
 - Pure HTML, CSS, and vanilla JavaScript (no frameworks)
 - Main pages set like a NeurIPS paper in self-hosted [TeX Gyre](https://www.gust.org.pl/projects/e-foundry/tex-gyre) Termes and Heros (`fonts/`, GUST Font License)
-- Blog posts in a margin-notes layout set in [EB Garamond](https://fonts.google.com/specimen/EB+Garamond)
+- Blog posts in the same paper style, one column
 - Light and dark themes: follows the system, with a toggle saved in `localStorage`
 - [MathJax 3](https://www.mathjax.org/) for LaTeX rendering in blog posts
 - Responsive design

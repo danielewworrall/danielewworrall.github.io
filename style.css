@@ -2,13 +2,10 @@
    Daniel Worrall — site styles (October 2026 redesign)
    Main pages are set like a NeurIPS paper: TeX Gyre Termes and
    Heros (the free Times and Helvetica that LaTeX uses), ruled
-   title block, booktabs tables. Blog pages (body.blog) use a
-   Tufte-style "margin notes" layout in EB Garamond.
+   title block, booktabs tables. Blog posts use the same style.
    Every colour is a custom property; dark mode follows the
    system unless the toggle sets data-theme on <html>.
    ============================================================ */
-
-@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap');
 
 @font-face { font-family: "TeX Gyre Termes"; font-style: normal; font-weight: 400; font-display: swap; src: url("/fonts/texgyretermes-regular.woff2") format("woff2"); }
 @font-face { font-family: "TeX Gyre Termes"; font-style: italic; font-weight: 400; font-display: swap; src: url("/fonts/texgyretermes-italic.woff2") format("woff2"); }
@@ -28,11 +25,6 @@
   --highlight: #fffbe6;
   --code-bg: #f5f5f2;
 
-  /* Blog (margin notes) */
-  --paper: #fffff8;
-  --ink: #111111;
-  --ink-muted: #4a4a46;
-  --note-rule: #d9d9cf;
 
   /* Names kept for inline styles in older pages */
   --text-primary: var(--fg);
@@ -43,7 +35,6 @@
   --serif: "TeX Gyre Termes", "Times New Roman", Times, serif;
   --sans: "TeX Gyre Heros", Helvetica, Arial, sans-serif;
   --mono: ui-monospace, "SF Mono", Menlo, Consolas, "Courier New", monospace;
-  --book: "EB Garamond", Garamond, Georgia, serif;
 
   --measure: 820px;
   color-scheme: light;
@@ -53,14 +44,14 @@
   :root:not([data-theme="light"]) {
     --bg: #17181b; --fg: #e8e6e1; --muted: #a9a7a1; --rule: #d8d6d0; --hairline: #2e3034;
     --link: #9bbcff; --highlight: #2a2618; --code-bg: #222327;
-    --paper: #161513; --ink: #e9e5da; --ink-muted: #b3aea2; --note-rule: #3a3833;
+   
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
   --bg: #17181b; --fg: #e8e6e1; --muted: #a9a7a1; --rule: #d8d6d0; --hairline: #2e3034;
   --link: #9bbcff; --highlight: #2a2618; --code-bg: #222327;
-  --paper: #161513; --ink: #e9e5da; --ink-muted: #b3aea2; --note-rule: #3a3833;
+ 
   color-scheme: dark;
 }
 
@@ -213,65 +204,51 @@ h1.section-header__title { font-size: 2.1rem; }
 .lecture-list__desc { font-size: .95rem; color: var(--muted); }
 .lecture-list__link { font: 14px var(--sans); }
 
-/* ── Blog (margin notes) ──────────────────────────────────── */
-body.blog { background: var(--paper); color: var(--ink); font: 19px/1.6 var(--book); }
-body.blog .nav, body.blog .footer { font-family: var(--book); border-color: var(--note-rule); }
-body.blog .nav { font-size: 17px; font-variant: small-caps; letter-spacing: .04em; }
-body.blog .nav__links a { color: var(--ink-muted); }
-body.blog .nav__links a.active { color: var(--ink); font-weight: 500; text-decoration: underline; text-underline-offset: 4px; }
-body.blog .nav__theme-toggle { font-family: var(--book); font-variant: small-caps; color: var(--ink-muted); border-color: var(--note-rule); }
-body.blog .footer, body.blog .footer__links a { color: var(--ink-muted); font-size: 15px; }
-body.blog a { color: var(--ink); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 2px; text-decoration-color: var(--ink-muted); }
-body.blog .nav a, body.blog .footer a { text-decoration: none; }
-body.blog .container { max-width: 1040px; }
-body.blog .section-header__label { font: 500 15px var(--book); font-variant: small-caps; letter-spacing: .06em; text-transform: none; color: var(--ink-muted); }
-body.blog .section-header__title { font-family: var(--book); font-weight: 400; font-size: 2.6rem; }
-body.blog .section-header__line { border-color: var(--note-rule); max-width: 60ch; }
+/* ── Blog ─────────────────────────────────────────────────── */
+/* Posts use the same paper typography as the home page: one column,
+   the title between a heavy and a light rule, bold upright headings. */
 
 /* Blog index */
-.blog-grid { display: grid; max-width: 62ch; }
-.blog-card { padding: 16px 0; border-top: 1px solid var(--note-rule); display: grid; gap: 4px; }
-.blog-card__date { font-size: .9rem; color: var(--ink-muted); font-variant: small-caps; letter-spacing: .04em; font-variant-numeric: oldstyle-nums; }
-.blog-card__title { font-weight: 400; font-style: italic; font-size: 1.45rem; line-height: 1.25; }
-.blog-card__title a { text-decoration: none !important; }
-.blog-card__excerpt { font-size: 1.02rem; color: var(--ink-muted); }
-.blog-card__tags { display: flex; flex-wrap: wrap; gap: 2px 12px; }
-.blog-card__tag { font-size: .9rem; font-variant: small-caps; letter-spacing: .04em; color: var(--ink-muted); }
+.blog-grid { display: grid; }
+.blog-card { padding: 12px 0; border-top: 1px solid var(--hairline); display: grid; gap: 3px; }
+.blog-card__date { font-size: .9rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.blog-card__title { font-weight: 700; font-size: 1.1rem; line-height: 1.3; }
+.blog-card__excerpt { font-size: .97rem; color: var(--muted); }
+.blog-card__tags { display: flex; flex-wrap: wrap; gap: 2px 14px; }
+.blog-card__tag { font: 13px var(--sans); color: var(--muted); }
 
-/* Blog post: a 60ch text column with a right margin for side notes */
-.blog-post { max-width: 1040px; }
-.blog-post__header { max-width: 60ch; margin-bottom: 30px; display: grid; gap: 8px; }
-.blog-post__title { font-weight: 400; font-size: 2.6rem; line-height: 1.1; }
-.blog-post__meta { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 16px; font-size: .95rem; color: var(--ink-muted); font-variant: small-caps; letter-spacing: .04em; }
-.blog-post__content { max-width: 60ch; counter-reset: sidenote; }
+/* Blog post */
+.blog-post__header { display: grid; gap: 12px; margin-bottom: 32px; text-align: center; }
+.blog-post__header::before { content: ""; display: block; border-top: 4px solid var(--rule); }
+.blog-post__header::after { content: ""; display: block; border-top: 1px solid var(--rule); order: 2; }
+.blog-post__header .section-header__label { order: -1; }
+.blog-post__title { font-weight: 700; font-size: 2rem; line-height: 1.15; order: 1; }
+.blog-post__meta { order: 3; display: flex; flex-wrap: wrap; justify-content: center; align-items: baseline; gap: 4px 16px; font-size: .95rem; color: var(--muted); }
+.blog-post__content { max-width: 680px; margin-inline: auto; font-size: 1.06rem; line-height: 1.65; }
+.blog-post__header { max-width: 680px; margin-inline: auto; }
 .blog-post__content > * + * { margin-top: 1em; }
 .blog-post__content p, .blog-post__content li { hyphens: auto; overflow-wrap: break-word; }
 .blog-post__content a { overflow-wrap: anywhere; }
-.blog-post__content h2 { font-weight: 400; font-style: italic; font-size: 1.7rem; margin-top: 1.6em; }
-.blog-post__content h3 { font-weight: 400; font-style: italic; font-size: 1.35rem; margin-top: 1.4em; }
-.blog-post__content h4 { font-weight: 500; font-size: 1.1rem; margin-top: 1.2em; }
+.blog-post__content h2 { font-weight: 700; font-size: 1.3rem; margin-top: 1.8em; }
+.blog-post__content h3 { font-weight: 700; font-size: 1.1rem; margin-top: 1.5em; }
+.blog-post__content h4 { font-weight: 700; font-style: italic; font-size: 1rem; margin-top: 1.2em; }
 .blog-post__content ul, .blog-post__content ol { padding-left: 1.4em; }
-.blog-post__content blockquote { margin-left: 0; padding-left: 1em; border-left: 2px solid var(--note-rule); font-style: italic; color: var(--ink-muted); }
+.blog-post__content blockquote { margin-left: 0; padding-left: 1em; border-left: 2px solid var(--hairline); color: var(--muted); }
 .blog-post__content img { display: inline-block; }
-.blog-post__content details { border-top: 1px solid var(--note-rule); border-bottom: 1px solid var(--note-rule); padding: 6px 0; }
-.blog-post__content summary { cursor: pointer; font-style: italic; }
+.blog-post__content details { border-top: 1px solid var(--hairline); border-bottom: 1px solid var(--hairline); padding: 6px 0; }
+.blog-post__content summary { cursor: pointer; font-weight: 700; }
 .blog-post__content table { border-collapse: collapse; font-size: .95em; display: block; overflow-x: auto; max-width: 100%; }
 .blog-post__content th, .blog-post__content td { padding: 4px 12px 4px 0; text-align: left; }
-.blog-post__content thead th { border-top: 1.6px solid var(--ink); border-bottom: .8px solid var(--ink); }
-.blog-post__content tbody tr:last-child td { border-bottom: 1.6px solid var(--ink); }
+.blog-post__content thead th { border-top: 1.6px solid var(--rule); border-bottom: .8px solid var(--rule); }
+.blog-post__content tbody tr:last-child td { border-bottom: 1.6px solid var(--rule); }
 .blog-post__content pre { background: var(--code-bg); padding: 12px 14px; overflow-x: auto; font-size: 14px; line-height: 1.5; border-radius: 3px; }
-.blog-post__content code { font-family: var(--mono); font-size: .82em; }
+.blog-post__content code { font-family: var(--mono); font-size: .85em; }
 .blog-post__content pre code { font-size: inherit; }
 .blog-post__content pre[class*="language-"], .blog-post__content code[class*="language-"] { background: var(--code-bg); text-shadow: none; }
 
-/* Side notes: <span class="sidenote">…</span> right after the text they annotate.
-   They sit in the right margin on wide screens and drop below the line on phones. */
-.blog-post__content .sidenote { float: right; clear: right; width: 30ch; margin-right: calc(-30ch - 5%); font-size: .8rem; line-height: 1.45; color: var(--ink-muted); position: relative; }
-.blog-post__content .sidenote::before { counter-increment: sidenote; content: counter(sidenote) " "; font-size: .85em; vertical-align: super; }
-.blog-post__content .sidenote-ref::after { counter-increment: none; }
-@media (max-width: 1100px) {
-  .blog-post__content .sidenote { float: none; display: block; width: auto; margin: .6em 0 .6em 1em; padding-left: .8em; border-left: 2px solid var(--note-rule); }
-}
+/* Notes: <span class="sidenote">…</span> inside a paragraph shows as a small
+   indented note under that line (no margin column). */
+.blog-post__content .sidenote { display: block; margin: .5em 0 .5em 1.2em; padding-left: .8em; border-left: 2px solid var(--hairline); font-size: .88rem; line-height: 1.5; color: var(--muted); }
 
 /* Wide maths scrolls inside its own box instead of the page */
 mjx-container[display="true"] { overflow-x: auto; overflow-y: hidden; max-width: 100%; padding-block: 2px; }
@@ -298,8 +275,8 @@ mjx-container[display="true"] { overflow-x: auto; overflow-y: hidden; max-width:
   .pub-grid { grid-template-columns: 1fr; }
   .talk-card { grid-template-columns: 1fr; }
   .talk-card > *, .talk-card__date { grid-column: 1; grid-row: auto; }
-  body.blog { font-size: 18px; }
-  .blog-post__title, body.blog .section-header__title { font-size: 2.1rem; }
+  .blog-post__title { font-size: 1.7rem; }
+  .blog-post__content { font-size: 1rem; }
 }
 
 @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
