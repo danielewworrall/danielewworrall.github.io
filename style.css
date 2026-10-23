@@ -255,6 +255,7 @@ h1.section-header__title { font-size: 2.1rem; }
 .token.function, .token.class-name, .token.decorator { color: var(--code-function); }
 .token.builtin { color: var(--code-builtin); }
 .token.operator, .token.punctuation { color: var(--code-punct); }
+.token { background: none; }
 
 /* Notes: <span class="sidenote">…</span> inside a paragraph shows as a small
    indented note under that line (no margin column). */
