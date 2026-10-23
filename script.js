@@ -45,12 +45,7 @@
 (function loadPrism() {
   if (!document.querySelector('code[class*="language-"]')) return;
 
-  // Load CSS
-  const theme = document.createElement('link');
-  theme.rel = 'stylesheet';
-  theme.href = 'https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.min.css';
-  document.head.appendChild(theme);
-
+  // Token colours live in style.css so they follow the light and dark themes.
   // Load JS + Python language
   const script = document.createElement('script');
   script.src = 'https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js';
