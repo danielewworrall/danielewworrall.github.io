@@ -113,7 +113,6 @@ p { margin: 0; }
 .titleblock__rule { border-top-width: 1px; }
 .titleblock h1 { font-size: 2.1rem; font-weight: 700; text-align: center; line-height: 1.15; }
 .titleblock__aff { text-align: center; line-height: 1.5; }
-.titleblock__email { font-family: var(--mono); font-size: .85rem; }
 .titleblock__links { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 18px; font: 15px var(--sans); }
 
 .abstract-row { display: grid; grid-template-columns: 180px minmax(0, 1fr); gap: 32px; align-items: start; }
