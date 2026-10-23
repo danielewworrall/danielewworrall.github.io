@@ -7,6 +7,7 @@
     <title>Hyper-dual numbers and higher-order derivatives — Daniel Worrall</title>
     <meta name="description"
         content="Extending dual numbers to higher-order automatic differentiation via independent infinitesimals and hyper-dual numbers, with connections to rooted trees and JAX.">
+    <script>try { var t = localStorage.getItem('theme'); if (t) document.documentElement.setAttribute('data-theme', t); } catch (e) { }</script>
     <link rel="stylesheet" href="/style.css">
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
     <!-- MathJax -->
@@ -19,27 +20,19 @@
     <script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-chtml.js" async></script>
 </head>
 
-<body>
+<body class="blog">
 
-    <canvas id="neural-canvas"></canvas>
-
-    <nav class="nav" role="navigation">
-        <div class="nav__inner">
-            <a href="/" class="nav__logo">d<span>.</span>worrall</a>
-            <ul class="nav__links" id="nav-links">
-                <li><a href="/">Home</a></li>
-                <li><a href="/blog/">Blog</a></li>
-                <li><a href="/publications.html">Publications</a></li>
-                <li><a href="/talks.html">Talks</a></li>
-                <li><a href="/teaching.html">Teaching</a></li>
-            </ul>
-            <div style="display:flex;align-items:center;gap:0.5rem;">
-                <button class="nav__theme-toggle" id="theme-toggle" aria-label="Toggle dark/light mode">☀️</button>
-                <button class="nav__hamburger" id="hamburger" aria-label="Toggle menu">
-                    <span></span><span></span><span></span>
-                </button>
-            </div>
-        </div>
+    <nav class="nav" aria-label="Site">
+      <div class="nav__inner">
+        <ul class="nav__links">
+          <li><a href="/">Home</a></li>
+          <li><a href="/blog/" class="active" aria-current="page">Blog</a></li>
+          <li><a href="/publications.html">Publications</a></li>
+          <li><a href="/talks.html">Talks</a></li>
+          <li><a href="/teaching.html">Teaching</a></li>
+        </ul>
+        <button class="nav__theme-toggle" id="theme-toggle" type="button">Dark</button>
+      </div>
     </nav>
 
     <main class="page-content">
@@ -435,16 +428,15 @@ print(result.tangent.primal)  # f'(x) via i₁  — same value!</code></pre>
     </main>
 
     <footer class="footer">
-        <div class="container">
-            <div class="footer__links">
-                <a href="https://scholar.google.com/citations?user=613GPbQAAAAJ&hl=en" target="_blank">Google
-                    Scholar</a>
-                <a href="https://github.com/danielewworrall" target="_blank">GitHub</a>
-                <a href="https://x.com/danielewworrall" target="_blank">Twitter</a>
-                <a href="https://www.linkedin.com/in/daniel-worrall-46a43238/" target="_blank">LinkedIn</a>
-            </div>
-            <p class="footer__text">© 2026 Daniel Worrall</p>
-        </div>
+      <div class="container">
+        <span>Daniel Worrall · Updated October 2026</span>
+        <span class="footer__links">
+          <a href="https://scholar.google.com/citations?user=613GPbQAAAAJ&amp;hl=en">Scholar</a>
+          <a href="https://github.com/danielewworrall">GitHub</a>
+          <a href="https://x.com/danielewworrall">Twitter</a>
+          <a href="https://www.linkedin.com/in/daniel-worrall-46a43238/">LinkedIn</a>
+        </span>
+      </div>
     </footer>
 
     <script src="/script.js"></script>

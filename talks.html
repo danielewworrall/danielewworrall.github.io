@@ -7,31 +7,24 @@
     <title>Talks — Daniel Worrall</title>
     <meta name="description"
         content="Invited talks and lectures by Daniel Worrall on equivariance, deep learning, and AI.">
-    <link rel="stylesheet" href="style.css">
+    <script>try { var t = localStorage.getItem('theme'); if (t) document.documentElement.setAttribute('data-theme', t); } catch (e) { }</script>
+    <link rel="stylesheet" href="/style.css">
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 </head>
 
 <body>
 
-    <canvas id="neural-canvas"></canvas>
-
-    <nav class="nav" role="navigation">
-        <div class="nav__inner">
-            <a href="/" class="nav__logo">d<span>.</span>worrall</a>
-            <ul class="nav__links" id="nav-links">
-                <li><a href="/">Home</a></li>
-                <li><a href="/blog/">Blog</a></li>
-                <li><a href="publications.html">Publications</a></li>
-                <li><a href="talks.html" class="active">Talks</a></li>
-                <li><a href="teaching.html">Teaching</a></li>
-            </ul>
-            <div style="display:flex;align-items:center;gap:0.5rem;">
-                <button class="nav__theme-toggle" id="theme-toggle" aria-label="Toggle dark/light mode">☀️</button>
-                <button class="nav__hamburger" id="hamburger" aria-label="Toggle menu">
-                    <span></span><span></span><span></span>
-                </button>
-            </div>
-        </div>
+    <nav class="nav" aria-label="Site">
+      <div class="nav__inner">
+        <ul class="nav__links">
+          <li><a href="/">Home</a></li>
+          <li><a href="/blog/">Blog</a></li>
+          <li><a href="/publications.html">Publications</a></li>
+          <li><a href="/talks.html" class="active" aria-current="page">Talks</a></li>
+          <li><a href="/teaching.html">Teaching</a></li>
+        </ul>
+        <button class="nav__theme-toggle" id="theme-toggle" type="button">Dark</button>
+      </div>
     </nav>
 
     <main class="page-content">
@@ -57,7 +50,7 @@
                     <span class="talk-card__date">Mar 2021</span>
                     <h3 class="talk-card__title">Equivariance: Trends and Challenges</h3>
                     <p class="talk-card__venue">ELLIS Symposium on Geometric Deep Learning for Medical Imaging</p>
-                    <p class="talk-card__location">📍 Virtual</p>
+                    <p class="talk-card__location">Virtual</p>
                     <div class="talk-card__links">
                         <a href="https://www.youtube.com/watch?v=_A8Hbzhr0yc" class="pub-card__link" target="_blank">Video</a>
                     </div>
@@ -73,7 +66,7 @@
                     <span class="talk-card__date">Aug 2020</span>
                     <h3 class="talk-card__title">Equivariance in Deep Learning — Part 3</h3>
                     <p class="talk-card__venue">Machine Learning Summer School Indonesia (MLSS-Indo)</p>
-                    <p class="talk-card__location">📍 Bandung, Indonesia</p>
+                    <p class="talk-card__location">Bandung, Indonesia</p>
                     <div class="talk-card__links">
                         <a href="https://drive.google.com/file/d/1vRSfcDaAqUEtVwWCEKcdQxXkn8KN5rTq/view"
                             class="pub-card__link" target="_blank">Slides</a>
@@ -85,7 +78,7 @@
                     <span class="talk-card__date">Aug 2020</span>
                     <h3 class="talk-card__title">Equivariance in Deep Learning — Part 2</h3>
                     <p class="talk-card__venue">Machine Learning Summer School Indonesia (MLSS-Indo)</p>
-                    <p class="talk-card__location">📍 Bandung, Indonesia</p>
+                    <p class="talk-card__location">Bandung, Indonesia</p>
                     <div class="talk-card__links">
                         <a href="https://drive.google.com/file/d/1iUQKWu22hTLr2u2z1sAn85-_1lrBZ3eL/view"
                             class="pub-card__link" target="_blank">Slides</a>
@@ -97,7 +90,7 @@
                     <span class="talk-card__date">Aug 2020</span>
                     <h3 class="talk-card__title">Machine Learning Basics</h3>
                     <p class="talk-card__venue">Machine Learning Summer School Indonesia (MLSS-Indo)</p>
-                    <p class="talk-card__location">📍 Bandung, Indonesia</p>
+                    <p class="talk-card__location">Bandung, Indonesia</p>
                     <div class="talk-card__links">
                         <a href="https://drive.google.com/file/d/19h0sxyZIuTMdV8WaF11GEPGpUPv-Jpwe/view"
                             class="pub-card__link" target="_blank">Slides</a>
@@ -109,7 +102,7 @@
                     <span class="talk-card__date">Jun 2018</span>
                     <h3 class="talk-card__title">Understanding & Generalising the Convolution</h3>
                     <p class="talk-card__venue">London Machine Learning Meetup</p>
-                    <p class="talk-card__location">📍 London, UK</p>
+                    <p class="talk-card__location">London, UK</p>
                     <div class="talk-card__links">
                         <a href="docs/June18-LondonMeetup.pdf" class="pub-card__link" target="_blank">Slides</a>
                         <a href="https://youtu.be/TlzRyHbWeP0" class="pub-card__link" target="_blank">Video</a>
@@ -120,7 +113,7 @@
                     <span class="talk-card__date">Sep 2017</span>
                     <h3 class="talk-card__title">Harmonic Networks: Deep Translation and Rotation Equivariance</h3>
                     <p class="talk-card__venue">BMVA Symposium on Deep Learning for Computer Vision</p>
-                    <p class="talk-card__location">📍 London, UK</p>
+                    <p class="talk-card__location">London, UK</p>
                 </div>
 
             </section>
@@ -129,19 +122,18 @@
     </main>
 
     <footer class="footer">
-        <div class="container">
-            <div class="footer__links">
-                <a href="https://scholar.google.com/citations?user=613GPbQAAAAJ&hl=en" target="_blank">Google
-                    Scholar</a>
-                <a href="https://github.com/danielewworrall" target="_blank">GitHub</a>
-                <a href="https://x.com/danielewworrall" target="_blank">Twitter</a>
-                <a href="https://www.linkedin.com/in/daniel-worrall-46a43238/" target="_blank">LinkedIn</a>
-            </div>
-            <p class="footer__text">© 2026 Daniel Worrall</p>
-        </div>
+      <div class="container">
+        <span>Daniel Worrall · Updated October 2026</span>
+        <span class="footer__links">
+          <a href="https://scholar.google.com/citations?user=613GPbQAAAAJ&amp;hl=en">Scholar</a>
+          <a href="https://github.com/danielewworrall">GitHub</a>
+          <a href="https://x.com/danielewworrall">Twitter</a>
+          <a href="https://www.linkedin.com/in/daniel-worrall-46a43238/">LinkedIn</a>
+        </span>
+      </div>
     </footer>
 
-    <script src="script.js"></script>
+    <script src="/script.js"></script>
 </body>
 
 </html>

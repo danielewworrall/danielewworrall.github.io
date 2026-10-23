@@ -4,384 +4,203 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Daniel Worrall — Machine Learning Research Scientist</title>
+  <title>Daniel Worrall</title>
   <meta name="description"
-    content="Machine learning researcher. Lead of the Digital Twins team at Cusp from December 2026, formerly Senior Research Scientist at Google DeepMind. Research on AI for science, weather prediction and equivariance.">
-  <link rel="stylesheet" href="style.css">
+    content="Daniel Worrall works on scientific machine learning: high precision machine learning models that can rival and surpass classical numerical methods. Digital Twins Lead at CuspAI from December 2026; previously Google DeepMind.">
+  <script>try { var t = localStorage.getItem('theme'); if (t) document.documentElement.setAttribute('data-theme', t); } catch (e) { }</script>
+  <link rel="stylesheet" href="/style.css">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 </head>
 
 <body>
 
-  <canvas id="neural-canvas"></canvas>
-
-  <!-- ── Navigation ──────────────────────────────────────── -->
-  <nav class="nav" role="navigation">
+  <nav class="nav" aria-label="Site">
     <div class="nav__inner">
-      <a href="/" class="nav__logo">d<span>.</span>worrall</a>
-      <ul class="nav__links" id="nav-links">
-        <li><a href="/" class="active">Home</a></li>
+      <ul class="nav__links">
+        <li><a href="/" class="active" aria-current="page">Home</a></li>
         <li><a href="/blog/">Blog</a></li>
-        <li><a href="publications.html">Publications</a></li>
-        <li><a href="talks.html">Talks</a></li>
-        <li><a href="teaching.html">Teaching</a></li>
+        <li><a href="/publications.html">Publications</a></li>
+        <li><a href="/talks.html">Talks</a></li>
+        <li><a href="/teaching.html">Teaching</a></li>
       </ul>
-      <div style="display:flex;align-items:center;gap:0.5rem;">
-        <button class="nav__theme-toggle" id="theme-toggle" aria-label="Toggle dark/light mode">☀️</button>
-        <button class="nav__hamburger" id="hamburger" aria-label="Toggle menu">
-          <span></span><span></span><span></span>
-        </button>
-      </div>
+      <button class="nav__theme-toggle" id="theme-toggle" type="button">Dark</button>
     </div>
   </nav>
 
   <main class="page-content">
     <div class="container">
 
-      <!-- ── Hero ───────────────────────────────────────── -->
-      <section class="hero">
-        <div class="hero__grid">
+      <!-- Title block, set like the first page of a paper -->
+      <header class="titleblock">
+        <h1>Daniel Worrall</h1>
+        <div class="titleblock__rule"></div>
+        <p class="titleblock__aff">Digital Twins Lead, <a href="https://www.cusp.ai/">CuspAI</a><br>
+          <span class="titleblock__email">daniel.e.w.worrall@gmail.com</span></p>
+        <p class="titleblock__links">
+          <a href="mailto:daniel.e.w.worrall@gmail.com">Email</a>
+        <a href="https://scholar.google.com/citations?user=613GPbQAAAAJ&amp;hl=en">Scholar</a>
+        <a href="https://github.com/danielewworrall">GitHub</a>
+        <a href="https://x.com/danielewworrall">Twitter</a>
+        <a href="https://www.linkedin.com/in/daniel-worrall-46a43238/">LinkedIn</a>
+          <a href="/publications.html">All publications</a>
+        </p>
+      </header>
+
+      <div class="abstract-row">
+        <figure>
+          <img src="images/headshot.jpg" alt="Daniel Worrall" width="180" height="180">
+          <figcaption><b>Figure 1:</b> The author.</figcaption>
+        </figure>
+        <section class="abstract">
+          <h2>Abstract</h2>
+          <p>I work on scientific machine learning, building high precision machine learning models that can rival and surpass classical numerical methods. On 1 December 2026 I join <a href="https://www.cusp.ai/">CuspAI</a> as Digital Twins Lead. At <a href="https://deepmind.google/">Google DeepMind</a> I worked on the <a href="https://arxiv.org/abs/2509.14185">discovery of unstable singularities</a> in the equations of fluid dynamics and on AI weather prediction. Before that I worked on equivariance, normalizing flows, uncertainty quantification, combinatorial optimization, and medical imaging.</p>
+        </section>
+      </div>
+
+      <section class="sec">
+        <h2><span class="n">1</span>Selected papers</h2>
+        <div class="paper paper--hl">
+          <img class="paper__fig" src="images/papers/singularities.jpg" alt="Third unstable self-similar solution of the IPM equation (Fig. 2a)" loading="lazy">
           <div>
-            <p class="hero__greeting">Machine Learning Researcher</p>
-            <h1 class="hero__name">Daniel <span class="accent">Worrall</span></h1>
-            <p class="hero__role">Lead, Digital Twins team · <strong>Cusp</strong> (from 1 Dec 2026) · formerly <strong>Google DeepMind</strong></p>
-
-            <div class="interests">
-              <span class="tag">AI4Science</span>
-              <span class="tag tag--cyan">Digital Twins</span>
-              <span class="tag tag--purple">Equivariance</span>
-            </div>
-
-            <p class="hero__bio">
-              I work on AI for science: building high precision machine learning models
-              that can rival and surpass classical numerical methods,
-              while leveraging the power of data-driven techniques.
-              On 1 December 2026 I join Cusp to lead the Digital Twins team.
-              At Google DeepMind I worked on AI weather prediction, and before that on
-              equivariance, normalizing flows, uncertainty quantification,
-              combinatorial optimization, and medical imaging.
-            </p>
-
-            <div class="hero__links">
-              <a href="https://scholar.google.com/citations?user=613GPbQAAAAJ&hl=en" target="_blank">Scholar</a>
-              <a href="https://github.com/danielewworrall" target="_blank">GitHub</a>
-              <a href="https://x.com/danielewworrall" target="_blank">Twitter</a>
-              <a href="https://www.linkedin.com/in/daniel-worrall-46a43238/" target="_blank">LinkedIn</a>
-              <a href="mailto:daniel.e.w.worrall@gmail.com">Email</a>
-            </div>
+            <p class="paper__title"><a href="https://arxiv.org/abs/2509.14185">Discovery of Unstable Singularities</a></p>
+            <p class="paper__authors">Y Wang, M Bennani, J Martens, S Racanière, S Blackwell, A Matthews, <span class="me">DE Worrall</span>, et al.</p>
+            <p class="paper__venue"><i>arXiv preprint</i>, 2025</p>
+            <p class="paper__links"><a href="https://arxiv.org/abs/2509.14185">arXiv</a> · <a href="https://deepmind.google/blog/discovering-new-solutions-to-century-old-problems-in-fluid-dynamics/">blog</a> · <a href="https://www.quantamagazine.org/using-ai-mathematicians-find-hidden-glitches-in-fluid-equations-20260109/">Quanta</a> · <a href="https://www.tiktok.com/@fryrsquared/video/7556639162305105174">Hannah Fry</a></p>
+            <p class="paper__desc">New families of unstable self-similar solutions to fluid equations, found with physics-informed networks trained to near machine precision.</p>
           </div>
-
-          <div class="hero__photo-wrapper">
-            <img src="images/daniel.jpg" alt="Daniel Worrall" class="hero__photo" />
+        </div>
+        <div class="paper paper--hl">
+          <img class="paper__fig" src="images/papers/mppde.jpg" alt="2D smoke inflow at 25, 50, 75 and 100 s: ground truth above, MP-PDE prediction below (Fig. 12)" loading="lazy">
+          <div>
+            <p class="paper__title"><a href="https://arxiv.org/abs/2202.03376">Message Passing Neural PDE Solvers</a></p>
+            <p class="paper__authors">J Brandstetter, <span class="me">DE Worrall</span>, M Welling</p>
+            <p class="paper__venue"><i>ICLR</i>, 2022</p>
+            <p class="paper__links"><a href="https://arxiv.org/abs/2202.03376">arXiv</a></p>
+            <p class="paper__desc">A neural solver built end to end from message passing, stable over long rollouts and across PDE families.</p>
           </div>
+        </div>
+        <div class="paper">
+          <img class="paper__fig" src="images/papers/se3.png" alt="Equivariant attention on a point cloud (Fig. 1B)" loading="lazy">
+          <div>
+            <p class="paper__title"><a href="https://arxiv.org/abs/2006.10503">SE(3)-Transformers: 3D Roto-Translation Equivariant Attention Networks</a></p>
+            <p class="paper__authors">FB Fuchs, <span class="me">DE Worrall</span>, V Fischer, M Welling</p>
+            <p class="paper__venue"><i>NeurIPS</i>, 2020</p>
+            <p class="paper__links"><a href="https://arxiv.org/abs/2006.10503">arXiv</a></p>
+            <p class="paper__desc">Self-attention for 3D point clouds and graphs that is equivariant to rotations and translations.</p>
+          </div>
+        </div>
+        <div class="paper">
+          <img class="paper__fig" src="images/papers/hnet.jpg" alt="Harmonic Network feature maps of an MNIST 8, arrows showing phase (Fig. 11)" loading="lazy">
+          <div>
+            <p class="paper__title"><a href="https://arxiv.org/abs/1612.04642">Harmonic Networks: Deep Translation and Rotation Equivariance</a></p>
+            <p class="paper__authors"><span class="me">DE Worrall</span>, SJ Garbin, D Turmukhambetov, GJ Brostow</p>
+            <p class="paper__venue"><i>CVPR</i>, 2017</p>
+            <p class="paper__links"><a href="https://arxiv.org/abs/1612.04642">arXiv</a></p>
+            <p class="paper__desc">CNNs whose features rotate predictably with the input, using circular harmonic filters.</p>
+          </div>
+        </div>
+        <p class="sec__more"><a href="/publications.html">All publications and patents</a></p>
+      </section>
+
+      <section class="sec">
+        <h2><span class="n">2</span>Writing</h2>
+        <div class="post">
+          <p><a class="post__title" href="/blog/2026/02/hyper-dual-numbers/">Hyper-dual numbers and higher-order derivatives</a><span class="post__date">2026.02.21</span></p>
+          <p>Extending dual numbers with multiple independent infinitesimals gives a clean, recursive route to higher-order automatic differentiation, connecting to the labeled rooted trees of Faà di Bruno’s formula.</p>
+        </div>
+        <div class="post">
+          <p><a class="post__title" href="/blog/2023/11/rooted-trees-and-differentiation/">On rooted trees and differentiation</a><span class="post__date">2023.11.22</span></p>
+          <p>The chain rule for higher order derivatives boasts a wealth of beautiful mathematical structure touching special rooted trees, group theory, integer partitions and order theory.</p>
+        </div>
+        <div class="post">
+          <p><a class="post__title" href="/blog/2021/08/dual-numbers/">Dual numbers</a><span class="post__date">2021.08.09</span></p>
+          <p>A generalisation of the complex numbers where i² = 0. Evaluate a function at x + i and you can read off its derivative.</p>
+        </div>
+        <div class="post">
+          <p><a class="post__title" href="/blog/2020/12/reversible-optimisers/">Reversible optimisers</a><span class="post__date">2020.12.20</span></p>
+          <p>Reversibility is built into many modern neural optimisers, perhaps serendipitously.</p>
+        </div>
+        <div class="post">
+          <p><a class="post__title" href="/blog/2019/12/the-invention-of-randomness/">On the ‘invention’ of randomness</a><span class="post__date">2019.12.15</span></p>
+          <p>Jaynes essentially claims that randomness does not exist. After lecturing Bayesian statistics for two years, I felt confident in my understanding. It seems I was wrong.</p>
+        </div>
+        <p class="sec__more"><a href="/blog/">All posts</a></p>
+      </section>
+
+      <section class="sec">
+        <h2><span class="n">3</span>News</h2>
+        <div class="table-wrap">
+          <table class="booktabs">
+            <caption><b>Table 1:</b> Recent events, newest first.</caption>
+            <thead><tr><th>Date</th><th>Event</th></tr></thead>
+            <tbody>
+              <tr><td class="d">Oct 2026</td><td>I have left <a href="https://deepmind.google/"><b>Google DeepMind</b></a> and will be joining <a href="https://www.cusp.ai/"><b>CuspAI</b></a> as Digital Twins Lead on 1 December 2026.</td></tr>
+              <tr><td class="d">Sep 2025</td><td>New preprint: <a href="https://arxiv.org/abs/2509.14185">Discovery of Unstable Singularities</a>. <a href="https://deepmind.google/blog/discovering-new-solutions-to-century-old-problems-in-fluid-dynamics/">Blog</a> · <a href="https://www.quantamagazine.org/using-ai-mathematicians-find-hidden-glitches-in-fluid-equations-20260109/">Quanta</a> · <a href="https://www.tiktok.com/@fryrsquared/video/7556639162305105174">Hannah Fry</a></td></tr>
+              <tr><td class="d">2024</td><td>New preprint: <a href="https://openreview.net/forum?id=UsFJBqMBd7">Spectral Shaping for Neural PDE Surrogates</a>, with <a href="https://astroautomata.com/">M. Cranmer</a>, <a href="https://people.ece.uw.edu/kutz_nathan/">JN Kutz</a> and P. Battaglia.</td></tr>
+              <tr><td class="d">Apr 2023</td><td><a href="https://arxiv.org/abs/2203.02201">Neural Simulated Annealing</a> published at <a href="https://aistats.org/aistats2023/">AISTATS 2023</a>.</td></tr>
+              <tr><td class="d">Jul 2022</td><td>Lecturing at the PALMS 2022 Machine Learning Summer School.</td></tr>
+              <tr><td class="d">Apr 2022</td><td>Joined the Weather team at <a href="https://deepmind.google/">DeepMind</a> as a Senior Research Scientist.</td></tr>
+              <tr><td class="d">Mar 2021</td><td>Talk at the <a href="https://ellis.eu/events/ellis-symposium-workshop-on-geometric-deep-learning-for-medical-imaging">ELLIS Symposium on Geometric Deep Learning for Medical Imaging</a>: <i>Equivariance: Trends and Challenges</i>. <a href="https://www.youtube.com/watch?v=_A8Hbzhr0yc">Video</a></td></tr>
+              <tr><td class="d">Feb 2021</td><td>Talk at <a href="https://research.ibm.com/">IBM Research</a> on <i>Exploiting Symmetries for Deep Learning</i>.</td></tr>
+              <tr><td class="d">Sep 2020</td><td>Joined <a href="https://www.qualcomm.com/invention/artificial-intelligence/ai-research">Qualcomm AI Research</a> as a Staff Engineer.</td></tr>
+              <tr><td class="d">Aug 2020</td><td>Lectured at the <a href="https://mlss.telkomuniversity.ac.id/">Machine Learning Summer School Indonesia</a>.</td></tr>
+            </tbody>
+          </table>
         </div>
       </section>
 
-
-      <!-- ── Blog Posts (front & center) ─────────────────── -->
-      <section>
-        <div class="section-header">
-          <p class="section-header__label">Writing</p>
-          <h2 class="section-header__title">Blog</h2>
-          <div class="section-header__line"></div>
-        </div>
-
-        <div class="blog-grid">
-
-          <article class="blog-card">
-            <span class="blog-card__date">2026.02.21</span>
-            <h3 class="blog-card__title">
-              <a href="/blog/2026/02/hyper-dual-numbers/">Hyper-dual numbers and higher-order derivatives</a>
-            </h3>
-            <p class="blog-card__excerpt">
-              Extending dual numbers with multiple independent infinitesimals gives a clean,
-              recursive route to higher-order automatic differentiation, connecting to the
-              labeled rooted trees of Faà di Bruno's formula.
-            </p>
-            <div class="blog-card__tags">
-              <span class="blog-card__tag">automatic differentiation</span>
-              <span class="blog-card__tag">algebra</span>
-            </div>
-          </article>
-
-          <article class="blog-card">
-            <span class="blog-card__date">2023.11.22</span>
-            <h3 class="blog-card__title">
-              <a href="/blog/2023/11/rooted-trees-and-differentiation/">On rooted trees and differentiation</a>
-            </h3>
-            <p class="blog-card__excerpt">
-              The chain rule for higher order derivatives boasts a wealth of beautiful mathematical
-              structure touching the theory of special rooted trees, group theory, combinatorics of
-              integer partitions, order theory, and many others.
-            </p>
-            <div class="blog-card__tags">
-              <span class="blog-card__tag">differentiation</span>
-              <span class="blog-card__tag">algebra</span>
-            </div>
-          </article>
-
-          <article class="blog-card">
-            <span class="blog-card__date">2021.08.09</span>
-            <h3 class="blog-card__title">
-              <a href="/blog/2021/08/dual-numbers/">Dual numbers</a>
-            </h3>
-            <p class="blog-card__excerpt">
-              There is a generalisation of the complex numbers where i²=0 instead of i²=−1.
-              Functions extended to this dual number system have the curious property that we
-              can read off their derivatives if we evaluate them at the dual number x + i.
-            </p>
-            <div class="blog-card__tags">
-              <span class="blog-card__tag">automatic differentiation</span>
-              <span class="blog-card__tag">algebra</span>
-            </div>
-          </article>
-
-          <article class="blog-card">
-            <span class="blog-card__date">2020.12.20</span>
-            <h3 class="blog-card__title">
-              <a href="/blog/2020/12/reversible-optimisers/">Reversible optimisers</a>
-            </h3>
-            <p class="blog-card__excerpt">
-              Reversible neural architectures have been a popular research area in the last few years,
-              but reversibility is also built into many modern day neural optimisers, perhaps serendipitously.
-            </p>
-            <div class="blog-card__tags">
-              <span class="blog-card__tag">optimisation</span>
-              <span class="blog-card__tag">reversibility</span>
-            </div>
-          </article>
-
-          <article class="blog-card">
-            <span class="blog-card__date">2019.12.15</span>
-            <h3 class="blog-card__title">
-              <a href="/blog/2019/12/the-invention-of-randomness/">On the 'invention' of randomness</a>
-            </h3>
-            <p class="blog-card__excerpt">
-              Jaynes essentially claims that randomness simply does not exist. It is a human invention.
-              After lecturing a Bayesian statistics course for two years, I felt fairly confident in
-              my understanding — it seems I was wrong.
-            </p>
-            <div class="blog-card__tags">
-              <span class="blog-card__tag">probability</span>
-              <span class="blog-card__tag">bayesianism</span>
-              <span class="blog-card__tag">Jaynes</span>
-            </div>
-          </article>
-
+      <section class="sec">
+        <h2><span class="n">4</span>Career</h2>
+        <div class="table-wrap">
+          <table class="booktabs">
+            <caption><b>Table 2:</b> Positions held.</caption>
+            <thead><tr><th>Years</th><th>Position</th></tr></thead>
+            <tbody>
+              <tr><td class="d">Dec 2026 –</td><td><b>Digital Twins Lead</b>, <a href="https://www.cusp.ai/">CuspAI</a></td></tr>
+              <tr><td class="d">2022 – 2026</td><td><b>Senior Research Scientist</b>, Weather team, <a href="https://deepmind.google/">Google DeepMind</a>, London</td></tr>
+              <tr><td class="d">2020 – 2022</td><td><b>Staff Engineer</b>, Machine Learning for Combinatorial Optimization, <a href="https://www.qualcomm.com/invention/artificial-intelligence/ai-research">Qualcomm AI Research</a>, Amsterdam</td></tr>
+              <tr><td class="d">2018 – 2020</td><td><b>Postdoctoral Researcher</b>, <a href="https://amlab.science.uva.nl/">Amsterdam Machine Learning Lab</a>, <a href="https://www.uva.nl/en">University of Amsterdam</a>, with <a href="https://staff.fnwi.uva.nl/m.welling/">Max Welling</a>. Lectured Bayesian Statistics for ML; lab manager for the <a href="https://ivi.uva.nl/research/icai-labs">Philips Lab at UvA</a>.</td></tr>
+              <tr><td class="d">2014 – 2018</td><td><b>PhD in Computer Vision</b>, <a href="https://www.ucl.ac.uk/computer-science/">University College London</a>, with <a href="http://www0.cs.ucl.ac.uk/staff/G.Brostow/">Gabriel J. Brostow</a> and Dr Clare Wilson FRCOphth</td></tr>
+              <tr><td class="d">2010 – 2014</td><td><b>MEng Engineering</b>, <a href="https://www.sid.cam.ac.uk/">Sidney Sussex College</a>, <a href="https://www.cam.ac.uk/">University of Cambridge</a> (Scholar)</td></tr>
+            </tbody>
+          </table>
         </div>
       </section>
 
-
-      <!-- ── Latest News ─────────────────────────────────── -->
-      <section>
-        <div class="section-header">
-          <p class="section-header__label">Updates</p>
-          <h2 class="section-header__title">Latest News</h2>
-          <div class="section-header__line"></div>
-        </div>
-
-        <ul class="news-list">
-                    <li class="news-item">
-                        <div class="news-item__dot"></div>
-                        <span class="news-item__date">Oct 2026</span>
-                        <p class="news-item__text">I have left <strong>Google DeepMind</strong> and will be joining <strong>Cusp</strong>
-              as Lead of the Digital Twins team on 1 December 2026.</p>
-                    </li>
-          <li class="news-item">
-            <div class="news-item__dot"></div>
-            <span class="news-item__date">Sep 2025</span>
-            <p class="news-item__text">New preprint: <a href="https://arxiv.org/abs/2509.14185"
-                target="_blank"><strong>Discovery of Unstable Singularities</strong></a>. <a
-                href="https://deepmind.google/blog/discovering-new-solutions-to-century-old-problems-in-fluid-dynamics/"
-                target="_blank">Blog →</a> · <a
-                href="https://www.quantamagazine.org/using-ai-mathematicians-find-hidden-glitches-in-fluid-equations-20260109/"
-                target="_blank">Quanta →</a></p>
-          </li>
-          <li class="news-item">
-            <div class="news-item__dot"></div>
-            <span class="news-item__date">2024</span>
-            <p class="news-item__text">New preprint: <a href="https://openreview.net/forum?id=UsFJBqMBd7"
-                target="_blank"><strong>Spectral Shaping for Neural PDE Surrogates</strong></a>, with M. Cranmer, JN
-              Kutz, and P. Battaglia.</p>
-          </li>
-          <li class="news-item">
-            <div class="news-item__dot"></div>
-            <span class="news-item__date">Apr 2023</span>
-            <p class="news-item__text"><a href="https://arxiv.org/abs/2203.02201" target="_blank"><strong>Neural
-                  Simulated Annealing</strong></a> published at <strong>AISTATS 2023</strong>.</p>
-          </li>
-          <li class="news-item">
-            <div class="news-item__dot"></div>
-            <span class="news-item__date">Jul 2022</span>
-            <p class="news-item__text">Lecturing at <strong>PALMS 2022</strong> Machine Learning Summer School.</p>
-          </li>
-          <li class="news-item">
-            <div class="news-item__dot"></div>
-            <span class="news-item__date">Apr 2022</span>
-            <p class="news-item__text">Joined the Structured Intelligence Team at <a href="https://deepmind.google/"
-                target="_blank">DeepMind</a> as a <strong>Senior Research Scientist</strong>.</p>
-          </li>
-          <li class="news-item">
-            <div class="news-item__dot"></div>
-            <span class="news-item__date">Mar 2021</span>
-            <p class="news-item__text">Talk at <a
-                href="https://ellis.eu/events/ellis-symposium-workshop-on-geometric-deep-learning-for-medical-imaging"
-                target="_blank">ELLIS Symposium on Geometric Deep Learning for Medical Imaging</a> — <em>Equivariance:
-                Trends and Challenges</em>. <a href="https://www.youtube.com/watch?v=_A8Hbzhr0yc" target="_blank">Watch
-                →</a></p>
-          </li>
-          <li class="news-item">
-            <div class="news-item__dot"></div>
-            <span class="news-item__date">Feb 2021</span>
-            <p class="news-item__text">Talk at <strong>IBM Research</strong> on <em>Exploiting Symmetries for Deep
-                Learning</em>.</p>
-          </li>
-          <li class="news-item">
-            <div class="news-item__dot"></div>
-            <span class="news-item__date">Sep 2020</span>
-            <p class="news-item__text">Joined <a
-                href="https://www.qualcomm.com/invention/artificial-intelligence/ai-research" target="_blank">Qualcomm
-                AI Research</a> as a <strong>Staff Engineer</strong>.</p>
-          </li>
-          <li class="news-item">
-            <div class="news-item__dot"></div>
-            <span class="news-item__date">Aug 2020</span>
-            <p class="news-item__text">Lectured at the <a href="https://mlss.telkomuniversity.ac.id/"
-                target="_blank">Machine Learning Summer School Indonesia</a>.</p>
-          </li>
+      <section class="sec">
+        <h2><span class="n">5</span>Previous masters students</h2>
+        <ul class="students">
+        <li>Alessandra van Ree <span>· Neural PDE Solvers</span></li>
+        <li>Eli de Smet <span>· Saddle-Free Newton Descent</span></li>
+        <li>Jan Huiskes <span>· Fast Fourier Transform Neural Networks</span></li>
+        <li>Rob Hesselink <span>· Contrastive Equivariant Representations</span></li>
+        <li>Vivian van Oijen <span>· Esophageal Histopathology</span></li>
+        <li><a href="https://scholar.google.com/citations?user=bcIqaJwAAAAJ">Bryan Cardenas</a> <span>· Esophageal Histopathology</span></li>
+        <li><a href="https://scholar.google.com/citations?user=PzFBuiIAAAAJ">Christina Winkler</a> <span>· Conditional Normalizing Flows</span></li>
+        <li><a href="https://twitter.com/diacon995">Nichita Diaconu</a> <span>· Learning Convolutions</span></li>
+        <li>Jonas M J Braun <span>· Non-geometric Equivariance</span></li>
+        <li><a href="https://twitter.com/mfournarakis">Marios Fournarakis</a> <span>· Equivariance for Tracking</span></li>
+        <li><a href="https://github.com/tychovdo/">Tycho van der Ouderaa</a> <span>· Reversible Networks for Medical Imaging</span></li>
+        <li><a href="https://sakishinoda.github.io/">Saki Shinoda</a> <span>· Semi-supervised Learning</span></li>
         </ul>
-      </section>
-
-
-      <!-- ── Bio ─────────────────────────────────────────── -->
-      <section>
-        <div class="section-header">
-          <p class="section-header__label">Background</p>
-          <h2 class="section-header__title">Bio</h2>
-          <div class="section-header__line"></div>
-        </div>
-
-        <div class="bio-grid">
-          <div class="bio-card">
-            <p class="bio-card__years">Dec 2026 —</p>
-            <h3 class="bio-card__title">Lead, Digital Twins Team</h3>
-            <p class="bio-card__desc">Cusp</p>
-          </div>
-          <div class="bio-card">
-            <p class="bio-card__years">2022 — 2026</p>
-            <h3 class="bio-card__title">Senior Research Scientist</h3>
-            <p class="bio-card__desc">Structured Intelligence Team, Google DeepMind, London</p>
-          </div>
-          <div class="bio-card">
-            <p class="bio-card__years">2020 — 2022</p>
-            <h3 class="bio-card__title">Staff Engineer</h3>
-            <p class="bio-card__desc">Machine Learning for Combinatorial Optimization, Qualcomm AI Research, Amsterdam
-            </p>
-          </div>
-          <div class="bio-card">
-            <p class="bio-card__years">2018 — 2020</p>
-            <h3 class="bio-card__title">Postdoctoral Researcher</h3>
-            <p class="bio-card__desc">Amsterdam Machine Learning Lab with Max Welling. Lectured Bayesian Statistics for
-              ML. Lab manager for Philips Lab at UvA.</p>
-          </div>
-          <div class="bio-card">
-            <p class="bio-card__years">2014 — 2018</p>
-            <h3 class="bio-card__title">PhD in Computer Vision</h3>
-            <p class="bio-card__desc">University College London with Gabriel J. Brostow and Dr. Clare Wilson FRCOphth.
-            </p>
-          </div>
-          <div class="bio-card">
-            <p class="bio-card__years">2010 — 2014</p>
-            <h3 class="bio-card__title">MEng Engineering</h3>
-            <p class="bio-card__desc">Sidney Sussex College, University of Cambridge (Scholar).</p>
-          </div>
-        </div>
-      </section>
-
-
-      <!-- ── Previous Students ───────────────────────────── -->
-      <section>
-        <div class="section-header">
-          <p class="section-header__label">Mentoring</p>
-          <h2 class="section-header__title">Previous Masters Students</h2>
-          <div class="section-header__line"></div>
-        </div>
-
-        <div class="students-grid">
-          <div class="student-item">
-            <p class="student-item__name">Alessandra van Ree</p>
-            <p class="student-item__topic">Neural PDE Solvers</p>
-          </div>
-          <div class="student-item">
-            <p class="student-item__name">Eli de Smet</p>
-            <p class="student-item__topic">Saddle-Free Newton Descent</p>
-          </div>
-          <div class="student-item">
-            <p class="student-item__name">Jan Huiskes</p>
-            <p class="student-item__topic">Fast Fourier Transform Neural Networks</p>
-          </div>
-          <div class="student-item">
-            <p class="student-item__name">Rob Hesselink</p>
-            <p class="student-item__topic">Contrastive Equivariant Representations</p>
-          </div>
-          <div class="student-item">
-            <p class="student-item__name">Vivian van Oijen</p>
-            <p class="student-item__topic">Esophageal Histopathology</p>
-          </div>
-          <div class="student-item">
-            <p class="student-item__name"><a href="https://scholar.google.com/citations?user=bcIqaJwAAAAJ"
-                target="_blank">Bryan Cardenas</a></p>
-            <p class="student-item__topic">Esophageal Histopathology</p>
-          </div>
-          <div class="student-item">
-            <p class="student-item__name"><a href="https://scholar.google.com/citations?user=PzFBuiIAAAAJ"
-                target="_blank">Christina Winkler</a></p>
-            <p class="student-item__topic">Conditional Normalizing Flows</p>
-          </div>
-          <div class="student-item">
-            <p class="student-item__name"><a href="https://twitter.com/diacon995" target="_blank">Nichita Diaconu</a>
-            </p>
-            <p class="student-item__topic">Learning Convolutions</p>
-          </div>
-          <div class="student-item">
-            <p class="student-item__name">Jonas M J Braun</p>
-            <p class="student-item__topic">Non-geometric Equivariance</p>
-          </div>
-          <div class="student-item">
-            <p class="student-item__name"><a href="https://twitter.com/mfournarakis" target="_blank">Marios
-                Fournarakis</a></p>
-            <p class="student-item__topic">Equivariance for Tracking</p>
-          </div>
-          <div class="student-item">
-            <p class="student-item__name"><a href="https://github.com/tychovdo/" target="_blank">Tycho van der
-                Ouderaa</a></p>
-            <p class="student-item__topic">Reversible Networks for Medical Imaging</p>
-          </div>
-          <div class="student-item">
-            <p class="student-item__name"><a href="https://sakishinoda.github.io/" target="_blank">Saki Shinoda</a></p>
-            <p class="student-item__topic">Semi-supervised Learning</p>
-          </div>
-        </div>
       </section>
 
     </div>
   </main>
 
-
-  <!-- ── Footer ──────────────────────────────────────────── -->
   <footer class="footer">
     <div class="container">
-      <div class="footer__links">
-        <a href="https://scholar.google.com/citations?user=613GPbQAAAAJ&hl=en" target="_blank">Google Scholar</a>
-        <a href="https://github.com/danielewworrall" target="_blank">GitHub</a>
-        <a href="https://x.com/danielewworrall" target="_blank">Twitter</a>
-        <a href="https://www.linkedin.com/in/daniel-worrall-46a43238/" target="_blank">LinkedIn</a>
-      </div>
-      <p class="footer__text">© 2026 Daniel Worrall</p>
+      <span>Daniel Worrall · Updated October 2026</span>
+      <span class="footer__links">
+        <a href="https://scholar.google.com/citations?user=613GPbQAAAAJ&amp;hl=en">Scholar</a>
+        <a href="https://github.com/danielewworrall">GitHub</a>
+        <a href="https://x.com/danielewworrall">Twitter</a>
+        <a href="https://www.linkedin.com/in/daniel-worrall-46a43238/">LinkedIn</a>
+      </span>
     </div>
   </footer>
 
-  <script src="script.js"></script>
+  <script src="/script.js"></script>
 </body>
 
 </html>
