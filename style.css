@@ -44,15 +44,15 @@
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #17181b; --fg: #e8e6e1; --muted: #a9a7a1; --rule: #d8d6d0; --hairline: #2e3034;
-    --link: #9bbcff; --highlight: #2a2618; --code-bg: #222327; --code-comment: #8b949e; --code-keyword: #f0a0d8; --code-string: #9fd89f; --code-number: #f2b880; --code-function: #9bbcff; --code-builtin: #c8a8ff; --code-punct: #c4c2bc;
+    --bg: #202124; --fg: #d6d4ce; --muted: #9a988f; --rule: #8c8a84; --hairline: #34363a;
+    --link: #a8c4f0; --highlight: #2b2a22; --code-bg: #27292c; --code-comment: #868b91; --code-keyword: #e0a2cf; --code-string: #a3cf9f; --code-number: #e3b688; --code-function: #a8c4f0; --code-builtin: #c3aeea; --code-punct: #b8b6b0;
    
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #17181b; --fg: #e8e6e1; --muted: #a9a7a1; --rule: #d8d6d0; --hairline: #2e3034;
-  --link: #9bbcff; --highlight: #2a2618; --code-bg: #222327; --code-comment: #8b949e; --code-keyword: #f0a0d8; --code-string: #9fd89f; --code-number: #f2b880; --code-function: #9bbcff; --code-builtin: #c8a8ff; --code-punct: #c4c2bc;
+  --bg: #202124; --fg: #d6d4ce; --muted: #9a988f; --rule: #8c8a84; --hairline: #34363a;
+  --link: #a8c4f0; --highlight: #2b2a22; --code-bg: #27292c; --code-comment: #868b91; --code-keyword: #e0a2cf; --code-string: #a3cf9f; --code-number: #e3b688; --code-function: #a8c4f0; --code-builtin: #c3aeea; --code-punct: #b8b6b0;
  
   color-scheme: dark;
 }
@@ -263,6 +263,10 @@ h1.section-header__title { font-size: 2.1rem; }
 
 /* Wide maths scrolls inside its own box instead of the page */
 mjx-container[display="true"] { overflow-x: auto; overflow-y: hidden; max-width: 100%; padding-block: 2px; }
+
+/* Dim photos and figures a little in dark mode */
+:root[data-theme="dark"] img { filter: brightness(.88); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) img { filter: brightness(.88); } }
 
 /* Invert black-on-white diagrams in dark mode */
 :root[data-theme="dark"] .blog-post__content img[src$=".svg"] { filter: invert(0.9); }
