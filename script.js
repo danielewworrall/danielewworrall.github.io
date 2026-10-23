@@ -115,3 +115,48 @@
     })
     .catch(() => { }); // fail silently
 })();
+
+// ── Reading Time and Views (blog posts) ──────────────────────
+// Reading time from the post's word count, at about 230 words a minute.
+(function addReadingTime() {
+  const content = document.querySelector('.blog-post__content');
+  const meta = document.querySelector('.blog-post__meta');
+  if (!content || !meta) return;
+  const copy = content.cloneNode(true);
+  copy.querySelectorAll('pre, script, style').forEach(el => el.remove());
+  const words = copy.textContent.split(/\s+/).filter(Boolean).length;
+  const span = document.createElement('span');
+  span.className = 'blog-post__reading-time';
+  span.textContent = `${Math.max(1, Math.round(words / 230))} min read`;
+  const time = meta.querySelector('time');
+  time ? time.after(span) : meta.prepend(span);
+})();
+
+// ── Page Views (GoatCounter) ─────────────────────────────────
+// Cookie-free counts at https://danielewworrall.goatcounter.com. Only the
+// live site counts, never the password-protected drafts. Posts show their
+// own total once "allow adding visitor counts" is on in GoatCounter.
+(function goatCounter() {
+  const GC = 'https://danielewworrall.goatcounter.com';
+  const path = window.location.pathname;
+  if (window.location.hostname !== 'danielewworrall.github.io' || path.startsWith('/drafts/')) return;
+  const s = document.createElement('script');
+  s.async = true;
+  s.src = 'https://gc.zgo.at/count.js';
+  s.dataset.goatcounter = `${GC}/count`;
+  document.body.appendChild(s);
+
+  const meta = document.querySelector('.blog-post__meta');
+  if (!meta) return;
+  fetch(`${GC}/counter/${encodeURIComponent(path)}.json`)
+    .then(r => (r.ok ? r.json() : null))
+    .then(data => {
+      if (!data || !data.count) return;
+      const span = document.createElement('span');
+      span.className = 'blog-post__views';
+      span.textContent = `${data.count} ${data.count === '1' ? 'view' : 'views'}`;
+      const after = meta.querySelector('.blog-post__reading-time') || meta.querySelector('time');
+      after ? after.after(span) : meta.append(span);
+    })
+    .catch(() => { }); // fail silently
+})();
