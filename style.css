@@ -180,7 +180,11 @@ h1.section-header__title { font-size: 2.1rem; }
 .pub-card__authors { font-size: .95rem; }
 .pub-card__venue { font-size: .95rem; font-style: italic; }
 .pub-card__links { font: 14px var(--sans); display: flex; flex-wrap: wrap; gap: 2px 14px; margin-top: 2px; }
-.pub-card__cite-badge { color: var(--muted); }
+.pub-intro { color: var(--muted); max-width: 600px; }
+.pub-list .paper { grid-template-columns: 150px minmax(0, 1fr); gap: 20px; padding-block: 12px; }
+.pub-year-divider + .paper { border-top: 0; }
+.paper__fig.paper__fig--none { background: none; }
+.paper__cites { color: var(--muted); }
 .pub-year-divider { font-weight: 700; font-size: 1.15rem; margin: 18px 0 2px; border-bottom: 1.6px solid var(--rule); padding-bottom: 2px; }
 
 /* ── Talks ────────────────────────────────────────────────── */
@@ -285,6 +289,8 @@ mjx-container[display="true"] { overflow-x: auto; overflow-y: hidden; max-width:
   .paper__fig { max-width: 240px; }
   .paper--hl { padding-inline: 10px; }
   .paper--hl .paper__fig { margin-left: 0; }
+  .pub-list .paper { grid-template-columns: 1fr; }
+  .paper__fig--none { display: none; }
   .students { grid-template-columns: 1fr; }
   .pub-grid { grid-template-columns: 1fr; }
   .talk-card { grid-template-columns: 1fr; }
