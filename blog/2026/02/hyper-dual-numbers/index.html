@@ -258,8 +258,8 @@ Dual(Dual(Dual(3,1), Dual(1,0)),
                         but only 3 distinct values ($x$, $1$, $0$). After evaluation,
                         <code>result.primal.tangent</code> and <code>result.tangent.primal</code>
                         both store $f'(x)$. The two $i_1$ and $i_2$ channels carry
-                        duplicate information. At order $n$ we are hauling $2^n$ components
-                        when only $n+1$ are distinct. We will return to this
+                        duplicate information. At order $K$ we are hauling $2^K$ components
+                        when only $K+1$ are distinct. We will return to this
                         <a href="#truncated-polynomials">below</a>.
                     </p>
 
@@ -314,11 +314,11 @@ print(f"tan'''(2) = {result.tangent.tangent.tangent:.4f}")  # 176.9645</code></p
 
                     <h2>The general pattern</h2>
 
-                    <p>For the $n$th derivative we nest $n$ layers, each with its own infinitesimal
-                        $i_1, \ldots, i_n$ ($i_k^2 = 0$). The seed is $x + i_1 + \cdots + i_n$ and
-                        the $n$th derivative lives in the coefficient of $i_1 i_2 \cdots i_n$.</p>
+                    <p>For the $K$th derivative we nest $K$ layers, each with its own infinitesimal
+                        $i_1, \ldots, i_K$ ($i_k^2 = 0$). The seed is $x + i_1 + \cdots + i_K$ and
+                        the $K$th derivative lives in the coefficient of $i_1 i_2 \cdots i_K$.</p>
 
-                    <p>There are $2^n$ components in total, one per subset of $\{1, \ldots, n\}$.
+                    <p>There are $2^K$ components in total, one per subset of $\{1, \ldots, K\}$.
                         But most of them are redundant! Recall the second-derivative expansion:</p>
 
                     $$
@@ -329,8 +329,8 @@ print(f"tan'''(2) = {result.tangent.tangent.tangent:.4f}")  # 176.9645</code></p
                     $$
 
                     <p>The $i_1$ and $i_2$ components both store ${\color{#5b9bd5}f'(x)}$: the same value
-                        twice. In general, all $\binom{n}{k}$ subsets of size $k$
-                        store $f^{(k)}(x)/k!$. So of the $2^n$ components, only $n+1$ are
+                        twice. In general, all $\binom{K}{k}$ subsets of size $k$
+                        store $f^{(k)}(x)/k!$. So of the $2^K$ components, only $K+1$ are
                         distinct.</p>
 
                     <h2 id="truncated-polynomials">Exploiting the symmetry</h2>
@@ -347,17 +347,17 @@ print(result.tangent.primal)  # f'(x) via i₁  — same value!</code></pre>
                     <p>This is not a mathematical issue. Both components <em>must</em> agree by
                         the permutation symmetry of the infinitesimals. It is an implementational
                         one: we are doing redundant work. The <em>truncated polynomial algebra</em>
-                        exploits this. Instead of $n$ independent infinitesimals, use a <em>single</em>
-                        one with the relaxed condition $i^{n+1} = 0$. A number is now just an
-                        $(n+1)$-tuple:</p>
+                        exploits this. Instead of $K$ independent infinitesimals, use a <em>single</em>
+                        one with the relaxed condition $i^{K+1} = 0$. A number is now just an
+                        $(K+1)$-tuple:</p>
 
                     $$
                     f(x + i) = f(x) + i\,f'(x) + \frac{i^2}{2!}\,f''(x) + \cdots
-                    + \frac{i^n}{n!}\,f^{(n)}(x).
+                    + \frac{i^K}{K!}\,f^{(K)}(x).
                     $$
 
-                    <p>This is $n+1$ components instead of $2^n$, a massive saving. Multiplication
-                        becomes polynomial convolution truncated at degree $n$, costing $O(n^2)$
+                    <p>This is $K+1$ components instead of $2^K$, a massive saving. Multiplication
+                        becomes polynomial convolution truncated at degree $K$, costing $O(K^2)$
                         per primitive evaluation. In practice, most common primitives ($\exp$, $\sin$,
                         $\tan$, etc.) have the nice property that higher-order derivatives can
                         be expressed in terms of lower-order ones. For instance, $\tan'(x) = 1 + \tan^2(x)$,
@@ -367,8 +367,8 @@ print(result.tangent.primal)  # f'(x) via i₁  — same value!</code></pre>
 
                     <p>To summarise: nested dual numbers build higher-order differentiation
                         from the first-order algebra alone, with no new rules, just nesting. Conceptually
-                        the cleanest, but $2^n$ scaling. Truncated
-                        polynomials collapse the redundancy to $n+1$ scaling, at the cost of
+                        the cleanest, but $2^K$ scaling. Truncated
+                        polynomials collapse the redundancy to $K+1$ scaling, at the cost of
                         dedicated higher-order rules per primitive.</p>
 
                     <h2>The connection to rooted trees</h2>
